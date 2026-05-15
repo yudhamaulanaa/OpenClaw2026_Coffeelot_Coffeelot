@@ -122,4 +122,7 @@ Submission materials now explicitly identify OpenClaw as the main AI agent runti
 ## Latest update — Uploaded Final PDF Report
 
 The final user-provided PDF report has replaced the generated placeholder PDF at `docs/reports/OpenClaw2026_Coffeelot_Coffeelot.pdf` for submission.
+## Latest update — Backend Structure Cleanup
+
+Backend API structure has been cleaned up by moving CORS helpers, DOKU callback security helpers, and payment/stock/reconciliation operations out of `apps/api/src/index.ts` into focused modules. API contracts remain unchanged.
 

@@ -784,4 +784,10 @@
 ## 2026-05-15 — Uploaded Final PDF Report
 
 - Replaced the generated placeholder PDF with the user-provided final report PDF at `docs/reports/OpenClaw2026_Coffeelot_Coffeelot.pdf`.
+## 2026-05-15 — Backend Structure Cleanup
+
+- Extracted API CORS handling into `apps/api/src/http.ts`.
+- Extracted DOKU callback signature/JSON parsing helpers into `apps/api/src/doku-callback-security.ts`.
+- Extracted paid-payment, stock deduction, agent event trigger, and payment reconciliation operations into `apps/api/src/payment-ops.ts`.
+- Kept API route contracts unchanged while reducing `apps/api/src/index.ts` size and responsibilities.
 

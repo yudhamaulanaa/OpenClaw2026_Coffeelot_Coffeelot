@@ -219,4 +219,9 @@
 ## Completed — Uploaded Final PDF Report
 
 - [x] Add the user-provided final PDF report to the repository using the required submission filename.
+## Completed — Backend Structure Cleanup
+
+- [x] Extract CORS helper from API index.
+- [x] Extract DOKU callback signature/security helpers.
+- [x] Extract payment paid-flow, stock deduction, reconciliation, and paid-order agent trigger helpers.
 
