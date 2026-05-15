@@ -1,5 +1,26 @@
 # Coffeelot — Changelog
 
+## [DOKU Payment Reconciliation] — 2026-05-15
+
+### Added
+
+- Added DOKU MCP transaction status lookup by invoice using `get_transaction_by_invoice_number`.
+- Added manual reconciliation endpoint `POST /api/payments/:id/reconcile`.
+- Added pending-payment reconciliation endpoint `POST /api/payments/reconcile-pending`.
+- Added API worker polling for pending DOKU payments every 60 seconds by default, configurable with `PAYMENT_RECONCILE_INTERVAL_MS` and `PAYMENT_RECONCILE_ENABLED`.
+
+### Changed
+
+- Successful DOKU reconcile now updates payment status to `paid`, sets `paidAt`, stores the provider response safely, and marks the linked order as paid in one transaction.
+- Existing callback path now uses the same paid-status update helper as reconciliation.
+
+### Verification
+
+- `bun run typecheck` passes.
+- `bun run build` passes.
+- `coffeelot-api` restarted successfully and is active.
+- Manual reconciliation synced sandbox VA payments `CLT-20260515-8045` and `CLT-20260515-0087` from DOKU `SUCCESS` to local `paid`.
+
 ## [DOKU MCP Sandbox Integration] — 2026-05-15
 
 ### Added

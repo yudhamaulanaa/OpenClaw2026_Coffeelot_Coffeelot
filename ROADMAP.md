@@ -98,6 +98,9 @@ Integrate DOKU MCP Server untuk payment processing.
 - [x] Real DOKU MCP sandbox tool discovery using runtime credentials
 - [x] QRIS payment creation through DOKU MCP sandbox
 - [x] BCA Virtual Account payment creation through DOKU MCP sandbox
+- [x] Fallback payment reconciliation/polling via DOKU MCP invoice status
+- [x] Manual payment reconciliation endpoint
+- [x] Reconciled DOKU `SUCCESS` → local payment paid + order paid
 - [ ] Callback signature/security validation
 - [ ] Payment confirmation → trigger stock deduction
 

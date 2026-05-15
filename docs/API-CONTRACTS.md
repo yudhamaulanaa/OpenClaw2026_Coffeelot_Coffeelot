@@ -440,7 +440,7 @@ Create payment for an order via DOKU. In sandbox, Coffeelot calls the DOKU MCP S
 
 ### GET /api/payments/:id/status
 
-Check payment status (polls DOKU).
+Check local payment status. Expired pending payments are marked expired when read.
 
 **Response 200:**
 ```json
@@ -450,6 +450,31 @@ Check payment status (polls DOKU).
   "paid_at": "ISO8601 | null"
 }
 ```
+
+
+### POST /api/payments/:id/reconcile
+
+Manually reconcile one payment against DOKU MCP by invoice number. This is safe for admin/internal use when webhook delivery is delayed.
+
+**Response 200:**
+```json
+{
+  "updated": true,
+  "payment": { "id": "uuid", "status": "paid", "paidAt": "ISO8601" },
+  "provider": { "invoiceNumber": "CLT-...", "status": "paid", "providerStatus": "SUCCESS" }
+}
+```
+
+### POST /api/payments/reconcile-pending
+
+Reconcile pending DOKU payments in batch. The API service also runs this as a polling worker every 60 seconds by default.
+
+**Query params:**
+- `limit` optional, default `20`, max `50`.
+
+**Runtime config:**
+- `PAYMENT_RECONCILE_ENABLED=false` disables the worker.
+- `PAYMENT_RECONCILE_INTERVAL_MS=60000` controls the worker interval.
 
 ### POST /api/payments/callback
 

@@ -64,8 +64,11 @@
 - [x] Verify sandbox QRIS payment creation via MCP
 - [x] Verify sandbox BCA Virtual Account payment creation via MCP
 - [x] Harden invalid callback handling to return clear 4xx errors instead of generic 500
+- [x] Add fallback DOKU MCP reconciliation/polling for pending payments
+- [x] Add manual payment reconciliation endpoint
+- [x] Sync DOKU `SUCCESS` status to local paid payment/order state
 - [ ] Add callback signature/security validation
-- [ ] Payment confirmation → order paid + stock deduction transaction
+- [ ] Payment confirmation → stock deduction transaction
 - [ ] Verify sandbox end-to-end payment callback flow
 
 ## Later

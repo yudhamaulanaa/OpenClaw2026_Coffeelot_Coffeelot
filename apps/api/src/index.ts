@@ -4,6 +4,7 @@ import { resolveTenantContext } from "./context";
 import { prisma } from "./db";
 import { ApiError, statusFromError, toErrorEnvelope } from "./errors";
 import { createDokuMcpPayment, listDokuMcpTools } from "./doku-mcp";
+import { getDokuTransactionStatus } from "./payment-reconciliation";
 import { createSandboxPayment, normalizePaymentStatus } from "./payments";
 
 const port = Number(process.env.API_PORT ?? 3001);
@@ -33,6 +34,66 @@ function applyCors(origin: string | null, set: { headers?: Record<string, unknow
     "access-control-max-age": "86400",
     vary: "Origin",
   };
+}
+
+type PaymentRecord = Awaited<ReturnType<typeof prisma.payment.findFirstOrThrow>>;
+
+async function markPaymentFromProviderStatus(payment: PaymentRecord, status: string, rawResponse: unknown) {
+  const paidAt = status === "paid" ? new Date() : payment.paidAt;
+  return prisma.$transaction(async (tx) => {
+    const updatedPayment = await tx.payment.update({
+      where: { id: payment.id },
+      data: {
+        status,
+        paidAt,
+        rawResponse: JSON.stringify(rawResponse),
+      },
+    });
+
+    if (status === "paid") {
+      await tx.order.update({
+        where: { id: payment.orderId },
+        data: { orderStatus: "paid" },
+      });
+    }
+
+    return updatedPayment;
+  });
+}
+
+async function reconcilePayment(payment: PaymentRecord) {
+  const invoice = payment.dokuInvoiceId;
+  if (!invoice) throw new ApiError("INVALID_PAYLOAD", "Payment does not have a DOKU invoice reference", 400);
+
+  const provider = await getDokuTransactionStatus(invoice);
+  const shouldUpdate = payment.status !== provider.status || (provider.status === "paid" && !payment.paidAt);
+  const updated = shouldUpdate
+    ? await markPaymentFromProviderStatus(payment, provider.status, { source: "doku-mcp-reconcile", provider })
+    : payment;
+
+  return { payment: updated, provider, updated: shouldUpdate };
+}
+
+async function reconcilePendingPayments(limit = 20) {
+  const payments = await prisma.payment.findMany({
+    where: {
+      status: "pending",
+      dokuInvoiceId: { not: null },
+      expiredAt: { gte: new Date(Date.now() - 24 * 60 * 60 * 1000) },
+    },
+    orderBy: { createdAt: "asc" },
+    take: limit,
+  });
+
+  const results = [];
+  for (const payment of payments) {
+    try {
+      results.push({ id: payment.id, ...(await reconcilePayment(payment)) });
+    } catch (error) {
+      results.push({ id: payment.id, error: error instanceof Error ? error.message : "Unknown reconcile error" });
+    }
+  }
+  return results;
 }
 
 export const app = new Elysia({ prefix: "/api" })
@@ -433,6 +494,16 @@ export const app = new Elysia({ prefix: "/api" })
     }
     return { id: payment.id, status: payment.status, paid_at: payment.paidAt };
   })
+  .post("/payments/:id/reconcile", async ({ headers, params }) => {
+    const { tenantId, outletId } = resolveTenantContext(headers);
+    const payment = await prisma.payment.findFirstOrThrow({ where: { id: params.id, tenantId, outletId } });
+    return reconcilePayment(payment);
+  })
+  .post("/payments/reconcile-pending", async ({ query }) => {
+    const limit = Math.min(Number(query.limit ?? 20), 50);
+    const results = await reconcilePendingPayments(limit);
+    return { ok: true, count: results.length, results };
+  })
   .post(
     "/payments/callback",
     async ({ body }) => {
@@ -456,20 +527,7 @@ export const app = new Elysia({ prefix: "/api" })
       });
       if (!payment) throw new ApiError("PAYMENT_NOT_FOUND", "Payment not found for callback reference", 404);
 
-      const updated = await prisma.$transaction(async (tx) => {
-        const paidAt = status === "paid" ? new Date() : null;
-        const updatedPayment = await tx.payment.update({
-          where: { id: payment.id },
-          data: { status, paidAt, rawResponse: JSON.stringify(body) },
-        });
-        if (status === "paid") {
-          await tx.order.update({
-            where: { id: payment.orderId },
-            data: { orderStatus: "paid", invoiceNumber: payment.orderId.startsWith("CLT-") ? undefined : `CLT-${new Date().toISOString().slice(0, 10).replaceAll("-", "")}-${Math.floor(Math.random() * 10_000).toString().padStart(4, "0")}` },
-          });
-        }
-        return updatedPayment;
-      });
+      const updated = await markPaymentFromProviderStatus(payment, status, { source: "doku-callback", body });
 
       return { ok: true, payment: updated };
     },
@@ -528,3 +586,17 @@ export const app = new Elysia({ prefix: "/api" })
 
 app.listen({ hostname: host, port });
 console.log(`Coffeelot API listening on http://${host}:${port}`);
+
+const reconcileIntervalMs = Number(process.env.PAYMENT_RECONCILE_INTERVAL_MS ?? 60_000);
+const reconcileEnabled = process.env.PAYMENT_RECONCILE_ENABLED !== "false";
+if (reconcileEnabled && reconcileIntervalMs > 0) {
+  setInterval(async () => {
+    try {
+      const results = await reconcilePendingPayments(20);
+      const updated = results.filter((result) => "updated" in result && result.updated).length;
+      if (updated > 0) console.log(`Payment reconciliation updated ${updated} payment(s)`);
+    } catch (error) {
+      console.error("Payment reconciliation failed", error instanceof Error ? error.message : error);
+    }
+  }, reconcileIntervalMs).unref();
+}

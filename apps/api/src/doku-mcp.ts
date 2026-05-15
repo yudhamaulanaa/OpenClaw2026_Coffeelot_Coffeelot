@@ -93,6 +93,18 @@ async function callMcpRpc<T = unknown>(method: string, params: Record<string, un
   return rpc.result as T;
 }
 
+export async function callDokuMcpTool(name: string, toolRequest: Record<string, unknown>) {
+  if (!protocolVersion) await initializeDokuMcp();
+  return callMcpRpc(
+    "tools/call",
+    {
+      name,
+      arguments: { toolRequest },
+    },
+    Date.now(),
+  );
+}
+
 export async function initializeDokuMcp() {
   const result = await callMcpRpc<{ protocolVersion?: string; serverInfo?: unknown }>("initialize", {}, 0);
   protocolVersion = result.protocolVersion ?? protocolVersion;

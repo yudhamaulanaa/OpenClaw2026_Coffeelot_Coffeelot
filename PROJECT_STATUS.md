@@ -14,7 +14,7 @@ Milestone 3 — Backend Foundation is complete and merged to `main`.
 
 Milestone 4 — Built-in POS / Order Channels MVP foundation is complete and merged to `main`.
 
-Milestone 5 — DOKU Payment Integration is in progress on branch `feat/doku-mcp-integration`: sandbox placeholder payment creation, status polling, callback handling, and POS payment link/QR/VA display are implemented. The public deployment serves `https://coffeelot.app` and `https://api.coffeelot.app`; frontend API calls use the public API origin and backend CORS allows the app origin. DOKU MCP sandbox discovery now works against the real endpoint, and payment creation has been verified for QRIS and BCA Virtual Account sandbox tools with runtime-only credentials. Next target: callback signature/security validation and paid-order stock deduction hardening.
+Milestone 5 — DOKU Payment Integration is in progress on branch `feat/doku-payment-reconciliation`: sandbox placeholder payment creation, status polling, callback handling, and POS payment link/QR/VA display are implemented. The public deployment serves `https://coffeelot.app` and `https://api.coffeelot.app`; frontend API calls use the public API origin and backend CORS allows the app origin. DOKU MCP sandbox discovery and payment creation are verified for QRIS, DOKU Checkout, and BCA Virtual Account paths with runtime-only credentials. Fallback reconciliation/polling is implemented and has synced paid sandbox VA transactions from DOKU `SUCCESS` to local `paid`. Next target: callback signature/security validation and stock deduction hardening.
 
 Roadmap and docs are updated with the latest MVP direction:
 
@@ -40,10 +40,11 @@ Keep `.md` files updated as part of the work, not afterthoughts:
 Continue Milestone 5 in this order:
 
 1. Add callback signature/security validation using confirmed DOKU callback headers/canonical string.
-2. Harden successful payment flow: payment paid → order paid → invoice assignment → stock deduction → stock movement records.
-3. Add an internal/safe callback simulation script for existing sandbox payment records.
-4. Verify with `bun run typecheck`, `bun run build`, and a sandbox end-to-end payment callback.
-5. Update living docs and changelog before merging.
+2. Harden successful payment flow: payment paid → order paid → recipe-based stock deduction → stock movement records.
+3. Fix POS order creation so DOKU payments remain `pending_payment` until callback/reconciliation confirms payment.
+4. Add an internal/safe callback simulation script for existing sandbox payment records.
+5. Verify with `bun run typecheck`, `bun run build`, and sandbox callback/reconciliation tests.
+6. Update living docs and changelog before merging.
 
 ### Modules Created
 
