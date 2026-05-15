@@ -153,3 +153,10 @@
 - [ ] Add operator booking calendar/table map UI.
 - [ ] Add automatic no-show/release reminders around booking time.
 
+## Completed — Agent Insight Comparison
+
+- [x] Analyze duplicated AI insight prompt behavior.
+- [x] Split prompt intent per workflow.
+- [x] Add workflow focus metadata.
+- [x] Add tabular comparison view to `/agent`.
+

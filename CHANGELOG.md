@@ -725,3 +725,9 @@
 - Added `booking_seat_insight` Agent Workflow using LLM to assess seat availability, arrival watchlist, occupancy risk, and floor actions.
 - Added `/agent` dashboard rendering for booking insight cards.
 
+## 2026-05-15 — Agent Insight Comparison
+
+- Split generic LLM insight prompting into workflow-specific prompts for daily report, risk detection, promo generation, and morning briefing.
+- Added workflow focus metadata to agent output metadata so UI can distinguish insight intent.
+- Added `/agent` insight comparison table showing latest structured insight per workflow with provider, status, summary, signal counts, owner message, and timestamp.
+

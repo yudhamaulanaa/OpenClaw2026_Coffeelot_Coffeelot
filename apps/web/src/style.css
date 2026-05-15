@@ -189,3 +189,14 @@ select:disabled, input:disabled, button:disabled { opacity: .65; }
 .seat-metrics strong { font-size: 24px; color: #6f3f20; }
 .seat-metrics small { color: #7f654f; }
 @media (max-width: 620px) { .seat-metrics { grid-template-columns: 1fr; } }
+
+
+.insight-comparison-panel { margin-bottom: 20px; }
+.insight-table-wrap { overflow-x: auto; border: 1px solid #ead8c1; border-radius: 14px; background: white; }
+.insight-table { width: 100%; border-collapse: collapse; min-width: 980px; }
+.insight-table th, .insight-table td { padding: 10px 12px; border-bottom: 1px solid #f0dfc9; text-align: left; vertical-align: top; }
+.insight-table th { background: #fff3df; color: #6f3f20; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; }
+.insight-table tr:last-child td { border-bottom: 0; }
+.provider-pill { border-radius: 999px; padding: 4px 8px; font-size: 12px; font-weight: 900; text-transform: uppercase; }
+.provider-pill.llm { background: #dbeafe; color: #1d4ed8; }
+.provider-pill.fallback { background: #f3f4f6; color: #4b5563; }

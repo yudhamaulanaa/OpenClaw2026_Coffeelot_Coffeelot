@@ -84,3 +84,11 @@ Runtime capacity controls:
 - `BOOKING_DEFAULT_SEAT_CAPACITY` default `24`
 - `BOOKING_DEFAULT_HOLD_MINUTES` default `90`
 
+## Latest update — Agent Insight Comparison
+
+The Agent Dashboard now includes a tabular comparison view for structured insights. This helps compare `daily_report`, `risk_detection`, `promo_generation`, `morning_briefing`, and booking insights side-by-side.
+
+Prompt analysis result:
+- Previous non-booking workflows shared the same generic prompt, causing similar LLM phrasing.
+- Prompts are now workflow-specific: daily report summarizes performance, risk detection audits operational risk, promo generation focuses on approvable campaigns, and morning briefing focuses opening-shift readiness.
+

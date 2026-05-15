@@ -132,20 +132,63 @@ function normalizeInsight(value: Partial<StructuredInsight> | null | undefined, 
   };
 }
 
-async function generateLlmInsight(input: AgentRunInput) {
+type InsightWorkflowFocus = "daily_report" | "risk_detection" | "promo_generation" | "morning_briefing";
+
+function workflowInsightPrompt(focus: InsightWorkflowFocus) {
+  const base = "Output wajib JSON valid dengan field: summary, performance_status (poor|fair|good|excellent), highlights array, risks array {title,description,severity low|medium|high}, restock_recommendations array {item_name,recommended_qty,unit,reason}, sales_opportunities array {title,description,expected_impact low|medium|high}, next_best_actions array, owner_message. Jangan tambah teks di luar JSON.";
+  const prompts: Record<InsightWorkflowFocus, string> = {
+    daily_report: `Kamu adalah Daily Business Analyst untuk pemilik coffee shop/F&B kecil. Fokus HANYA pada ringkasan performa hari ini vs kemarin: revenue, order count, average order value, best seller, dan 2-3 keputusan operasional paling penting. Jangan membuat copy promo panjang. Jangan melebih-lebihkan risiko kecuali datanya jelas. Buat owner_message seperti laporan harian singkat. ${base}`,
+    risk_detection: `Kamu adalah Operational Risk Auditor untuk coffee shop/F&B kecil. Fokus HANYA pada risiko yang bisa mengganggu operasi: stock kritis, revenue drop, order kosong, AOV rendah, dependency produk, dan sinyal yang butuh tindakan cepat. Summary harus berupa tingkat risiko, bukan laporan penjualan umum. Highlights boleh minim; risks wajib tajam dan diberi severity. Next actions harus berupa mitigasi. Jangan membuat ide promo kecuali untuk mitigasi risiko sepi. ${base}`,
+    promo_generation: `Kamu adalah Promo Strategist untuk coffee shop/F&B kecil. Fokus HANYA pada peluang penjualan dan campaign yang bisa dipublish setelah approval owner. Buat sales_opportunities konkret: menu target, angle promo, contoh copy singkat, timing, dan expected impact. Risks hanya risiko promo seperti margin, stok, atau cannibalization. Restock hanya muncul jika promo butuh stok. Owner_message harus mengingatkan bahwa promo perlu approval. ${base}`,
+    morning_briefing: `Kamu adalah Opening Shift Briefing Assistant untuk coffee shop/F&B kecil. Fokus HANYA pada briefing sebelum operasional: apa yang harus dicek saat buka, stock/prep priority, menu yang perlu didorong, payment/kitchen readiness, dan potensi rush hour. Summary harus seperti briefing pagi untuk owner/shift lead. Jangan menulis laporan akhir hari atau copy promo panjang. ${base}`,
+  };
+  return prompts[focus];
+}
+
+function workflowFallbackTone(insight: StructuredInsight, focus: InsightWorkflowFocus): StructuredInsight {
+  if (focus === "risk_detection") {
+    return {
+      ...insight,
+      summary: insight.risks.length ? `Terdeteksi ${insight.risks.length} risiko operasional yang perlu dicek.` : "Tidak ada risiko besar dari snapshot sales/stok saat ini.",
+      highlights: insight.highlights.slice(0, 1),
+      sales_opportunities: [],
+      owner_message: insight.risks.length ? "Prioritasnya mitigasi risiko sebelum mengembangkan promo atau eksperimen penjualan." : "Operasional terlihat aman; lanjut monitor stok, order, dan pembayaran pending.",
+    };
+  }
+  if (focus === "promo_generation") {
+    return {
+      ...insight,
+      summary: "Rekomendasi promo dibuat dari menu aktif, best seller, dan peluang mendorong menu yang belum dominan.",
+      risks: insight.risks.filter((risk) => risk.title.toLowerCase().includes("stok") || risk.title.toLowerCase().includes("stock")),
+      next_best_actions: insight.sales_opportunities.length ? ["Review margin dan stok sebelum approve promo.", "Pilih 1 copy promo untuk diuji di jam sepi.", "Pantau efek promo terhadap order dan AOV."] : insight.next_best_actions,
+      owner_message: "Promo ini masih perlu approval owner sebelum dipakai ke customer.",
+    };
+  }
+  if (focus === "morning_briefing") {
+    return {
+      ...insight,
+      summary: "Briefing pembukaan: cek kesiapan stok, kitchen/barista, pembayaran, dan menu yang perlu didorong hari ini.",
+      next_best_actions: ["Cek stok kritis dan prep bahan sebelum rush hour.", "Pastikan QRIS/VA dan kitchen queue siap.", "Brief kasir untuk mendorong menu peluang hari ini."],
+      owner_message: "Sebelum buka, pastikan stok aman, antrean operasional siap, dan tim tahu menu prioritas hari ini.",
+    };
+  }
+  return insight;
+}
+
+async function generateLlmInsight(input: AgentRunInput, focus: InsightWorkflowFocus) {
   const snapshot = await buildInsightSnapshot(input);
-  const fallback = fallbackInsight(snapshot);
+  const fallback = workflowFallbackTone(fallbackInsight(snapshot), focus);
   const result = await chatCompletionJson<StructuredInsight>({
     fallback,
     messages: [
       {
         role: "system",
-        content: `Kamu adalah AI Insight Agent untuk pemilik coffee shop/F&B kecil. Nilai data operasional harian dan beri insight Bahasa Indonesia yang ringkas, praktis, dan langsung bisa dieksekusi. Output wajib JSON valid dengan field: summary, performance_status (poor|fair|good|excellent), highlights array, risks array {title,description,severity low|medium|high}, restock_recommendations array {item_name,recommended_qty,unit,reason}, sales_opportunities array {title,description,expected_impact low|medium|high}, next_best_actions array, owner_message. Jangan tambah teks di luar JSON.`,
+        content: workflowInsightPrompt(focus),
       },
       { role: "user", content: JSON.stringify(snapshot) },
     ],
   });
-  return { insight: normalizeInsight(result.data, fallback), provider: result.provider, reason: "reason" in result ? result.reason : undefined, snapshot };
+  return { insight: normalizeInsight(result.data, fallback), provider: result.provider, reason: "reason" in result ? result.reason : undefined, snapshot, workflowFocus: focus };
 }
 
 type BookingSeatInsight = {
@@ -272,13 +315,13 @@ async function salesSnapshot(input: AgentRunInput, offsetDays = 0) {
 }
 
 async function runDailyReport(input: AgentRunInput): Promise<AgentWorkflowOutput> {
-  const { insight, provider, reason, snapshot } = await generateLlmInsight(input);
+  const { insight, provider, reason, snapshot, workflowFocus } = await generateLlmInsight(input, "daily_report");
   const title = `AI daily insight — ${snapshot.date}`;
   return {
     outputType: "report",
     title,
     content: insightToContent(insight, provider),
-    metadata: JSON.stringify({ provider, reason, insight, snapshot }),
+    metadata: JSON.stringify({ provider, reason, workflowFocus, insight, snapshot }),
     requiresApproval: false,
   };
 }
@@ -300,37 +343,37 @@ async function runRestockAlert(input: AgentRunInput): Promise<AgentWorkflowOutpu
 }
 
 async function runRiskDetection(input: AgentRunInput): Promise<AgentWorkflowOutput> {
-  const { insight, provider, reason, snapshot } = await generateLlmInsight(input);
+  const { insight, provider, reason, snapshot, workflowFocus } = await generateLlmInsight(input, "risk_detection");
   const riskCount = insight.risks.length;
   return {
     outputType: riskCount > 0 ? "alert" : "report",
     title: riskCount > 0 ? `AI risk detection — ${riskCount} signal(s)` : "AI risk detection — all clear",
     content: insightToContent(insight, provider),
-    metadata: JSON.stringify({ provider, reason, insight, snapshot }),
+    metadata: JSON.stringify({ provider, reason, workflowFocus, insight, snapshot }),
     requiresApproval: false,
   };
 }
 
 async function runPromoGeneration(input: AgentRunInput): Promise<AgentWorkflowOutput> {
-  const { insight, provider, reason, snapshot } = await generateLlmInsight(input);
+  const { insight, provider, reason, snapshot, workflowFocus } = await generateLlmInsight(input, "promo_generation");
   const primary = insight.sales_opportunities[0];
   const title = primary ? `AI promo idea — ${primary.title}` : "AI promo idea — review sales opportunity";
   return {
     outputType: "promo",
     title,
     content: insightToContent(insight, provider),
-    metadata: JSON.stringify({ provider, reason, insight, snapshot }),
+    metadata: JSON.stringify({ provider, reason, workflowFocus, insight, snapshot }),
     requiresApproval: true,
   };
 }
 
 async function runMorningBriefing(input: AgentRunInput): Promise<AgentWorkflowOutput> {
-  const { insight, provider, reason, snapshot } = await generateLlmInsight(input);
+  const { insight, provider, reason, snapshot, workflowFocus } = await generateLlmInsight(input, "morning_briefing");
   return {
     outputType: "briefing",
     title: `AI morning briefing — ${new Date().toISOString().slice(0, 10)}`,
     content: insightToContent(insight, provider),
-    metadata: JSON.stringify({ provider, reason, insight, snapshot }),
+    metadata: JSON.stringify({ provider, reason, workflowFocus, insight, snapshot }),
     requiresApproval: false,
   };
 }

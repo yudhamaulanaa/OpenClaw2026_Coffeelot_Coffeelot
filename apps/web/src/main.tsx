@@ -106,10 +106,10 @@ type AgentInsight = {
   owner_message?: string;
 };
 
-function parseAgentMetadata(metadata?: string | null): { provider?: string; reason?: string; insight?: AgentInsight } | null {
+function parseAgentMetadata(metadata?: string | null): { provider?: string; reason?: string; workflowFocus?: string; insight?: AgentInsight } | null {
   if (!metadata) return null;
   try {
-    const parsed = JSON.parse(metadata) as { provider?: string; reason?: string; insight?: AgentInsight };
+    const parsed = JSON.parse(metadata) as { provider?: string; reason?: string; workflowFocus?: string; insight?: AgentInsight };
     return parsed && typeof parsed === "object" ? parsed : null;
   } catch {
     return null;
@@ -499,6 +499,112 @@ function App() {
   );
 }
 
+
+type InsightComparisonRow = {
+  key: string;
+  workflowId: string;
+  outputType: string;
+  title: string;
+  provider: string;
+  status: string;
+  summary: string;
+  risks: number;
+  opportunities: number;
+  actions: number;
+  ownerMessage: string;
+  createdAt: string;
+};
+
+function latestInsightRows(runs: AgentRun[]): InsightComparisonRow[] {
+  const rows: InsightComparisonRow[] = [];
+  for (const run of runs) {
+    for (const output of run.outputs) {
+      const agent = parseAgentMetadata(output.metadata);
+      const booking = parseBookingMetadata(output.metadata);
+      if (agent?.insight) {
+        rows.push({
+          key: output.id,
+          workflowId: agent.workflowFocus ?? run.workflowId,
+          outputType: output.outputType,
+          title: output.title,
+          provider: agent.provider ?? "unknown",
+          status: agent.insight.performance_status ?? "-",
+          summary: agent.insight.summary ?? output.content.slice(0, 140),
+          risks: agent.insight.risks?.length ?? 0,
+          opportunities: agent.insight.sales_opportunities?.length ?? 0,
+          actions: agent.insight.next_best_actions?.length ?? 0,
+          ownerMessage: agent.insight.owner_message ?? "-",
+          createdAt: output.createdAt,
+        });
+      } else if (booking?.bookingInsight) {
+        rows.push({
+          key: output.id,
+          workflowId: run.workflowId,
+          outputType: output.outputType,
+          title: output.title,
+          provider: booking.provider ?? "unknown",
+          status: booking.bookingInsight.availability_status ?? "-",
+          summary: booking.bookingInsight.summary ?? output.content.slice(0, 140),
+          risks: booking.bookingInsight.risks?.length ?? 0,
+          opportunities: booking.bookingInsight.arrival_watchlist?.length ?? 0,
+          actions: booking.bookingInsight.seat_actions?.length ?? 0,
+          ownerMessage: booking.bookingInsight.owner_message ?? "-",
+          createdAt: output.createdAt,
+        });
+      }
+    }
+  }
+  const latestByWorkflow = new Map<string, InsightComparisonRow>();
+  for (const row of rows.sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt))) {
+    if (!latestByWorkflow.has(row.workflowId)) latestByWorkflow.set(row.workflowId, row);
+  }
+  return [...latestByWorkflow.values()];
+}
+
+function AgentInsightComparisonTable({ runs }: { runs: AgentRun[] }) {
+  const rows = latestInsightRows(runs);
+  return (
+    <section className="panel insight-comparison-panel">
+      <div className="agent-run-head">
+        <h2>Insight comparison</h2>
+        <small>Latest AI-generated output per workflow. Use this to compare focus and avoid repetitive insight.</small>
+      </div>
+      {rows.length === 0 ? <p>No structured insights yet. Run workflows first.</p> : (
+        <div className="insight-table-wrap">
+          <table className="insight-table">
+            <thead>
+              <tr>
+                <th>Workflow</th>
+                <th>Type</th>
+                <th>Provider</th>
+                <th>Status</th>
+                <th>Summary</th>
+                <th>Signals</th>
+                <th>Owner message</th>
+                <th>Updated</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((row) => (
+                <tr key={row.key}>
+                  <td><strong>{row.workflowId.replaceAll("_", " ")}</strong></td>
+                  <td>{row.outputType}</td>
+                  <td><span className={row.provider === "llm" ? "provider-pill llm" : "provider-pill fallback"}>{row.provider}</span></td>
+                  <td><span className={`insight-status ${row.status}`}>{row.status}</span></td>
+                  <td>{row.summary}</td>
+                  <td><small>{row.risks} risk • {row.opportunities} opp/watch • {row.actions} action</small></td>
+                  <td>{row.ownerMessage}</td>
+                  <td><small>{new Date(row.createdAt).toLocaleString("id-ID")}</small></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </section>
+  );
+}
+
 function AgentDashboard() {
   const [workflows, setWorkflows] = useState<string[]>([]);
   const [runs, setRuns] = useState<AgentRun[]>([]);
@@ -559,6 +665,8 @@ function AgentDashboard() {
           ))}
         </div>
       </section>
+
+      <AgentInsightComparisonTable runs={runs} />
 
       <section className="panel agent-timeline">
         <h2>Activity timeline</h2>
