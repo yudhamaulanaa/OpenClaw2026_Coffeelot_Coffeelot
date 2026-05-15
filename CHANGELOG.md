@@ -1,5 +1,20 @@
 # Coffeelot — Changelog
 
+## [Milestone 3 Reports and Stock Closeout] — 2026-05-15
+
+### Added
+
+- Added recent orders and daily report endpoints with revenue, order count, average order value, best sellers, and critical stock data.
+- Confirmed transactional restock stock movement and checkout invoice generation are part of the API foundation.
+
+### Updated
+
+- Marked stock engine and invoice generator tasks complete in `TODO.md` and `ROADMAP.md`.
+
+### Verification
+
+- `bun run typecheck` passes for shared, API, and web workspaces.
+
 ## [Milestone 3 API Foundation] — 2026-05-15
 
 ### Added

@@ -194,6 +194,52 @@ export const app = new Elysia({ prefix: "/api" })
     const { tenantId, outletId } = resolveTenantContext(headers);
     return prisma.order.findMany({ where: { tenantId, outletId }, include: { items: true }, orderBy: { createdAt: "desc" } });
   })
+
+  .get("/reports/recent-orders", async ({ headers, query }) => {
+    const { tenantId, outletId } = resolveTenantContext(headers);
+    const limit = Math.min(Number(query.limit ?? 10), 50);
+    return prisma.order.findMany({
+      where: { tenantId, outletId },
+      include: { items: true },
+      orderBy: { createdAt: "desc" },
+      take: limit,
+    });
+  })
+  .get("/reports/daily", async ({ headers, query }) => {
+    const { tenantId, outletId } = resolveTenantContext(headers);
+    const day = query.date ? new Date(`${query.date}T00:00:00.000Z`) : new Date();
+    day.setUTCHours(0, 0, 0, 0);
+    const next = new Date(day);
+    next.setUTCDate(next.getUTCDate() + 1);
+
+    const orders = await prisma.order.findMany({
+      where: { tenantId, outletId, orderStatus: "paid", createdAt: { gte: day, lt: next } },
+      include: { items: true },
+    });
+
+    const totalRevenue = orders.reduce((sum, order) => sum + Number(order.total), 0);
+    const totalOrders = orders.length;
+    const productSales = new Map<string, { product_name: string; qty_sold: number; total_sales: number }>();
+    for (const order of orders) {
+      for (const item of order.items) {
+        const current = productSales.get(item.productName) ?? { product_name: item.productName, qty_sold: 0, total_sales: 0 };
+        current.qty_sold += item.qty;
+        current.total_sales += Number(item.totalPrice);
+        productSales.set(item.productName, current);
+      }
+    }
+
+    const inventory = await prisma.inventoryItem.findMany({ where: { tenantId, outletId } });
+    return {
+      total_revenue: totalRevenue,
+      total_orders: totalOrders,
+      average_order_value: totalOrders === 0 ? 0 : totalRevenue / totalOrders,
+      best_selling_products: [...productSales.values()].sort((a, b) => b.qty_sold - a.qty_sold),
+      critical_stock: inventory
+        .filter((item) => Number(item.currentStock) <= Number(item.minimumStock))
+        .map((item) => ({ name: item.name, current_stock: Number(item.currentStock), minimum_stock: Number(item.minimumStock), unit: item.unit })),
+    };
+  })
   .get("/reports/critical-stock", async ({ headers }) => {
     const { tenantId, outletId } = resolveTenantContext(headers);
     const items = await prisma.inventoryItem.findMany({ where: { tenantId, outletId }, orderBy: { name: "asc" } });

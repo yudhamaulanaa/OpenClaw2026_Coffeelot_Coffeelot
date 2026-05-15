@@ -19,8 +19,8 @@
 - [x] Product service + endpoints
 - [x] Inventory service + endpoints
 - [x] Order service + endpoints
-- [ ] Stock engine
-- [ ] Invoice generator
+- [x] Stock engine
+- [x] Invoice generator
 - [x] Reports endpoints
 
 ## Milestone 4 — Built-in POS / Order Channels

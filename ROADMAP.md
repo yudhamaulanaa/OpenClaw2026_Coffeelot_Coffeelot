@@ -52,8 +52,8 @@ Setup API server dan core services.
 - [x] Product service + endpoints
 - [x] Inventory service + endpoints
 - [x] Order service + endpoints
-- [ ] Stock engine (transactional deduction)
-- [ ] Invoice generator
+- [x] Stock engine (transactional deduction)
+- [x] Invoice generator
 
 ---
 
