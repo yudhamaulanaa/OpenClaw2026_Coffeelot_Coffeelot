@@ -7,6 +7,7 @@ import { createDokuMcpPayment, listDokuMcpTools } from "./doku-mcp";
 import { getDokuTransactionStatus } from "./payment-reconciliation";
 import { createSandboxPayment, normalizePaymentStatus } from "./payments";
 import { AGENT_WORKFLOWS, runAgentWorkflow, type AgentTriggerType, type AgentWorkflowId } from "./agent-workflows";
+import { startAgentScheduler } from "./agent-scheduler";
 
 const port = Number(process.env.API_PORT ?? 3001);
 const host = process.env.API_HOST ?? "127.0.0.1";
@@ -691,6 +692,7 @@ export const app = new Elysia({ prefix: "/api" })
 
 app.listen({ hostname: host, port });
 console.log(`Coffeelot API listening on http://${host}:${port}`);
+startAgentScheduler();
 
 const reconcileIntervalMs = Number(process.env.PAYMENT_RECONCILE_INTERVAL_MS ?? 60_000);
 const reconcileEnabled = process.env.PAYMENT_RECONCILE_ENABLED !== "false";

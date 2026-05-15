@@ -113,7 +113,7 @@ Build agent orchestrator dan workflow engine.
 
 - [x] Agent core (execution loop)
 - [x] Workflow registry
-- [ ] Scheduler (cron-based)
+- [x] Scheduler (cron-based)
 - [ ] Event trigger system
 - [x] Agent output storage (agent_runs, agent_outputs tables)
 - [x] Agent dashboard page (activity timeline)

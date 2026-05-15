@@ -2,7 +2,7 @@
 
 Last updated: 2026-05-15
 
-## Overall Progress: Milestone 5 MVP Wrapped — Continuing Milestone 6
+## Overall Progress: Milestone 6 Scheduler Added — Continuing Agent/Event Workflows
 
 ### Current State
 
@@ -37,7 +37,7 @@ Keep `.md` files updated as part of the work, not afterthoughts:
 
 ### What's Next
 
-Continue with Milestone 6 — AI Agent Core. First target: implement an internal workflow runner API that records `agent_runs` and `agent_outputs`, then wire daily report / stock alert workflows on top of existing reporting and inventory data. DOKU callback security remains a tracked follow-up hardening task.
+Continue with Milestone 6/7 follow-ups. The internal workflow runner, agent dashboard, daily report/restock workflows, and configurable scheduler are now implemented. Next targets: event trigger system, richer workflow outputs, and approval states. DOKU callback security remains a tracked follow-up hardening task.
 
 ### Modules Created
 

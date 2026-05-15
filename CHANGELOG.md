@@ -1,5 +1,29 @@
 # Coffeelot — Changelog
 
+## [Agent Workflow Scheduler] — 2026-05-15
+
+### Added
+
+- Added configurable API-side agent scheduler for `daily_report` and `restock_alert`.
+- Scheduler uses runtime env controls for enable/disable, tenant/outlet target, initial delay, and interval durations.
+- Scheduled workflow runs are persisted as `agent_runs` with `trigger_type=scheduled` and generate normal `agent_outputs`.
+
+### Runtime Config
+
+- `AGENT_SCHEDULER_ENABLED`
+- `AGENT_SCHEDULER_TENANT_ID`
+- `AGENT_SCHEDULER_OUTLET_ID`
+- `AGENT_SCHEDULER_INITIAL_DELAY_MS`
+- `AGENT_DAILY_REPORT_INTERVAL_MS`
+- `AGENT_RESTOCK_ALERT_INTERVAL_MS`
+
+### Verification
+
+- `bun run typecheck` passes.
+- `bun run build` passes.
+- `coffeelot-api` restarted successfully.
+- Scheduler logged both `daily_report` and `restock_alert` scheduled runs as `completed`.
+
 ## [Web Navbar] — 2026-05-15
 
 ### Added

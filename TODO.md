@@ -103,6 +103,7 @@
 - [x] Add daily report workflow using existing sales/report data
 - [x] Add restock alert workflow using inventory thresholds
 - [x] Add agent dashboard/activity timeline page
+- [x] Add configurable scheduler for daily_report and restock_alert workflows
 
 ## Later
 
