@@ -50,3 +50,19 @@ Continue with Milestone 6/7 follow-ups. The internal workflow runner, agent dash
 
 - Callback security validation still needs confirmed DOKU callback signing details.
 - `www.coffeelot.app` is not enabled in Nginx Proxy Manager SSL until DNS resolves publicly.
+
+## Latest update — LLM Agent Insights
+
+Coffeelot Agent Workflows now support structured AI Insight generation. The mandatory AI Insight behavior inspired by the reference codebase has been adapted into existing Agent Workflows instead of adding a separate report module.
+
+Current behavior:
+- `daily_report`, `risk_detection`, `promo_generation`, and `morning_briefing` build a business snapshot and ask an OpenAI-compatible LLM for Indonesian owner-friendly insight.
+- If AI env is missing or provider fails, the workflow falls back to deterministic rule-based insight.
+- `/agent` renders structured insight cards with performance status, risks, restock recommendations, sales opportunities, next actions, and owner message.
+
+Required runtime env for live LLM mode:
+- `AI_BASE_URL`
+- `AI_API_KEY`
+- `AI_MODEL`
+- optional `AI_TIMEOUT_MS`
+

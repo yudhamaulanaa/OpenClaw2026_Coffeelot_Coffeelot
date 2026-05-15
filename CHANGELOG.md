@@ -708,3 +708,12 @@
 
 - This branch intentionally contains no implementation code.
 - Use this branch if restarting implementation from a clean blueprint.
+
+## 2026-05-15 — LLM Agent Insights
+
+- Added an OpenAI-compatible AI client for Agent Workflows using `AI_BASE_URL`, `AI_API_KEY`, `AI_MODEL`, and optional `AI_TIMEOUT_MS`.
+- Upgraded `daily_report`, `risk_detection`, `promo_generation`, and `morning_briefing` to generate structured AI Insight payloads from sales, inventory, product, and best-seller snapshots.
+- Added rule-based fallback insight output when the LLM provider is not configured or fails, so workflows continue safely.
+- Agent output metadata now stores provider, fallback reason, structured insight, and source snapshot.
+- Improved `/agent` dashboard to render AI Insight sections, performance status, risk severity, restock recommendations, sales opportunities, next best actions, and owner message.
+

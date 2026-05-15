@@ -159,3 +159,21 @@ select:disabled, input:disabled, button:disabled { opacity: .65; }
 .approval.pending { background: #fef3c7; color: #92400e; }
 .approval.approved { background: #dcfce7; color: #166534; }
 .approval.rejected { background: #fee2e2; color: #991b1b; }
+
+
+.agent-output-card details { margin-top: 6px; }
+.agent-output-card summary { cursor: pointer; color: #6f3f20; font-weight: 800; }
+.agent-insight-card { display: grid; gap: 10px; padding: 12px; border-radius: 14px; background: white; border: 1px solid #ead8c1; }
+.insight-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+.insight-status { border-radius: 999px; padding: 5px 10px; font-size: 12px; font-weight: 900; text-transform: uppercase; }
+.insight-status.poor { background: #fee2e2; color: #991b1b; }
+.insight-status.fair { background: #fef3c7; color: #92400e; }
+.insight-status.good { background: #dcfce7; color: #166534; }
+.insight-status.excellent { background: #dbeafe; color: #1d4ed8; }
+.insight-section { display: grid; gap: 4px; }
+.insight-section ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+.risk-dot { display: inline-flex; border-radius: 999px; padding: 2px 7px; margin-right: 4px; font-size: 11px; font-weight: 900; text-transform: uppercase; }
+.risk-dot.low { background: #dcfce7; color: #166534; }
+.risk-dot.medium { background: #fef3c7; color: #92400e; }
+.risk-dot.high { background: #fee2e2; color: #991b1b; }
+.agent-insight-card blockquote { margin: 0; padding: 10px 12px; border-left: 4px solid #6f3f20; background: #fffaf2; border-radius: 10px; color: #4f3422; }

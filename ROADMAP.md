@@ -153,3 +153,13 @@ Enable colok ke POS eksisting.
 - Multi-outlet switching UI
 - Subscription billing
 - Advanced analytics
+
+## Mandatory polish from reference codebase
+
+1. **AI Insight for Agent Workflows — done foundation**
+   - LLM-backed structured insight is now integrated into existing Agent Workflows with fallback mode.
+   - Next: configure runtime AI provider and tune prompts from real shop data.
+2. **Public endpoint rate limiter — next**
+3. **Improved `/chat` tracker UX — next**
+4. **Backend modularization — ongoing, incremental only**
+

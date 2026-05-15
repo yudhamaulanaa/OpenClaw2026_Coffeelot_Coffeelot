@@ -94,6 +94,75 @@ type AgentOutput = {
   approvedAt?: string | null;
 };
 
+
+type AgentInsight = {
+  summary?: string;
+  performance_status?: "poor" | "fair" | "good" | "excellent";
+  highlights?: string[];
+  risks?: Array<{ title?: string; description?: string; severity?: "low" | "medium" | "high" }>;
+  restock_recommendations?: Array<{ item_name?: string; recommended_qty?: number; unit?: string; reason?: string }>;
+  sales_opportunities?: Array<{ title?: string; description?: string; expected_impact?: "low" | "medium" | "high" }>;
+  next_best_actions?: string[];
+  owner_message?: string;
+};
+
+function parseAgentMetadata(metadata?: string | null): { provider?: string; reason?: string; insight?: AgentInsight } | null {
+  if (!metadata) return null;
+  try {
+    const parsed = JSON.parse(metadata) as { provider?: string; reason?: string; insight?: AgentInsight };
+    return parsed && typeof parsed === "object" ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+function InsightList({ title, items }: { title: string; items?: string[] }) {
+  if (!items?.length) return null;
+  return (
+    <div className="insight-section">
+      <strong>{title}</strong>
+      <ul>{items.map((item, index) => <li key={`${title}-${index}`}>{item}</li>)}</ul>
+    </div>
+  );
+}
+
+function AgentInsightCard({ metadata }: { metadata?: string | null }) {
+  const parsed = parseAgentMetadata(metadata);
+  const insight = parsed?.insight;
+  if (!insight) return null;
+  const status = insight.performance_status ?? "fair";
+  return (
+    <div className="agent-insight-card">
+      <div className="insight-head">
+        <span className={`insight-status ${status}`}>{status}</span>
+        <small>{parsed?.provider === "llm" ? "LLM Insight" : "Fallback Insight"}{parsed?.reason ? ` • ${parsed.reason}` : ""}</small>
+      </div>
+      {insight.summary ? <p>{insight.summary}</p> : null}
+      <InsightList title="Highlights" items={insight.highlights} />
+      {insight.risks?.length ? (
+        <div className="insight-section">
+          <strong>Risks</strong>
+          <ul>{insight.risks.map((risk, index) => <li key={`risk-${index}`}><span className={`risk-dot ${risk.severity ?? "medium"}`}>{risk.severity ?? "medium"}</span> {risk.title}: {risk.description}</li>)}</ul>
+        </div>
+      ) : null}
+      {insight.restock_recommendations?.length ? (
+        <div className="insight-section">
+          <strong>Restock</strong>
+          <ul>{insight.restock_recommendations.map((item, index) => <li key={`restock-${index}`}>{item.item_name}: {item.recommended_qty} {item.unit} — {item.reason}</li>)}</ul>
+        </div>
+      ) : null}
+      {insight.sales_opportunities?.length ? (
+        <div className="insight-section">
+          <strong>Sales opportunities</strong>
+          <ul>{insight.sales_opportunities.map((item, index) => <li key={`opportunity-${index}`}><span className={`risk-dot ${item.expected_impact ?? "medium"}`}>{item.expected_impact ?? "medium"}</span> {item.title}: {item.description}</li>)}</ul>
+        </div>
+      ) : null}
+      <InsightList title="Next best actions" items={insight.next_best_actions} />
+      {insight.owner_message ? <blockquote>{insight.owner_message}</blockquote> : null}
+    </div>
+  );
+}
+
 type AgentRun = {
   id: string;
   workflowId: string;
@@ -471,7 +540,11 @@ function AgentDashboard() {
                     ) : null}
                   </div>
                 ) : null}
-                <pre>{output.content}</pre>
+                <AgentInsightCard metadata={output.metadata} />
+                <details>
+                  <summary>Raw output</summary>
+                  <pre>{output.content}</pre>
+                </details>
               </div>
             ))}
           </article>

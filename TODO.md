@@ -123,3 +123,18 @@
 
 - Callback signature/security validation is blocked until DOKU callback signing details/headers are confirmed.
 - `www.coffeelot.app` SSL/proxy setup is blocked until DNS resolves publicly.
+
+## Completed — LLM Agent Insight Foundation
+
+- [x] Add OpenAI-compatible AI client for Agent Workflows.
+- [x] Adapt reference-codebase AI Insight pattern into `daily_report`, `risk_detection`, `promo_generation`, and `morning_briefing`.
+- [x] Add structured metadata for performance status, risks, restock, opportunities, next actions, and owner message.
+- [x] Add safe rule-based fallback when LLM is not configured/fails.
+- [x] Render AI Insight cards on `/agent`.
+
+## Still pending from mandatory reference-codebase items
+
+- [ ] Add public endpoint rate limiter.
+- [ ] Improve `/chat` order tracker UX.
+- [ ] Continue backend modularization in small safe steps.
+
