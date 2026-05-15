@@ -93,6 +93,56 @@ function PaymentBox({ payment, method, onCheck, checking }: { payment: PaymentRe
   );
 }
 
+function ChatPaymentOnlyView({
+  payment,
+  method,
+  checking,
+  onCheck,
+}: {
+  payment: PaymentResult;
+  method: DokuPaymentMethod;
+  checking: boolean;
+  onCheck: () => void;
+}) {
+  const va = vaNumber(payment);
+  const qr = qrCode(payment);
+  const url = paymentUrl(payment);
+  return (
+    <main className="chat-shell payment-only-shell">
+      <section className="payment-only-card">
+        <p className="eyebrow">Pembayaran</p>
+        {method === "va_bca" ? (
+          <>
+            <span className="payment-only-label">Nomor VA Bank BCA</span>
+            <strong className="payment-only-va">{va ?? "Menyiapkan nomor VA..."}</strong>
+          </>
+        ) : (
+          <>
+            <span className="payment-only-label">QR / QRIS</span>
+            {qr ? <code className="payment-only-qr">{qr}</code> : null}
+            {url ? <a href={url} target="_blank">Buka pembayaran</a> : null}
+          </>
+        )}
+        <button className="checkout" onClick={onCheck} disabled={checking}>{checking ? "Checking..." : "Check Pembayaran"}</button>
+      </section>
+    </main>
+  );
+}
+
+function ChatOrderStatusView({ orderStatus, prepStatus }: { orderStatus: string | null; prepStatus: string | null }) {
+  return (
+    <main className="chat-shell payment-only-shell">
+      <section className="order-status-box order-status-page">
+        <strong>Status pesanan</strong>
+        <span>Pembayaran: lunas</span>
+        <span>Order: {orderStatus === "paid" ? "dibayar" : orderStatus ?? "diproses"}</span>
+        <span>Dapur/barista: {prepStatus ?? "new"}</span>
+        <small>Pesanan sudah masuk antrean. Silakan tunggu diproses barista.</small>
+      </section>
+    </main>
+  );
+}
+
 function App() {
   const [products, setProducts] = useState<PosProduct[]>([]);
   const [cart, setCart] = useState<CartLine[]>([]);
@@ -352,6 +402,14 @@ function WebChatOrder() {
     }
   }
 
+  if (payment?.status === "paid") {
+    return <ChatOrderStatusView orderStatus={submittedOrderStatus} prepStatus={submittedPrepStatus} />;
+  }
+
+  if (payment) {
+    return <ChatPaymentOnlyView payment={payment} method={paymentMethod} checking={checkingPayment} onCheck={() => checkPaymentStatus().catch((error) => setMessage(error.message))} />;
+  }
+
   return (
     <main className="chat-shell">
       <section className="chat-hero">
@@ -405,19 +463,7 @@ function WebChatOrder() {
           </label>
           <div className="total">Total {money(total)}</div>
           <button className="checkout" disabled={cart.length === 0} onClick={() => submitChatOrder().catch((error) => setMessage(error.message))}>Kirim order</button>
-          {session ? <small>Chat session: {session.id}</small> : null}
-          {submittedOrderId ? <small>Order: {submittedOrderId}</small> : null}
-          {payment?.status === "paid" ? (
-            <div className="order-status-box">
-              <strong>Status pesanan</strong>
-              <span>Pembayaran: lunas</span>
-              <span>Order: {submittedOrderStatus === "paid" ? "dibayar" : submittedOrderStatus ?? "diproses"}</span>
-              <span>Dapur/barista: {submittedPrepStatus ?? "new"}</span>
-              <small>Simpan halaman ini untuk cek status pesanan. Setelah barista update antrean, status dapur akan ikut ditampilkan di versi berikutnya.</small>
-            </div>
-          ) : (
-            <PaymentBox payment={payment} method={paymentMethod} onCheck={() => checkPaymentStatus().catch((error) => setMessage(error.message))} checking={checkingPayment} />
-          )}
+
         </aside>
       </section>
     </main>

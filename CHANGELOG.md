@@ -1,5 +1,19 @@
 # Coffeelot — Changelog
 
+## [Webchat Payment-Only Checkout View] — 2026-05-15
+
+### Changed
+
+- After checkout on `/chat`, the customer is now moved to a focused payment-only view instead of keeping the menu/cart visible.
+- For VA BCA, the payment page only highlights the VA number and a check-payment button.
+- Once payment is paid, `/chat` switches to the order-status page.
+
+### Verification
+
+- `bun run typecheck` passes.
+- `bun run build` passes.
+- `https://coffeelot.app/chat` serves the updated bundle containing `Nomor VA Bank BCA` and payment-only view classes.
+
 ## [Payment Response Casing Fix] — 2026-05-15
 
 ### Fixed
