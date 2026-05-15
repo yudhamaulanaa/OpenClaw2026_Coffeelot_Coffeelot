@@ -91,4 +91,9 @@ The Agent Dashboard now includes a tabular comparison view for structured insigh
 Prompt analysis result:
 - Previous non-booking workflows shared the same generic prompt, causing similar LLM phrasing.
 - Prompts are now workflow-specific: daily report summarizes performance, risk detection audits operational risk, promo generation focuses on approvable campaigns, and morning briefing focuses opening-shift readiness.
+## Latest update — BI Insight Pack
+
+Coffeelot now has a first-pass BI Insight Pack in Agent Workflows. The agent can generate AI-backed insights for menu engineering, demand forecast, prep planning, kitchen SLA, and payment reconciliation health. These workflows appear in `/agent` and are included in the insight comparison table.
+
+The BI snapshot now includes hourly sales, menu performance, recipe stock risk, active kitchen queue/SLA indicators, and pending payment summary so the LLM can reason beyond generic reports.
 

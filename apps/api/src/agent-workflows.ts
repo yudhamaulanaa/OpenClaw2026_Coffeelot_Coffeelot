@@ -2,7 +2,19 @@ import { chatCompletionJson } from "./ai-client";
 import { getSeatAvailabilitySnapshot } from "./booking-seat-service";
 import { prisma } from "./db";
 
-export const AGENT_WORKFLOWS = ["daily_report", "restock_alert", "risk_detection", "promo_generation", "morning_briefing", "booking_seat_insight"] as const;
+export const AGENT_WORKFLOWS = [
+  "daily_report",
+  "restock_alert",
+  "risk_detection",
+  "promo_generation",
+  "morning_briefing",
+  "booking_seat_insight",
+  "menu_engineering",
+  "demand_forecast",
+  "prep_planning",
+  "kitchen_sla",
+  "payment_reconciliation_insight",
+] as const;
 export type AgentWorkflowId = (typeof AGENT_WORKFLOWS)[number];
 export type AgentTriggerType = "scheduled" | "event" | "on_demand";
 
@@ -80,21 +92,75 @@ function fallbackInsight(snapshot: Awaited<ReturnType<typeof buildInsightSnapsho
 }
 
 async function buildInsightSnapshot(input: AgentRunInput) {
-  const [today, yesterday, inventory, products] = await Promise.all([
+  const [today, yesterday, inventory, products, pendingPayments, kitchenOrders] = await Promise.all([
     salesSnapshot(input),
     salesSnapshot(input, -1),
     prisma.inventoryItem.findMany({ where: { tenantId: input.tenantId, outletId: input.outletId }, orderBy: { name: "asc" } }),
-    prisma.product.findMany({ where: { tenantId: input.tenantId, isActive: true, OR: [{ outletId: null }, { outletId: input.outletId }] }, orderBy: [{ category: "asc" }, { name: "asc" }] }),
+    prisma.product.findMany({
+      where: { tenantId: input.tenantId, isActive: true, OR: [{ outletId: null }, { outletId: input.outletId }] },
+      include: { recipes: { include: { inventoryItem: true } } },
+      orderBy: [{ category: "asc" }, { name: "asc" }],
+    }),
+    prisma.payment.findMany({
+      where: { tenantId: input.tenantId, outletId: input.outletId, status: "pending" },
+      orderBy: { createdAt: "desc" },
+      take: 10,
+    }),
+    prisma.order.findMany({
+      where: { tenantId: input.tenantId, outletId: input.outletId, prepStatus: { in: ["new", "preparing", "ready"] } },
+      include: { items: true, payments: true },
+      orderBy: { createdAt: "asc" },
+      take: 20,
+    }),
   ]);
   const criticalStock = inventory
     .filter((item) => Number(item.currentStock) <= Number(item.minimumStock))
     .map((item) => ({ id: item.id, name: item.name, unit: item.unit, currentStock: Number(item.currentStock), minimumStock: Number(item.minimumStock) }));
+  const hourlySales = today.orders.reduce<Record<string, { orders: number; revenue: number }>>((acc, order) => {
+    const hour = order.createdAt.getUTCHours().toString().padStart(2, "0");
+    const bucket = acc[hour] ?? { orders: 0, revenue: 0 };
+    bucket.orders += 1;
+    bucket.revenue += Number(order.total);
+    acc[hour] = bucket;
+    return acc;
+  }, {});
+  const menuSales = new Map<string, { qty: number; revenue: number }>();
+  for (const order of today.orders) {
+    for (const item of order.items) {
+      const current = menuSales.get(item.productName) ?? { qty: 0, revenue: 0 };
+      current.qty += item.qty;
+      current.revenue += Number(item.totalPrice);
+      menuSales.set(item.productName, current);
+    }
+  }
+  const menuPerformance = products.map((product) => {
+    const sold = menuSales.get(product.name) ?? { qty: 0, revenue: 0 };
+    const recipeRisks = product.recipes
+      .filter((recipe) => Number(recipe.inventoryItem.currentStock) <= Number(recipe.inventoryItem.minimumStock))
+      .map((recipe) => ({ item_name: recipe.inventoryItem.name, current_stock: Number(recipe.inventoryItem.currentStock), minimum_stock: Number(recipe.inventoryItem.minimumStock), unit: recipe.inventoryItem.unit }));
+    return { id: product.id, name: product.name, category: product.category, price: Number(product.price), qtySoldToday: sold.qty, revenueToday: sold.revenue, recipeRisks };
+  }).sort((a, b) => b.revenueToday - a.revenueToday);
   return {
     date: today.start.toISOString().slice(0, 10),
-    today: { totalRevenue: today.totalRevenue, totalOrders: today.totalOrders, averageOrderValue: today.averageOrderValue, bestSellers: today.bestSellers },
+    today: { totalRevenue: today.totalRevenue, totalOrders: today.totalOrders, averageOrderValue: today.averageOrderValue, bestSellers: today.bestSellers, hourlySales },
     yesterday: { totalRevenue: yesterday.totalRevenue, totalOrders: yesterday.totalOrders, averageOrderValue: yesterday.averageOrderValue, bestSellers: yesterday.bestSellers },
     criticalStock,
     products: products.map((product) => ({ id: product.id, name: product.name, category: product.category, price: Number(product.price) })),
+    menuPerformance,
+    paymentOps: {
+      pendingCount: pendingPayments.length,
+      pendingTotal: pendingPayments.reduce((sum, payment) => sum + Number(payment.amount), 0),
+      oldestPendingMinutes: pendingPayments.length ? Math.round((Date.now() - pendingPayments[pendingPayments.length - 1].createdAt.getTime()) / 60_000) : 0,
+      pendingMethods: pendingPayments.reduce<Record<string, number>>((acc, payment) => ({ ...acc, [payment.paymentMethod]: (acc[payment.paymentMethod] ?? 0) + 1 }), {}),
+    },
+    kitchenOps: {
+      activeCount: kitchenOrders.length,
+      newCount: kitchenOrders.filter((order) => order.prepStatus === "new").length,
+      preparingCount: kitchenOrders.filter((order) => order.prepStatus === "preparing").length,
+      readyCount: kitchenOrders.filter((order) => order.prepStatus === "ready").length,
+      oldestActiveMinutes: kitchenOrders.length ? Math.round((Date.now() - kitchenOrders[0].createdAt.getTime()) / 60_000) : 0,
+      activeOrders: kitchenOrders.slice(0, 8).map((order) => ({ id: order.id, prepStatus: order.prepStatus, orderChannel: order.orderChannel, minutesOpen: Math.round((Date.now() - order.createdAt.getTime()) / 60_000), items: order.items.map((item) => ({ name: item.productName, qty: item.qty })) })),
+    },
   };
 }
 
@@ -132,7 +198,16 @@ function normalizeInsight(value: Partial<StructuredInsight> | null | undefined, 
   };
 }
 
-type InsightWorkflowFocus = "daily_report" | "risk_detection" | "promo_generation" | "morning_briefing";
+type InsightWorkflowFocus =
+  | "daily_report"
+  | "risk_detection"
+  | "promo_generation"
+  | "morning_briefing"
+  | "menu_engineering"
+  | "demand_forecast"
+  | "prep_planning"
+  | "kitchen_sla"
+  | "payment_reconciliation_insight";
 
 function workflowInsightPrompt(focus: InsightWorkflowFocus) {
   const base = "Output wajib JSON valid dengan field: summary, performance_status (poor|fair|good|excellent), highlights array, risks array {title,description,severity low|medium|high}, restock_recommendations array {item_name,recommended_qty,unit,reason}, sales_opportunities array {title,description,expected_impact low|medium|high}, next_best_actions array, owner_message. Jangan tambah teks di luar JSON.";
@@ -141,6 +216,11 @@ function workflowInsightPrompt(focus: InsightWorkflowFocus) {
     risk_detection: `Kamu adalah Operational Risk Auditor untuk coffee shop/F&B kecil. Fokus HANYA pada risiko yang bisa mengganggu operasi: stock kritis, revenue drop, order kosong, AOV rendah, dependency produk, dan sinyal yang butuh tindakan cepat. Summary harus berupa tingkat risiko, bukan laporan penjualan umum. Highlights boleh minim; risks wajib tajam dan diberi severity. Next actions harus berupa mitigasi. Jangan membuat ide promo kecuali untuk mitigasi risiko sepi. ${base}`,
     promo_generation: `Kamu adalah Promo Strategist untuk coffee shop/F&B kecil. Fokus HANYA pada peluang penjualan dan campaign yang bisa dipublish setelah approval owner. Buat sales_opportunities konkret: menu target, angle promo, contoh copy singkat, timing, dan expected impact. Risks hanya risiko promo seperti margin, stok, atau cannibalization. Restock hanya muncul jika promo butuh stok. Owner_message harus mengingatkan bahwa promo perlu approval. ${base}`,
     morning_briefing: `Kamu adalah Opening Shift Briefing Assistant untuk coffee shop/F&B kecil. Fokus HANYA pada briefing sebelum operasional: apa yang harus dicek saat buka, stock/prep priority, menu yang perlu didorong, payment/kitchen readiness, dan potensi rush hour. Summary harus seperti briefing pagi untuk owner/shift lead. Jangan menulis laporan akhir hari atau copy promo panjang. ${base}`,
+    menu_engineering: `Kamu adalah Menu Engineering Analyst untuk coffee shop/F&B kecil. Fokus HANYA pada klasifikasi menu berdasarkan qty sold, revenue, price, dan recipe stock risk: star, plowhorse, puzzle, dog. Summary harus menyebut menu yang perlu didorong, dipertahankan, direprice, dibundle, atau dievaluasi. Sales opportunities wajib berupa rekomendasi menu konkret. Risks fokus pada menu laku yang rawan stok dan menu tidak bergerak. ${base}`,
+    demand_forecast: `Kamu adalah Demand Forecast Analyst untuk coffee shop/F&B kecil. Fokus HANYA memprediksi demand operasional berikutnya dari penjualan hari ini/kemarin, hourlySales, best seller, dan inventory. Summary harus berupa ekspektasi demand dan jam/jalur yang perlu diantisipasi. Next actions harus konkret untuk persiapan rush hour dan menu demand. Jangan menulis laporan umum. ${base}`,
+    prep_planning: `Kamu adalah Prep Planning Agent untuk coffee shop/F&B kecil. Fokus HANYA menghitung prioritas prep bahan/menu sebelum rush atau shift berikutnya. Gunakan criticalStock, recipeRisks, best seller, dan kitchenOps. Restock recommendations boleh dipakai sebagai prep/replenishment recommendation. Next actions harus berupa checklist prep. Jangan membahas strategi promo kecuali stok/menu berlebih. ${base}`,
+    kitchen_sla: `Kamu adalah Kitchen SLA Monitor untuk coffee shop/F&B kecil. Fokus HANYA pada antrean kitchen, prepStatus, order yang terlalu lama, bottleneck menu, dan tindakan mempercepat service. Summary harus menyebut kondisi SLA kitchen. Risks wajib membahas keterlambatan jika ada. Sales opportunities biasanya kosong kecuali service recovery. ${base}`,
+    payment_reconciliation_insight: `Kamu adalah Payment Reconciliation Analyst untuk coffee shop/F&B kecil. Fokus HANYA pada kesehatan pembayaran: pending payment, metode pembayaran, potensi callback/reconcile issue, dan tindakan reconcile. Summary harus menyebut status payment ops. Risks harus membahas pending lama/mismatch bila ada. Next actions harus berupa langkah cek/reconcile. Jangan membuat promo/menu insight. ${base}`,
   };
   return prompts[focus];
 }
@@ -171,6 +251,21 @@ function workflowFallbackTone(insight: StructuredInsight, focus: InsightWorkflow
       next_best_actions: ["Cek stok kritis dan prep bahan sebelum rush hour.", "Pastikan QRIS/VA dan kitchen queue siap.", "Brief kasir untuk mendorong menu peluang hari ini."],
       owner_message: "Sebelum buka, pastikan stok aman, antrean operasional siap, dan tim tahu menu prioritas hari ini.",
     };
+  }
+  if (focus === "menu_engineering") {
+    return { ...insight, summary: "Menu engineering: evaluasi menu berdasarkan penjualan, revenue, dan risiko stok resep.", owner_message: "Prioritas BI: pertahankan menu yang kuat, dorong menu potensial, dan evaluasi menu yang tidak bergerak." };
+  }
+  if (focus === "demand_forecast") {
+    return { ...insight, summary: "Demand forecast: prediksi kebutuhan demand berikutnya dari pola order, best seller, dan jam penjualan.", next_best_actions: ["Siapkan bahan untuk menu best seller.", "Pantau jam order tertinggi dan kitchen queue.", "Jaga stok kritis sebelum rush berikutnya."], owner_message: "Coffeelot membaca pola demand agar operasional bisa siap sebelum rush terjadi." };
+  }
+  if (focus === "prep_planning") {
+    return { ...insight, summary: "Prep planning: prioritas prep ditentukan dari best seller, stok kritis, dan risiko resep.", sales_opportunities: [], owner_message: "Checklist prep hari ini harus menjaga bahan utama, cup, es, dan item best seller tetap aman." };
+  }
+  if (focus === "kitchen_sla") {
+    return { ...insight, summary: "Kitchen SLA: pantau antrean aktif, status preparing/ready, dan order yang terlalu lama terbuka.", sales_opportunities: [], owner_message: "Jaga waktu tunggu tetap pendek; order lama harus diprioritaskan sebelum menambah beban baru." };
+  }
+  if (focus === "payment_reconciliation_insight") {
+    return { ...insight, summary: "Payment reconciliation: cek pending payment, metode pembayaran, dan kebutuhan reconcile manual/otomatis.", sales_opportunities: [], owner_message: "Pembayaran pending harus direconcile agar order paid, stok, dan kitchen status tetap sinkron." };
   }
   return insight;
 }
@@ -389,6 +484,31 @@ async function runBookingSeatInsight(input: AgentRunInput): Promise<AgentWorkflo
   };
 }
 
+async function runBusinessInsight(input: AgentRunInput, focus: Exclude<InsightWorkflowFocus, "daily_report" | "risk_detection" | "promo_generation" | "morning_briefing">): Promise<AgentWorkflowOutput> {
+  const { insight, provider, reason, snapshot, workflowFocus } = await generateLlmInsight(input, focus);
+  const outputTypeByFocus: Record<typeof focus, AgentWorkflowOutput["outputType"]> = {
+    menu_engineering: "recommendation",
+    demand_forecast: "report",
+    prep_planning: "recommendation",
+    kitchen_sla: insight.risks.length ? "alert" : "report",
+    payment_reconciliation_insight: insight.risks.length ? "alert" : "report",
+  };
+  const titleByFocus: Record<typeof focus, string> = {
+    menu_engineering: "BI menu engineering insight",
+    demand_forecast: "BI demand forecast insight",
+    prep_planning: "BI prep planning insight",
+    kitchen_sla: "BI kitchen SLA insight",
+    payment_reconciliation_insight: "BI payment reconciliation insight",
+  };
+  return {
+    outputType: outputTypeByFocus[focus],
+    title: `${titleByFocus[focus]} — ${snapshot.date}`,
+    content: insightToContent(insight, provider),
+    metadata: JSON.stringify({ provider, reason, workflowFocus, insight, snapshot }),
+    requiresApproval: false,
+  };
+}
+
 async function executeWorkflow(input: AgentRunInput) {
   if (input.workflowId === "daily_report") return runDailyReport(input);
   if (input.workflowId === "restock_alert") return runRestockAlert(input);
@@ -396,6 +516,11 @@ async function executeWorkflow(input: AgentRunInput) {
   if (input.workflowId === "promo_generation") return runPromoGeneration(input);
   if (input.workflowId === "morning_briefing") return runMorningBriefing(input);
   if (input.workflowId === "booking_seat_insight") return runBookingSeatInsight(input);
+  if (input.workflowId === "menu_engineering") return runBusinessInsight(input, "menu_engineering");
+  if (input.workflowId === "demand_forecast") return runBusinessInsight(input, "demand_forecast");
+  if (input.workflowId === "prep_planning") return runBusinessInsight(input, "prep_planning");
+  if (input.workflowId === "kitchen_sla") return runBusinessInsight(input, "kitchen_sla");
+  if (input.workflowId === "payment_reconciliation_insight") return runBusinessInsight(input, "payment_reconciliation_insight");
   throw new Error(`Unknown workflow ${input.workflowId}`);
 }
 

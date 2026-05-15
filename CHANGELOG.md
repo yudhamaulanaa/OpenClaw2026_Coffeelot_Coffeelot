@@ -730,4 +730,14 @@
 - Split generic LLM insight prompting into workflow-specific prompts for daily report, risk detection, promo generation, and morning briefing.
 - Added workflow focus metadata to agent output metadata so UI can distinguish insight intent.
 - Added `/agent` insight comparison table showing latest structured insight per workflow with provider, status, summary, signal counts, owner message, and timestamp.
+## 2026-05-15 — BI Insight Pack
+
+- Expanded Agent Workflows with a Business Intelligence insight pack:
+  - `menu_engineering`
+  - `demand_forecast`
+  - `prep_planning`
+  - `kitchen_sla`
+  - `payment_reconciliation_insight`
+- Added richer insight snapshots for hourly sales, menu performance, recipe stock risks, kitchen queue/SLA, and pending payment reconciliation.
+- Each BI workflow uses a distinct LLM prompt and stores `workflowFocus` metadata so `/agent` comparison table can distinguish their intent.
 

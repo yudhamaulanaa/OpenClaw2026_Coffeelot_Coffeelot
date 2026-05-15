@@ -159,4 +159,18 @@
 - [x] Split prompt intent per workflow.
 - [x] Add workflow focus metadata.
 - [x] Add tabular comparison view to `/agent`.
+## Completed — BI Insight Pack
+
+- [x] Add Menu Engineering Insight workflow.
+- [x] Add Demand Forecast Insight workflow.
+- [x] Add Prep Planning Insight workflow.
+- [x] Add Kitchen SLA Insight workflow.
+- [x] Add Payment/Reconciliation Insight workflow.
+- [x] Include BI workflows in `/agent` workflow list and comparison table.
+
+## Follow-up — BI Insight Pack
+
+- [ ] Add dedicated BI dashboard filters and charts.
+- [ ] Add COGS/margin fields for deeper menu engineering.
+- [ ] Add historical multi-day forecasting beyond today/yesterday.
 
