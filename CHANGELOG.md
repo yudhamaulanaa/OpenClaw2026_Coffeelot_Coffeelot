@@ -741,3 +741,12 @@
 - Added richer insight snapshots for hourly sales, menu performance, recipe stock risks, kitchen queue/SLA, and pending payment reconciliation.
 - Each BI workflow uses a distinct LLM prompt and stores `workflowFocus` metadata so `/agent` comparison table can distinguish their intent.
 
+
+## 2026-05-15 — Wrap-up Reporting Materials
+
+- Added report materials for the current Coffeelot MVP/BI phase:
+  - `docs/reports/COFFEELOT-PITCHDECK.md`
+  - `docs/reports/COFFEELOT-VIDEO-SCRIPT.md`
+  - `docs/reports/README.md`
+- The pitch deck positions Coffeelot as an AI Business Intelligence & Operations Agent for coffee shops/small F&B.
+- The video script includes demo flow, narration, recording checklist, and secret-safety reminder.

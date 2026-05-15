@@ -174,3 +174,11 @@
 - [ ] Add COGS/margin fields for deeper menu engineering.
 - [ ] Add historical multi-day forecasting beyond today/yesterday.
 
+
+## Reporting / Pitch Deck Follow-up
+
+- [x] Create Markdown pitch deck content for Coffeelot MVP/BI wrap-up.
+- [x] Create demo video script and recording checklist.
+- [ ] Convert pitch deck markdown into slides/PDF.
+- [ ] Capture product screenshots for deck.
+- [ ] Record demo video using safe browser tabs only.

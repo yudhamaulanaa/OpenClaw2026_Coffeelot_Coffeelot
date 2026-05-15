@@ -97,3 +97,12 @@ Coffeelot now has a first-pass BI Insight Pack in Agent Workflows. The agent can
 
 The BI snapshot now includes hourly sales, menu performance, recipe stock risk, active kitchen queue/SLA indicators, and pending payment summary so the LLM can reason beyond generic reports.
 
+
+## Latest update — Wrap-up Reporting Materials
+
+The current MVP/BI build phase has been wrapped with reporting assets in `docs/reports/`:
+
+- Pitch deck content covering problem, solution, demo flow, AI/BI layer, current status, and roadmap.
+- Demo video script covering POS, `/chat`, payment/inventory reliability, `/agent`, Booking Seat Insight, and BI workflows.
+
+These are Markdown source materials ready to convert into slides/PDF and a recorded demo video.
