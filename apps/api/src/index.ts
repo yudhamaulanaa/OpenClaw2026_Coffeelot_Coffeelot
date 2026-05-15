@@ -39,6 +39,50 @@ function applyCors(origin: string | null, set: { headers?: Record<string, unknow
 
 type PaymentRecord = Awaited<ReturnType<typeof prisma.payment.findFirstOrThrow>>;
 
+async function deductStockForPaidOrder(tx: Parameters<Parameters<typeof prisma.$transaction>[0]>[0], orderId: string) {
+  const existingSaleMovement = await tx.stockMovement.findFirst({ where: { orderId, movementType: "sale" } });
+  if (existingSaleMovement) return { deducted: false, reason: "already_deducted" };
+
+  const order = await tx.order.findUniqueOrThrow({ where: { id: orderId }, include: { items: true } });
+  const productIds = [...new Set(order.items.map((item) => item.productId))];
+  const recipes = await tx.productRecipe.findMany({
+    where: { tenantId: order.tenantId, productId: { in: productIds } },
+    include: { inventoryItem: true },
+  });
+  const recipeMap = new Map<string, typeof recipes>();
+  for (const recipe of recipes) {
+    const list = recipeMap.get(recipe.productId) ?? [];
+    list.push(recipe);
+    recipeMap.set(recipe.productId, list);
+  }
+
+  let movements = 0;
+  for (const item of order.items) {
+    const itemRecipes = recipeMap.get(item.productId) ?? [];
+    for (const recipe of itemRecipes) {
+      const stockBefore = Number(recipe.inventoryItem.currentStock);
+      const qty = Number(recipe.qtyUsed) * item.qty;
+      const stockAfter = stockBefore - qty;
+      await tx.inventoryItem.update({ where: { id: recipe.inventoryItemId }, data: { currentStock: stockAfter } });
+      await tx.stockMovement.create({
+        data: {
+          tenantId: order.tenantId,
+          outletId: order.outletId,
+          inventoryItemId: recipe.inventoryItemId,
+          movementType: "sale",
+          qty,
+          stockBefore,
+          stockAfter,
+          orderId: order.id,
+          note: `Sale deduction: ${item.qty}× ${item.productName}`,
+        },
+      });
+      movements += 1;
+    }
+  }
+  return { deducted: movements > 0, movements };
+}
+
 async function markPaymentFromProviderStatus(payment: PaymentRecord, status: string, rawResponse: unknown) {
   const paidAt = status === "paid" ? new Date() : payment.paidAt;
   return prisma.$transaction(async (tx) => {
@@ -56,6 +100,7 @@ async function markPaymentFromProviderStatus(payment: PaymentRecord, status: str
         where: { id: payment.orderId },
         data: { orderStatus: "paid" },
       });
+      await deductStockForPaidOrder(tx, payment.orderId);
     }
 
     return updatedPayment;
@@ -269,6 +314,7 @@ export const app = new Elysia({ prefix: "/api" })
           include: { items: true },
         });
 
+        await deductStockForPaidOrder(tx, order.id);
         return { order, items: order.items };
       });
     },

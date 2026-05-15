@@ -1,5 +1,21 @@
 # Coffeelot — Changelog
 
+## [Paid Order Stock Deduction] — 2026-05-15
+
+### Added
+
+- Added idempotent recipe-based stock deduction when an order becomes `paid`.
+- Paid cash orders now deduct inventory immediately using product recipes.
+- DOKU callback/reconciliation paid flow now also deducts inventory using the same transaction helper.
+- Sale deductions create `stock_movements` with `movement_type=sale` and order references.
+
+### Verification
+
+- `bun run typecheck` passes.
+- `bun run build` passes.
+- `coffeelot-api` restarted successfully.
+- Test Americano cash order deducted Biji Kopi by 18g, Cup 16oz by 1 pcs, and Es Batu by 150g, with sale movement records created.
+
 ## [Agent Dashboard UI] — 2026-05-15
 
 ### Added

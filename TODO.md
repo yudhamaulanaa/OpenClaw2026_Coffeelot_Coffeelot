@@ -84,7 +84,7 @@
 - [x] Add manual payment reconciliation endpoint
 - [x] Sync DOKU `SUCCESS` status to local paid payment/order state
 - [ ] Add callback signature/security validation
-- [ ] Payment confirmation → stock deduction transaction
+- [x] Payment confirmation → stock deduction transaction
 - [ ] Verify sandbox end-to-end payment callback flow
 
 ## POS / Operations UI

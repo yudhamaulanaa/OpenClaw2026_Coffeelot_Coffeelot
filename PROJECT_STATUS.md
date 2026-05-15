@@ -14,7 +14,7 @@ Milestone 3 — Backend Foundation is complete and merged to `main`.
 
 Milestone 4 — Built-in POS / Order Channels MVP foundation is complete and merged to `main`. A customer-facing `/chat` web order screen is now implemented and deployed for browser/QR-based self-order testing.
 
-Milestone 5 — DOKU Payment Integration MVP is wrapped for now. DOKU MCP sandbox discovery and payment creation are verified for QRIS, DOKU Checkout, and BCA Virtual Account paths with runtime-only credentials. Fallback reconciliation/polling is implemented, manual payment reconciliation works, webchat/POS payment status UX is deployed, and paid DOKU sandbox payments can sync to local `paid`. Remaining DOKU hardening items are tracked as follow-ups: callback signature/security validation and recipe-based stock deduction.
+Milestone 5 — DOKU Payment Integration MVP is wrapped for now. DOKU MCP sandbox discovery and payment creation are verified for QRIS, DOKU Checkout, and BCA Virtual Account paths with runtime-only credentials. Fallback reconciliation/polling is implemented, manual payment reconciliation works, webchat/POS payment status UX is deployed, and paid DOKU sandbox payments can sync to local `paid`. Remaining DOKU hardening items are tracked as follow-ups: callback signature/security validation. Recipe-based stock deduction is now implemented for paid orders.
 
 Roadmap and docs are updated with the latest MVP direction:
 
@@ -37,7 +37,7 @@ Keep `.md` files updated as part of the work, not afterthoughts:
 
 ### What's Next
 
-Continue with Milestone 6 — AI Agent Core. First target: implement an internal workflow runner API that records `agent_runs` and `agent_outputs`, then wire daily report / stock alert workflows on top of existing reporting and inventory data. DOKU callback security and stock deduction remain tracked follow-up hardening tasks.
+Continue with Milestone 6 — AI Agent Core. First target: implement an internal workflow runner API that records `agent_runs` and `agent_outputs`, then wire daily report / stock alert workflows on top of existing reporting and inventory data. DOKU callback security remains a tracked follow-up hardening task.
 
 ### Modules Created
 

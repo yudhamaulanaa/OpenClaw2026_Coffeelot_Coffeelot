@@ -103,7 +103,7 @@ Integrate DOKU MCP Server untuk payment processing.
 - [x] Manual payment reconciliation endpoint
 - [x] Reconciled DOKU `SUCCESS` → local payment paid + order paid
 - [ ] Callback signature/security validation
-- [ ] Payment confirmation → trigger stock deduction
+- [x] Payment confirmation → trigger stock deduction
 
 ---
 
