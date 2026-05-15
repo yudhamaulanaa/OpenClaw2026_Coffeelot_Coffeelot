@@ -124,6 +124,25 @@ function readSearchParam(name: string) {
   return new URLSearchParams(window.location.search).get(name) ?? "";
 }
 
+
+function AppNavbar({ active }: { active: "pos" | "chat" | "agent" }) {
+  const links = [
+    { id: "pos", href: "/", label: "POS" },
+    { id: "chat", href: "/chat", label: "Chat Order" },
+    { id: "agent", href: "/agent", label: "Agent" },
+  ] as const;
+  return (
+    <nav className="app-navbar">
+      <a className="brand" href="/">☕ Coffeelot</a>
+      <div>
+        {links.map((link) => (
+          <a key={link.id} href={link.href} className={active === link.id ? "active" : ""}>{link.label}</a>
+        ))}
+      </div>
+    </nav>
+  );
+}
+
 function PaymentBox({ payment, method, onCheck, checking }: { payment: PaymentResult | null; method?: DokuPaymentMethod; onCheck?: () => void; checking?: boolean }) {
   if (!payment) return null;
   const url = paymentUrl(payment);
@@ -257,6 +276,7 @@ function App() {
 
   return (
     <main className="shell">
+      <AppNavbar active="pos" />
       <section className="header">
         <div>
           <p className="eyebrow">Coffeelot POS</p>
@@ -392,6 +412,7 @@ function AgentDashboard() {
 
   return (
     <main className="shell">
+      <AppNavbar active="agent" />
       <section className="header">
         <div>
           <p className="eyebrow">Coffeelot Agent</p>
@@ -577,6 +598,7 @@ function WebChatOrder() {
 
   return (
     <main className="chat-shell">
+      <AppNavbar active="chat" />
       <section className="chat-hero">
         <p className="eyebrow">Coffeelot Webchat Order</p>
         <h1>Pesan kopi dari meja kamu</h1>

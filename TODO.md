@@ -89,6 +89,7 @@
 - [x] Payment confirmation → stock deduction transaction
 - [x] Prevent paid orders/payment creation from making inventory negative
 - [x] Show temporary/projected stock while items are in POS and chat carts
+- [x] Add navbar across POS, chat, and agent UI pages
 - [ ] Verify sandbox end-to-end payment callback flow
 
 ## POS / Operations UI

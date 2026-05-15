@@ -1,5 +1,20 @@
 # Coffeelot — Changelog
 
+## [Web Navbar] — 2026-05-15
+
+### Added
+
+- Added a shared navbar to existing UI pages: POS `/`, Chat Order `/chat`, and Agent Dashboard `/agent`.
+- Navbar highlights the active page and links between available UI surfaces.
+- Added responsive navbar styling for mobile widths.
+
+### Verification
+
+- `bun run typecheck` passes.
+- `bun run build` passes.
+- `coffeelot-web` restarted successfully.
+- Public bundle includes navbar labels `Coffeelot`, `Chat Order`, and `Agent`.
+
 ## [Projected Cart Stock] — 2026-05-15
 
 ### Added
