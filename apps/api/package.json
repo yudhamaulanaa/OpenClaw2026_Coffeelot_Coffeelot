@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@coffeelot/shared": "workspace:*",
-    "@prisma/client": "latest",
+    "@prisma/client": "^6.19.3",
     "elysia": "latest",
     "zod": "latest"
   },

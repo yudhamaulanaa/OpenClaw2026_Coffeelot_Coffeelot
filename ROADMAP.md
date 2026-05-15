@@ -32,7 +32,7 @@ Status: **Started** — branch `feat/milestone-2-database-foundation` created; i
 - [x] Milestone branch created
 - [x] Bun workspace config
 - [x] `.env.example`
-- [ ] Prisma schema (all tables: tenant, POS, agent, payment)
+- [x] Prisma schema (all tables: tenant, POS, agent, payment)
 - [ ] Migration (SQLite)
 - [ ] Seed: demo tenant, outlet, user
 - [ ] Seed: sample products, inventory, recipes

@@ -1,5 +1,22 @@
 # Coffeelot — Changelog
 
+## [Milestone 2 Prisma Schema] — 2026-05-15
+
+### Added
+
+- Added `prisma/schema.prisma` using SQLite datasource and Prisma Client generator.
+- Modeled tenant, user, outlet, product, inventory, recipe, customer, order, stock movement, self-order/cart, AI agent, report, and payment tables from `docs/DATABASE-SCHEMA.md`.
+- Added indexes, unique constraints, relations, timestamps, and snake_case table/column mappings.
+
+### Updated
+
+- Marked Prisma schema tasks complete in `TODO.md` and `ROADMAP.md`.
+- Updated `PROJECT_STATUS.md` next steps toward migration and seed data.
+
+### Notes
+
+- Schema validation passed with `DATABASE_URL=file:./dev.db npx --yes prisma@6.19.3 validate --schema prisma/schema.prisma`. Prisma packages are pinned to `^6.19.3` to preserve the documented datasource URL workflow; Prisma 7 moves datasource URLs to `prisma.config.ts`.
+
 ## [Milestone 2 Foundation Bootstrap] — 2026-05-15
 
 ### Added

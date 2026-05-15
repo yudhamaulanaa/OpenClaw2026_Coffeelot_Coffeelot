@@ -20,11 +20,11 @@
   },
   "devDependencies": {
     "@types/node": "latest",
-    "prisma": "latest",
+    "prisma": "^6.19.3",
     "typescript": "latest"
   },
   "dependencies": {
-    "@prisma/client": "latest"
+    "@prisma/client": "^6.19.3"
   },
   "prisma": {
     "seed": "bun run prisma/seed.ts"
