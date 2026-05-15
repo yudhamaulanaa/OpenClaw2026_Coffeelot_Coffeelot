@@ -413,7 +413,7 @@ Reject a human-approved action.
 
 ### POST /api/payments/create
 
-Create payment for an order via DOKU.
+Create payment for an order via DOKU. In sandbox, Coffeelot calls the DOKU MCP Server and maps QRIS / Virtual Account responses into the payment record. If MCP is unavailable, the endpoint can fall back to the local sandbox placeholder and stores the fallback reason in `raw_response`.
 
 **Body:**
 ```json
@@ -455,7 +455,21 @@ Check payment status (polls DOKU).
 
 DOKU webhook callback (payment confirmation).
 
-**Note:** This endpoint is called by DOKU, not by frontend.
+**Note:** This endpoint is called by DOKU, not by frontend. Invalid payloads without a payment/provider reference return `400`; unknown references return `404`. Signature verification is still pending until callback signing details are confirmed.
+
+
+### GET /api/payments/doku/tools
+
+Inspect available DOKU MCP tools for the configured runtime credentials. Intended for integration diagnostics.
+
+**Response 200:**
+```json
+{
+  "ok": true,
+  "count": 35,
+  "tools": []
+}
+```
 
 ### GET /api/payments?order_id=uuid
 

@@ -1,5 +1,28 @@
 # Coffeelot — Changelog
 
+## [DOKU MCP Sandbox Integration] — 2026-05-15
+
+### Added
+
+- Added a DOKU MCP JSON-RPC client with initialize, tools/list, and tools/call support.
+- Added `GET /api/payments/doku/tools` to inspect available DOKU MCP tools from the configured sandbox endpoint.
+- Wired `POST /api/payments/create` to call real DOKU MCP tools for QRIS and Virtual Account payment creation, with sandbox placeholder fallback if MCP is unavailable.
+- Added DOKU runtime configuration placeholders to `.env.example` without committing real secrets.
+
+### Changed
+
+- Updated DOKU sandbox endpoint defaults to `https://api-sandbox.doku.com/doku-mcp-server/mcp`.
+- Expanded POS/payment method constants to include DOKU methods used by payment creation.
+- Hardened payment callback parsing so invalid or unknown callback references return clear 4xx API errors.
+
+### Verification
+
+- `bun run typecheck` passes.
+- `bun run build` passes.
+- `GET https://api.coffeelot.app/api/payments/doku/tools` returns 35 DOKU MCP tools including checkout, QRIS, and virtual account tools.
+- Sandbox QRIS payment creation returns a DOKU QR payload and QR image URL through `create_qris_payment`.
+- Sandbox BCA Virtual Account payment creation returns a VA number and how-to-pay URL through `create_virtual_account_payment`.
+
 ## [Deployment API URL and CORS Fix] — 2026-05-15
 
 ### Fixed

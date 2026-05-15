@@ -95,7 +95,9 @@ Integrate DOKU MCP Server untuk payment processing.
 - [x] Payment webhook/callback endpoint
 - [x] Payment UI di POS checkout
 - [x] Public HTTPS deployment for web/API payment callback URL
-- [ ] Real DOKU MCP/API integration using sandbox credentials
+- [x] Real DOKU MCP sandbox tool discovery using runtime credentials
+- [x] QRIS payment creation through DOKU MCP sandbox
+- [x] BCA Virtual Account payment creation through DOKU MCP sandbox
 - [ ] Callback signature/security validation
 - [ ] Payment confirmation → trigger stock deduction
 

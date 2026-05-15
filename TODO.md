@@ -58,11 +58,15 @@
 
 ### Real DOKU Hardening
 
-- [ ] Collect DOKU sandbox credentials/config
-- [ ] Replace sandbox placeholder with real DOKU MCP/API calls
+- [x] Collect DOKU sandbox credentials/config
+- [x] Discover real DOKU MCP tools via sandbox endpoint
+- [x] Replace payment creation placeholder path with real DOKU MCP QRIS/VA calls
+- [x] Verify sandbox QRIS payment creation via MCP
+- [x] Verify sandbox BCA Virtual Account payment creation via MCP
+- [x] Harden invalid callback handling to return clear 4xx errors instead of generic 500
 - [ ] Add callback signature/security validation
 - [ ] Payment confirmation → order paid + stock deduction transaction
-- [ ] Verify sandbox end-to-end payment flow
+- [ ] Verify sandbox end-to-end payment callback flow
 
 ## Later
 
@@ -72,5 +76,5 @@
 
 ## Blocked
 
-- Real DOKU integration is blocked until sandbox credentials/config and callback signing details are available.
+- Callback signature/security validation is blocked until DOKU callback signing details/headers are confirmed.
 - `www.coffeelot.app` SSL/proxy setup is blocked until DNS resolves publicly.

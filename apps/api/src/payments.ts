@@ -16,7 +16,7 @@ export type SandboxPaymentPayload = {
 };
 
 export function createSandboxPayment(input: CreateSandboxPaymentInput): SandboxPaymentPayload {
-  const baseUrl = process.env.DOKU_MCP_URL ?? "https://mcp-sandbox.doku.com/sse";
+  const baseUrl = process.env.DOKU_MCP_URL ?? "https://api-sandbox.doku.com/doku-mcp-server/mcp";
   const dokuInvoiceId = `DOKU-SANDBOX-${input.paymentId}`;
   const paymentUrl = `${baseUrl.replace(/\/sse$/, "")}/pay/${dokuInvoiceId}`;
   const qrCode = input.method === "qris" ? `QRIS:${dokuInvoiceId}:${input.amount}` : null;
@@ -31,9 +31,10 @@ export function createSandboxPayment(input: CreateSandboxPaymentInput): SandboxP
   };
 }
 
-export function normalizePaymentStatus(value: string): PaymentStatus {
-  if (["paid", "success", "settlement", "capture"].includes(value)) return "paid";
-  if (["expired"].includes(value)) return "expired";
-  if (["failed", "deny", "cancel"].includes(value)) return "failed";
+export function normalizePaymentStatus(value: string | undefined | null): PaymentStatus {
+  const normalized = value?.toLowerCase() ?? "pending";
+  if (["paid", "success", "settlement", "capture", "completed"].includes(normalized)) return "paid";
+  if (["expired"].includes(normalized)) return "expired";
+  if (["failed", "deny", "denied", "cancel", "cancelled", "canceled"].includes(normalized)) return "failed";
   return "pending";
 }

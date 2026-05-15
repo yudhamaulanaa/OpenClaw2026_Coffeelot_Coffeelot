@@ -3,6 +3,7 @@ import { isDokuPaymentMethod, isPaymentMethod } from "@coffeelot/shared";
 import { resolveTenantContext } from "./context";
 import { prisma } from "./db";
 import { ApiError, statusFromError, toErrorEnvelope } from "./errors";
+import { createDokuMcpPayment, listDokuMcpTools } from "./doku-mcp";
 import { createSandboxPayment, normalizePaymentStatus } from "./payments";
 
 const port = Number(process.env.API_PORT ?? 3001);
@@ -368,26 +369,55 @@ export const app = new Elysia({ prefix: "/api" })
         },
       });
 
-      const sandbox = createSandboxPayment({
-        paymentId: payment.id,
-        orderId: order.id,
-        amount: Number(order.total),
-        method: body.payment_method,
-      });
+      let providerPayment;
+      try {
+        providerPayment = await createDokuMcpPayment({
+          paymentId: payment.id,
+          orderId: order.id,
+          invoiceNumber: order.invoiceNumber ?? payment.id,
+          amount: Number(order.total),
+          method: body.payment_method,
+          callbackUrl: process.env.DOKU_CALLBACK_URL,
+          returnUrl: process.env.DOKU_RETURN_URL,
+        });
+      } catch (error) {
+        const sandbox = createSandboxPayment({
+          paymentId: payment.id,
+          orderId: order.id,
+          amount: Number(order.total),
+          method: body.payment_method,
+        });
+        providerPayment = {
+          ...sandbox,
+          rawResponse: JSON.stringify({
+            provider: "doku-sandbox-placeholder",
+            fallbackReason: error instanceof Error ? error.message : "DOKU MCP payment creation failed",
+            sandbox: JSON.parse(sandbox.rawResponse),
+          }),
+        };
+      }
 
       return prisma.payment.update({
         where: { id: payment.id },
         data: {
-          dokuInvoiceId: sandbox.dokuInvoiceId,
-          paymentUrl: sandbox.paymentUrl,
-          qrCode: sandbox.qrCode,
-          vaNumber: sandbox.vaNumber,
-          rawResponse: sandbox.rawResponse,
+          dokuInvoiceId: providerPayment.dokuInvoiceId,
+          paymentUrl: providerPayment.paymentUrl,
+          qrCode: providerPayment.qrCode,
+          vaNumber: providerPayment.vaNumber,
+          rawResponse: providerPayment.rawResponse,
         },
       });
     },
     { body: t.Object({ order_id: t.String(), payment_method: t.String() }) },
   )
+  .get("/payments/doku/tools", async () => {
+    try {
+      const tools = await listDokuMcpTools({ refresh: true });
+      return { ok: true, count: tools.length, tools };
+    } catch (error) {
+      throw new ApiError("DOKU_MCP_UNAVAILABLE", error instanceof Error ? error.message : "Unable to list DOKU MCP tools", 502);
+    }
+  })
   .get("/payments", async ({ headers, query }) => {
     const { tenantId, outletId } = resolveTenantContext(headers);
     return prisma.payment.findMany({
@@ -406,10 +436,25 @@ export const app = new Elysia({ prefix: "/api" })
   .post(
     "/payments/callback",
     async ({ body }) => {
-      const status = normalizePaymentStatus(body.status);
-      const payment = await prisma.payment.findFirstOrThrow({
-        where: { OR: [{ id: body.payment_id }, { dokuInvoiceId: body.doku_invoice_id }] },
+      const callbackBody = body as Record<string, unknown>;
+      const paymentId = typeof callbackBody.payment_id === "string" ? callbackBody.payment_id : undefined;
+      const dokuInvoiceId = typeof callbackBody.doku_invoice_id === "string" ? callbackBody.doku_invoice_id : undefined;
+      const providerReference =
+        dokuInvoiceId ??
+        (typeof callbackBody.invoice_number === "string" ? callbackBody.invoice_number : undefined) ??
+        (typeof callbackBody.transaction_id === "string" ? callbackBody.transaction_id : undefined) ??
+        (typeof callbackBody.reference_id === "string" ? callbackBody.reference_id : undefined);
+      if (!paymentId && !providerReference) throw new ApiError("INVALID_CALLBACK", "Missing payment_id or provider reference", 400);
+
+      const statusValue =
+        (typeof callbackBody.status === "string" ? callbackBody.status : undefined) ??
+        (typeof callbackBody.transaction_status === "string" ? callbackBody.transaction_status : undefined) ??
+        (typeof callbackBody.payment_status === "string" ? callbackBody.payment_status : undefined);
+      const status = normalizePaymentStatus(statusValue);
+      const payment = await prisma.payment.findFirst({
+        where: { OR: [{ id: paymentId ?? "" }, { dokuInvoiceId: providerReference ?? "" }] },
       });
+      if (!payment) throw new ApiError("PAYMENT_NOT_FOUND", "Payment not found for callback reference", 404);
 
       const updated = await prisma.$transaction(async (tx) => {
         const paidAt = status === "paid" ? new Date() : null;
@@ -428,7 +473,7 @@ export const app = new Elysia({ prefix: "/api" })
 
       return { ok: true, payment: updated };
     },
-    { body: t.Object({ payment_id: t.Optional(t.String()), doku_invoice_id: t.Optional(t.String()), status: t.String() }) },
+    { body: t.Record(t.String(), t.Unknown()) },
   )
   .get("/reports/recent-orders", async ({ headers, query }) => {
     const { tenantId, outletId } = resolveTenantContext(headers);

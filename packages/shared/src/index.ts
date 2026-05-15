@@ -23,7 +23,7 @@ export type PrepStatus = (typeof PREP_STATUSES)[number];
 export const ORDER_CHANNELS = ["cashier", "manual", "chat", "connector"] as const;
 export type OrderChannel = (typeof ORDER_CHANNELS)[number];
 
-export const PAYMENT_METHODS = ["cash", "qris", "transfer"] as const;
+export const PAYMENT_METHODS = ["cash", "qris", "transfer", "va_bca", "va_bni", "ovo", "gopay", "dana", "shopee_pay"] as const;
 export type PaymentMethod = (typeof PAYMENT_METHODS)[number];
 
 export const DOKU_PAYMENT_METHODS = ["qris", "va_bca", "va_bni", "ovo", "gopay", "dana", "shopee_pay"] as const;
@@ -50,6 +50,9 @@ export type ApiErrorCode =
   | "MISSING_CONTEXT"
   | "INACTIVE_PRODUCT"
   | "INSUFFICIENT_STOCK"
+  | "INVALID_CALLBACK"
+  | "PAYMENT_NOT_FOUND"
+  | "DOKU_MCP_UNAVAILABLE"
   | "INTERNAL_ERROR";
 
 export type ApiErrorEnvelope = {

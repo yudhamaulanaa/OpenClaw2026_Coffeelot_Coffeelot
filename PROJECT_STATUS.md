@@ -2,7 +2,7 @@
 
 Last updated: 2026-05-15
 
-## Overall Progress: Milestone 5 Started — DOKU Payment Hardening + Deployment
+## Overall Progress: Milestone 5 In Progress — Real DOKU MCP Sandbox Integrated
 
 ### Current State
 
@@ -14,7 +14,7 @@ Milestone 3 — Backend Foundation is complete and merged to `main`.
 
 Milestone 4 — Built-in POS / Order Channels MVP foundation is complete and merged to `main`.
 
-Milestone 5 — DOKU Payment Integration foundation is started on branch `feat/milestone-5-doku-hardening`: sandbox placeholder payment creation, status polling, callback handling, and POS payment link/QR/VA display are implemented. The public deployment now serves `https://coffeelot.app` and `https://api.coffeelot.app`; frontend API calls use the public API origin and backend CORS allows the app origin. Next target: replace sandbox placeholder with real DOKU MCP/API calls and harden paid-order stock deduction once sandbox credentials/flow are available.
+Milestone 5 — DOKU Payment Integration is in progress on branch `feat/doku-mcp-integration`: sandbox placeholder payment creation, status polling, callback handling, and POS payment link/QR/VA display are implemented. The public deployment serves `https://coffeelot.app` and `https://api.coffeelot.app`; frontend API calls use the public API origin and backend CORS allows the app origin. DOKU MCP sandbox discovery now works against the real endpoint, and payment creation has been verified for QRIS and BCA Virtual Account sandbox tools with runtime-only credentials. Next target: callback signature/security validation and paid-order stock deduction hardening.
 
 Roadmap and docs are updated with the latest MVP direction:
 
@@ -39,12 +39,11 @@ Keep `.md` files updated as part of the work, not afterthoughts:
 
 Continue Milestone 5 in this order:
 
-1. Collect real DOKU sandbox credentials/config and confirm the provider flow.
-2. Replace sandbox placeholder internals in `apps/api/src/payments.ts` with real DOKU MCP/API calls.
-3. Add callback signature/security validation.
-4. Harden successful payment flow: payment paid → order paid → invoice assignment → stock deduction → stock movement records.
-5. Verify with `bun run typecheck`, `bun run build`, and a sandbox end-to-end payment callback.
-6. Update living docs and changelog before merging.
+1. Add callback signature/security validation using confirmed DOKU callback headers/canonical string.
+2. Harden successful payment flow: payment paid → order paid → invoice assignment → stock deduction → stock movement records.
+3. Add an internal/safe callback simulation script for existing sandbox payment records.
+4. Verify with `bun run typecheck`, `bun run build`, and a sandbox end-to-end payment callback.
+5. Update living docs and changelog before merging.
 
 ### Modules Created
 
@@ -55,5 +54,5 @@ Continue Milestone 5 in this order:
 
 ### Blockers
 
-- Real DOKU integration needs sandbox credentials/config and callback signing details.
+- Callback security validation still needs confirmed DOKU callback signing details.
 - `www.coffeelot.app` is not enabled in Nginx Proxy Manager SSL until DNS resolves publicly.
