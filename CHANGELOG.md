@@ -1,5 +1,19 @@
 # Coffeelot — Changelog
 
+## [Chat Check Payment Reconcile Fix] — 2026-05-15
+
+### Fixed
+
+- Fixed `/chat` `Check Pembayaran` button to call `POST /api/payments/:id/reconcile` instead of only reading local status.
+- The button now actively syncs DOKU status first, so paid DOKU payments can immediately switch the customer view to order status.
+
+### Verification
+
+- `bun run typecheck` passes.
+- `bun run build` passes.
+- `coffeelot-web` restarted successfully.
+- Public `/chat` bundle contains `Check Pembayaran` and `/reconcile`.
+
 ## [Realtime Kitchen Refresh] — 2026-05-15
 
 ### Added

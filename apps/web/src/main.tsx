@@ -347,9 +347,10 @@ function WebChatOrder() {
     if (!payment?.id) return;
     setCheckingPayment(true);
     try {
-      const status = await api<{ id: string; status: string; paid_at?: string | null }>(`/payments/${payment.id}/status`);
-      setPayment((current) => current ? { ...current, status: status.status } : current);
-      if (status.status === "paid") {
+      const reconcile = await api<{ payment?: { status?: string; paidAt?: string | null }; provider?: { status?: string } }>(`/payments/${payment.id}/reconcile`, { method: "POST" });
+      const nextStatus = reconcile.payment?.status ?? reconcile.provider?.status ?? payment.status ?? "pending";
+      setPayment((current) => current ? { ...current, status: nextStatus } : current);
+      if (nextStatus === "paid") {
         setSubmittedOrderStatus("paid");
         if (submittedOrderId) {
           const order = await api<OrderDetail>(`/orders/${submittedOrderId}`);
@@ -358,7 +359,7 @@ function WebChatOrder() {
         }
         setMessage("Pembayaran diterima. Pesanan sedang diproses.");
       } else {
-        setMessage(`Status pembayaran: ${status.status}`);
+        setMessage(`Status pembayaran: ${nextStatus}`);
       }
     } finally {
       setCheckingPayment(false);
