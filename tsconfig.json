@@ -12,8 +12,11 @@
     "noEmit": true,
     "baseUrl": ".",
     "paths": {
-      "@coffeelot/shared": ["packages/shared/src/index.ts"]
-    }
+      "@coffeelot/shared": [
+        "packages/shared/src/index.ts"
+      ]
+    },
+    "ignoreDeprecations": "6.0"
   },
   "include": [
     "apps/**/*.ts",

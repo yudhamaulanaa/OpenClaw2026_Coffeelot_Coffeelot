@@ -1,5 +1,25 @@
 # Coffeelot — Changelog
 
+## [Tooling Verification] — 2026-05-15
+
+### Added
+
+- Installed Bun 1.3.14 on the host and generated `bun.lock`.
+
+### Updated
+
+- Added TypeScript `ignoreDeprecations: "6.0"` to keep workspace typecheck passing under TypeScript 6 while `baseUrl`/`paths` remain in use.
+- Updated `PROJECT_STATUS.md` to reflect completed dependency installation, Prisma generate, seed execution, and typecheck verification.
+
+### Verification
+
+- `bun --version` and `bunx --version` both report `1.3.14`.
+- `bun install` completed successfully.
+- `DATABASE_URL=file:./dev.db bunx prisma migrate reset --schema prisma/schema.prisma --force --skip-seed` completed successfully.
+- `DATABASE_URL=file:./dev.db bun run db:generate` completed successfully.
+- `DATABASE_URL=file:./dev.db bun run db:seed` completed successfully.
+- `bun run typecheck` passes for shared, API, and web workspaces.
+
 ## [Milestone 2 Migration and Seed] — 2026-05-15
 
 ### Added
