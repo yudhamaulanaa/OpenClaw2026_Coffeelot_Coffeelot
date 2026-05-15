@@ -1,0 +1,131 @@
+# Coffeelot — Roadmap
+
+## Vision
+
+Autonomous Coffee Shop / F&B Operator berbasis AI Agent.
+AI Agent yang bisa colok ke POS manapun.
+
+---
+
+## Milestone 1 — Project Brain
+
+Setup dokumentasi dan blueprint project.
+
+- [ ] AGENTS.md + adapter files
+- [ ] README.md
+- [ ] PROJECT_STATUS.md, ROADMAP.md, TODO.md, CHANGELOG.md
+- [ ] docs/ARCHITECTURE.md
+- [ ] docs/DATABASE-SCHEMA.md
+- [ ] docs/API-CONTRACTS.md
+
+---
+
+## Milestone 2 — Database Foundation
+
+Setup database schema (SQLite), migration, dan seed data.
+
+- [ ] Prisma schema (all tables: tenant, POS, agent, payment)
+- [ ] Migration (SQLite)
+- [ ] Seed: demo tenant, outlet, user
+- [ ] Seed: sample products, inventory, recipes
+- [ ] Seed: sample orders (for agent to analyze)
+
+---
+
+## Milestone 3 — Backend Foundation
+
+Setup API server dan core services.
+
+- [ ] Elysia.js server setup
+- [ ] Database client (Prisma + SQLite)
+- [ ] Tenant context middleware
+- [ ] Product service + endpoints
+- [ ] Inventory service + endpoints
+- [ ] Order service + endpoints
+- [ ] Stock engine (transactional deduction)
+- [ ] Invoice generator
+
+---
+
+## Milestone 4 — Built-in POS
+
+Build POS module sebagai data source dan workflow operasional kasir/barista.
+
+- [ ] Product grid UI
+- [ ] Cart management
+- [ ] Checkout flow
+- [ ] Order creation + stock deduction
+- [ ] Invoice generation
+- [ ] Receipt preview
+- [ ] Manual cart / custom item input untuk order cepat di kasir
+- [ ] Kitchen / Barista order queue
+- [ ] Order prep status: new → preparing → ready → completed
+- [ ] Barista click actions per order
+- [ ] Highlight waiting time / order age
+- [ ] Tablet-friendly kitchen display
+- [ ] Self-order via chat sebagai order channel MVP
+- [ ] QR order link generator untuk self-order
+- [ ] Customer cart flow via chat
+- [ ] Chat order masuk ke POS + kitchen queue
+
+---
+
+## Milestone 5 — DOKU Payment Integration
+
+Integrate DOKU MCP Server untuk payment processing.
+
+- [ ] Setup DOKU MCP connection (sandbox)
+- [ ] QRIS payment generation
+- [ ] Virtual Account payment
+- [ ] Payment status checking
+- [ ] Payment webhook/callback handling
+- [ ] Payment UI di POS checkout
+- [ ] Payment confirmation → trigger stock deduction
+
+---
+
+## Milestone 6 — AI Agent Core
+
+Build agent orchestrator dan workflow engine.
+
+- [ ] Agent core (execution loop)
+- [ ] Workflow registry
+- [ ] Scheduler (cron-based)
+- [ ] Event trigger system
+- [ ] Agent output storage (agent_runs, agent_outputs tables)
+- [ ] Agent dashboard page (activity timeline)
+
+---
+
+## Milestone 7 — Agent Workflows
+
+Implement individual agent workflows.
+
+- [ ] Daily Report workflow
+- [ ] Restock Alert workflow
+- [ ] Risk Detection workflow
+- [ ] Promo Generation workflow
+- [ ] Morning Briefing workflow
+
+---
+
+## Milestone 8 — POS Connector
+
+Enable colok ke POS eksisting.
+
+- [ ] CSV/Excel import (orders, products, inventory)
+- [ ] Data mapping/transformation
+- [ ] Import history & validation
+- [ ] Scheduled import (optional)
+
+---
+
+## Future (Post-MVP)
+
+- WhatsApp notification channel
+- Real-time POS API sync
+- Authentication & session management
+- Role-based permissions
+- Multi-outlet switching UI
+- Subscription billing
+- Advanced analytics
