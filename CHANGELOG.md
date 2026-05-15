@@ -1,5 +1,17 @@
 # Coffeelot — Changelog
 
+## [Deployment Proxy Setup] — 2026-05-15
+
+### Added
+
+- Added Vite allowed hosts for `coffeelot.app`, `www.coffeelot.app`, and `app.coffeelot.app` so Nginx Proxy Manager can proxy the web preview safely.
+
+### Verification
+
+- `bun run typecheck` passes.
+- `bun run build` passes.
+- Local NPM route verification passes for web root and API health.
+
 ## [Milestone 5 DOKU Payment Foundation] — 2026-05-15
 
 ### Added
