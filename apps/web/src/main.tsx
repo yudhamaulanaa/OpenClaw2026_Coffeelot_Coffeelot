@@ -18,10 +18,25 @@ type CartLine = {
 type PaymentResult = {
   id?: string;
   payment_url?: string | null;
+  paymentUrl?: string | null;
   qr_code?: string | null;
+  qrCode?: string | null;
   va_number?: string | null;
+  vaNumber?: string | null;
   status?: string;
 };
+
+function paymentUrl(payment: PaymentResult) {
+  return payment.payment_url ?? payment.paymentUrl ?? null;
+}
+
+function qrCode(payment: PaymentResult) {
+  return payment.qr_code ?? payment.qrCode ?? null;
+}
+
+function vaNumber(payment: PaymentResult) {
+  return payment.va_number ?? payment.vaNumber ?? null;
+}
 
 type ChatCartSession = {
   id: string;
@@ -54,21 +69,24 @@ function readSearchParam(name: string) {
 
 function PaymentBox({ payment, method, onCheck, checking }: { payment: PaymentResult | null; method?: DokuPaymentMethod; onCheck?: () => void; checking?: boolean }) {
   if (!payment) return null;
-  const isVaBca = method === "va_bca" || Boolean(payment.va_number);
+  const url = paymentUrl(payment);
+  const qr = qrCode(payment);
+  const va = vaNumber(payment);
+  const isVaBca = method === "va_bca" || Boolean(va);
   const statusText = payment.status === "paid" ? "Pembayaran diterima" : payment.status ?? "pending";
   return (
     <div className={`payment-box ${payment.status === "paid" ? "paid" : ""}`}>
       <strong>{payment.status === "paid" ? "Payment paid" : "Payment pending"}</strong>
-      {isVaBca && payment.va_number ? (
+      {isVaBca && va ? (
         <div className="va-instructions">
           <span>Bayar ke Virtual Account</span>
           <strong>Bank BCA</strong>
-          <code>{payment.va_number}</code>
+          <code>{va}</code>
           <small>Gunakan nomor VA BCA di atas dari m-BCA/ATM/internet banking. Status akan berubah otomatis, atau tekan Check Pembayaran.</small>
         </div>
       ) : null}
-      {payment.payment_url ? <a href={payment.payment_url} target="_blank">Open payment link</a> : null}
-      {payment.qr_code ? <code>{payment.qr_code}</code> : null}
+      {url ? <a href={url} target="_blank">Open payment link</a> : null}
+      {qr ? <code>{qr}</code> : null}
       <span>Status: {statusText}</span>
       {onCheck ? <button className="secondary-button" onClick={onCheck} disabled={checking}>{checking ? "Checking..." : "Check Pembayaran"}</button> : null}
     </div>

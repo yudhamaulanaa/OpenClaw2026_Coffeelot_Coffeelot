@@ -1,5 +1,19 @@
 # Coffeelot — Changelog
 
+## [Payment Response Casing Fix] — 2026-05-15
+
+### Fixed
+
+- Fixed frontend payment display to read both camelCase API fields (`vaNumber`, `paymentUrl`, `qrCode`) and snake_case fields (`va_number`, `payment_url`, `qr_code`).
+- This fixes VA BCA not appearing after checkout even though the API payment record contains a VA number.
+
+### Verification
+
+- Confirmed recent VA BCA payments contain `va_number` in the database.
+- `bun run typecheck` passes.
+- `bun run build` passes.
+- `https://coffeelot.app/chat` serves the updated bundle containing both camelCase and snake_case payment field handling.
+
 ## [Webchat Paid Order Status] — 2026-05-15
 
 ### Added
