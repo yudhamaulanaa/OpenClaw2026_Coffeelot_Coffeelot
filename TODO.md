@@ -13,15 +13,15 @@
 
 ## Up Next: Milestone 3 — Backend Foundation
 
-- [ ] Setup Elysia.js server
-- [ ] Database client (Prisma + SQLite)
-- [ ] Tenant context middleware
-- [ ] Product service + endpoints
-- [ ] Inventory service + endpoints
-- [ ] Order service + endpoints
+- [x] Setup Elysia.js server
+- [x] Database client (Prisma + SQLite)
+- [x] Tenant context middleware
+- [x] Product service + endpoints
+- [x] Inventory service + endpoints
+- [x] Order service + endpoints
 - [ ] Stock engine
 - [ ] Invoice generator
-- [ ] Reports endpoints
+- [x] Reports endpoints
 
 ## Milestone 4 — Built-in POS / Order Channels
 

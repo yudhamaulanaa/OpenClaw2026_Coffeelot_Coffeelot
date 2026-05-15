@@ -46,12 +46,12 @@ Status: **Complete** — database schema, migration, seed data, Bun tooling, Pri
 
 Setup API server dan core services.
 
-- [ ] Elysia.js server setup
-- [ ] Database client (Prisma + SQLite)
-- [ ] Tenant context middleware
-- [ ] Product service + endpoints
-- [ ] Inventory service + endpoints
-- [ ] Order service + endpoints
+- [x] Elysia.js server setup
+- [x] Database client (Prisma + SQLite)
+- [x] Tenant context middleware
+- [x] Product service + endpoints
+- [x] Inventory service + endpoints
+- [x] Order service + endpoints
 - [ ] Stock engine (transactional deduction)
 - [ ] Invoice generator
 

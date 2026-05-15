@@ -1,5 +1,22 @@
 # Coffeelot — Changelog
 
+## [Milestone 3 API Foundation] — 2026-05-15
+
+### Added
+
+- Added Elysia API server under `apps/api`.
+- Added Prisma client module, tenant/outlet context resolver, and API error envelope helpers.
+- Added initial endpoints for health, context, outlets, products/POS products, product create/update/disable, inventory, restock, paid order creation, order listing, and critical stock report.
+
+### Updated
+
+- Updated workspace tsconfigs for Node types and cross-workspace path alias typechecking.
+- Marked initial Milestone 3 API tasks complete in `TODO.md` and `ROADMAP.md`.
+
+### Verification
+
+- `bun run typecheck` passes for shared, API, and web workspaces.
+
 ## [Milestone 2 Complete] — 2026-05-15
 
 ### Added

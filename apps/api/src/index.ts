@@ -1,1 +1,204 @@
-console.log("Coffeelot API foundation ready");
+import { Elysia, t } from "elysia";
+import { isPaymentMethod } from "@coffeelot/shared";
+import { resolveTenantContext } from "./context";
+import { prisma } from "./db";
+import { ApiError, statusFromError, toErrorEnvelope } from "./errors";
+
+const port = Number(process.env.API_PORT ?? 3001);
+const host = process.env.API_HOST ?? "127.0.0.1";
+
+function invoiceNumber() {
+  const date = new Date().toISOString().slice(0, 10).replaceAll("-", "");
+  const suffix = Math.floor(Math.random() * 10_000).toString().padStart(4, "0");
+  return `CLT-${date}-${suffix}`;
+}
+
+export const app = new Elysia({ prefix: "/api" })
+  .onError(({ error, set }) => {
+    set.status = statusFromError(error);
+    return toErrorEnvelope(error);
+  })
+  .get("/health", () => ({ ok: true, service: "coffeelot-api" }))
+  .get("/context", async ({ headers }) => {
+    const ctx = resolveTenantContext(headers);
+    const [tenant, outlet] = await Promise.all([
+      prisma.tenant.findUniqueOrThrow({ where: { id: ctx.tenantId }, select: { id: true, name: true } }),
+      prisma.outlet.findUniqueOrThrow({ where: { id: ctx.outletId }, select: { id: true, name: true } }),
+    ]);
+    return { tenant, outlet };
+  })
+  .get("/outlets", async ({ headers }) => {
+    const { tenantId } = resolveTenantContext(headers);
+    return prisma.outlet.findMany({
+      where: { tenantId },
+      select: { id: true, name: true, address: true },
+      orderBy: { name: "asc" },
+    });
+  })
+  .get("/products", async ({ headers }) => {
+    const { tenantId } = resolveTenantContext(headers);
+    return prisma.product.findMany({ where: { tenantId }, orderBy: [{ category: "asc" }, { name: "asc" }] });
+  })
+  .get("/products/pos", async ({ headers }) => {
+    const { tenantId, outletId } = resolveTenantContext(headers);
+    return prisma.product.findMany({
+      where: { tenantId, isActive: true, OR: [{ outletId: null }, { outletId }] },
+      orderBy: [{ category: "asc" }, { name: "asc" }],
+    });
+  })
+  .post(
+    "/products",
+    async ({ headers, body }) => {
+      const { tenantId, outletId } = resolveTenantContext(headers);
+      return prisma.product.create({
+        data: {
+          tenantId,
+          outletId: body.outlet_id ?? outletId ?? null,
+          name: body.name,
+          category: body.category,
+          price: body.price,
+          isActive: body.is_active ?? true,
+        },
+      });
+    },
+    {
+      body: t.Object({
+        name: t.String({ minLength: 1 }),
+        category: t.String({ minLength: 1 }),
+        price: t.Number({ minimum: 0 }),
+        is_active: t.Optional(t.Boolean()),
+        outlet_id: t.Optional(t.Nullable(t.String())),
+      }),
+    },
+  )
+  .patch(
+    "/products/:id",
+    async ({ headers, params, body }) => {
+      const { tenantId } = resolveTenantContext(headers);
+      await prisma.product.findFirstOrThrow({ where: { id: params.id, tenantId } });
+      return prisma.product.update({
+        where: { id: params.id },
+        data: {
+          name: body.name,
+          category: body.category,
+          price: body.price,
+          isActive: body.is_active,
+          outletId: body.outlet_id,
+        },
+      });
+    },
+    {
+      body: t.Object({
+        name: t.Optional(t.String({ minLength: 1 })),
+        category: t.Optional(t.String({ minLength: 1 })),
+        price: t.Optional(t.Number({ minimum: 0 })),
+        is_active: t.Optional(t.Boolean()),
+        outlet_id: t.Optional(t.Nullable(t.String())),
+      }),
+    },
+  )
+  .delete("/products/:id", async ({ headers, params }) => {
+    const { tenantId } = resolveTenantContext(headers);
+    await prisma.product.findFirstOrThrow({ where: { id: params.id, tenantId } });
+    return prisma.product.update({ where: { id: params.id }, data: { isActive: false } });
+  })
+  .get("/inventory", async ({ headers }) => {
+    const { tenantId, outletId } = resolveTenantContext(headers);
+    const items = await prisma.inventoryItem.findMany({ where: { tenantId, outletId }, orderBy: { name: "asc" } });
+    return items.map((item) => ({ ...item, low_stock: Number(item.currentStock) <= Number(item.minimumStock) }));
+  })
+  .post(
+    "/inventory/:id/restock",
+    async ({ headers, params, body }) => {
+      const { tenantId, outletId } = resolveTenantContext(headers);
+      if (body.qty <= 0) throw new ApiError("INVALID_PAYLOAD", "qty must be greater than 0");
+      return prisma.$transaction(async (tx) => {
+        const item = await tx.inventoryItem.findFirstOrThrow({ where: { id: params.id, tenantId, outletId } });
+        const stockBefore = Number(item.currentStock);
+        const stockAfter = stockBefore + body.qty;
+        const updated = await tx.inventoryItem.update({ where: { id: item.id }, data: { currentStock: stockAfter } });
+        const movement = await tx.stockMovement.create({
+          data: { tenantId, outletId, inventoryItemId: item.id, movementType: "restock", qty: body.qty, stockBefore, stockAfter, note: body.note },
+        });
+        return { item: updated, movement };
+      });
+    },
+    { body: t.Object({ qty: t.Number({ exclusiveMinimum: 0 }), note: t.Optional(t.String()) }) },
+  )
+  .post(
+    "/orders",
+    async ({ headers, body }) => {
+      const { tenantId, outletId } = resolveTenantContext(headers);
+      if (!isPaymentMethod(body.payment_method)) throw new ApiError("INVALID_PAYLOAD", "Invalid payment_method");
+      if (body.items.length === 0) throw new ApiError("INVALID_PAYLOAD", "At least one order item is required");
+
+      return prisma.$transaction(async (tx) => {
+        const productIds = body.items.map((item) => item.product_id);
+        const products = await tx.product.findMany({ where: { tenantId, id: { in: productIds }, isActive: true } });
+        if (products.length !== productIds.length) throw new ApiError("INACTIVE_PRODUCT", "One or more products are inactive or missing");
+
+        const productMap = new Map(products.map((product) => [product.id, product]));
+        const subtotal = body.items.reduce((sum, item) => {
+          const product = productMap.get(item.product_id)!;
+          return sum + Number(product.price) * item.qty;
+        }, 0);
+        const discount = body.discount ?? 0;
+        const total = Math.max(0, subtotal - discount);
+
+        const order = await tx.order.create({
+          data: {
+            tenantId,
+            outletId,
+            customerId: body.customer_id,
+            invoiceNumber: invoiceNumber(),
+            orderStatus: "paid",
+            prepStatus: "new",
+            orderChannel: "cashier",
+            paymentMethod: body.payment_method,
+            subtotal,
+            discount,
+            total,
+            notes: body.notes,
+            items: {
+              create: body.items.map((item) => {
+                const product = productMap.get(item.product_id)!;
+                return {
+                  tenantId,
+                  productId: product.id,
+                  productName: product.name,
+                  qty: item.qty,
+                  unitPrice: Number(product.price),
+                  totalPrice: Number(product.price) * item.qty,
+                  notes: item.notes,
+                };
+              }),
+            },
+          },
+          include: { items: true },
+        });
+
+        return { order, items: order.items };
+      });
+    },
+    {
+      body: t.Object({
+        payment_method: t.String(),
+        discount: t.Optional(t.Number({ minimum: 0 })),
+        customer_id: t.Optional(t.String()),
+        notes: t.Optional(t.String()),
+        items: t.Array(t.Object({ product_id: t.String(), qty: t.Integer({ minimum: 1 }), notes: t.Optional(t.String()) })),
+      }),
+    },
+  )
+  .get("/orders", async ({ headers }) => {
+    const { tenantId, outletId } = resolveTenantContext(headers);
+    return prisma.order.findMany({ where: { tenantId, outletId }, include: { items: true }, orderBy: { createdAt: "desc" } });
+  })
+  .get("/reports/critical-stock", async ({ headers }) => {
+    const { tenantId, outletId } = resolveTenantContext(headers);
+    const items = await prisma.inventoryItem.findMany({ where: { tenantId, outletId }, orderBy: { name: "asc" } });
+    return items.filter((item) => Number(item.currentStock) <= Number(item.minimumStock));
+  });
+
+app.listen({ hostname: host, port });
+console.log(`Coffeelot API listening on http://${host}:${port}`);
