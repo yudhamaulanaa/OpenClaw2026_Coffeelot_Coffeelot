@@ -12,7 +12,7 @@ Milestone 2 — Database Foundation is in progress on branch `feat/milestone-2-d
 
 Milestone 4 — Built-in POS / Order Channels MVP foundation is complete.
 
-Next implementation target: Milestone 5 DOKU payment integration.
+Milestone 5 — DOKU Payment Integration foundation is in progress: sandbox placeholder payment creation, status polling, callback handling, and POS payment link/QR/VA display are implemented. Next target: replace sandbox placeholder with real DOKU MCP calls and harden paid-order stock deduction.
 
 Roadmap and docs are updated with the latest MVP direction:
 

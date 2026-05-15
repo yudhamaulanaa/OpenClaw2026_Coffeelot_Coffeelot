@@ -41,6 +41,7 @@ function App() {
   const [manualName, setManualName] = useState("");
   const [manualPrice, setManualPrice] = useState(0);
   const [message, setMessage] = useState("Ready");
+  const [lastPayment, setLastPayment] = useState<{ payment_url?: string | null; qr_code?: string | null; va_number?: string | null; status?: string } | null>(null);
 
   const total = useMemo(() => cart.reduce((sum, item) => sum + item.qty * item.unitPrice, 0), [cart]);
   const categories = useMemo(() => [...new Set(products.map((product) => product.category))], [products]);
@@ -79,13 +80,22 @@ function App() {
       setMessage("Custom item checkout needs API support; remove manual items for now.");
       return;
     }
-    await api("/orders", {
+    const result = await api<{ order: { id: string } }>("/orders", {
       method: "POST",
       body: JSON.stringify({
         payment_method: paymentMethod,
         items: catalogItems.map((item) => ({ product_id: item.productId, qty: item.qty, notes: item.notes })),
       }),
     });
+    if (paymentMethod === "qris" || paymentMethod === "transfer") {
+      const payment = await api<{ payment_url?: string | null; qr_code?: string | null; va_number?: string | null; status?: string }>("/payments/create", {
+        method: "POST",
+        body: JSON.stringify({ order_id: result.order.id, payment_method: paymentMethod === "qris" ? "qris" : "va_bca" }),
+      });
+      setLastPayment(payment);
+    } else {
+      setLastPayment(null);
+    }
     setCart([]);
     setMessage("Checkout complete. Order masuk kitchen queue.");
     await load();
@@ -147,6 +157,14 @@ function App() {
           </label>
           <div className="total">Total {money(total)}</div>
           <button className="checkout" disabled={cart.length === 0} onClick={checkout}>Checkout</button>
+          {lastPayment ? (
+            <div className="payment-box">
+              <strong>Payment pending</strong>
+              {lastPayment.payment_url ? <a href={lastPayment.payment_url} target="_blank">Open payment link</a> : null}
+              {lastPayment.qr_code ? <code>{lastPayment.qr_code}</code> : null}
+              {lastPayment.va_number ? <code>VA: {lastPayment.va_number}</code> : null}
+            </div>
+          ) : null}
         </div>
       </section>
 

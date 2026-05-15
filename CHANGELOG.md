@@ -1,5 +1,28 @@
 # Coffeelot — Changelog
 
+## [Milestone 5 DOKU Payment Foundation] — 2026-05-15
+
+### Added
+
+- Added DOKU payment method shared types and validators.
+- Added sandbox DOKU payment payload helper for payment URL, QRIS payload, VA number, and normalized status handling.
+- Added payment create, list-by-order, status, and callback endpoints.
+- Added POS checkout integration to create payment records for QRIS/transfer and display payment link, QR payload, or VA number.
+
+### Updated
+
+- Marked Milestone 5 payment foundation tasks complete in `TODO.md` and `ROADMAP.md`.
+- Updated `PROJECT_STATUS.md` with next hardening target: real DOKU MCP calls and paid-order stock deduction hardening.
+
+### Verification
+
+- `bun run typecheck` passes for shared, API, and web workspaces.
+- `bun run build` passes for shared, API, and web workspaces.
+
+### Notes
+
+- Current DOKU integration is a sandbox placeholder compatible with the planned API contract. Real MCP/provider calls should replace `apps/api/src/payments.ts` internals once sandbox credentials/flow are finalized.
+
 ## [Milestone 3 and 4 Complete] — 2026-05-15
 
 ### Updated

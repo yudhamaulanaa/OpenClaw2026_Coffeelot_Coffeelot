@@ -1,8 +1,9 @@
 import { Elysia, t } from "elysia";
-import { isPaymentMethod } from "@coffeelot/shared";
+import { isDokuPaymentMethod, isPaymentMethod } from "@coffeelot/shared";
 import { resolveTenantContext } from "./context";
 import { prisma } from "./db";
 import { ApiError, statusFromError, toErrorEnvelope } from "./errors";
+import { createSandboxPayment, normalizePaymentStatus } from "./payments";
 
 const port = Number(process.env.API_PORT ?? 3001);
 const host = process.env.API_HOST ?? "127.0.0.1";
@@ -317,6 +318,90 @@ export const app = new Elysia({ prefix: "/api" })
     await prisma.chatCartSession.update({ where: { id: session.id }, data: { status: "submitted" } });
     return { order, items: order.items };
   })
+
+  .post(
+    "/payments/create",
+    async ({ headers, body }) => {
+      const { tenantId, outletId } = resolveTenantContext(headers);
+      if (!isDokuPaymentMethod(body.payment_method)) throw new ApiError("INVALID_PAYLOAD", "Invalid DOKU payment_method");
+
+      const order = await prisma.order.findFirstOrThrow({ where: { id: body.order_id, tenantId, outletId } });
+      const expiredAt = new Date(Date.now() + 30 * 60 * 1000);
+
+      const payment = await prisma.payment.create({
+        data: {
+          tenantId,
+          outletId,
+          orderId: order.id,
+          paymentMethod: body.payment_method,
+          amount: Number(order.total),
+          status: "pending",
+          expiredAt,
+        },
+      });
+
+      const sandbox = createSandboxPayment({
+        paymentId: payment.id,
+        orderId: order.id,
+        amount: Number(order.total),
+        method: body.payment_method,
+      });
+
+      return prisma.payment.update({
+        where: { id: payment.id },
+        data: {
+          dokuInvoiceId: sandbox.dokuInvoiceId,
+          paymentUrl: sandbox.paymentUrl,
+          qrCode: sandbox.qrCode,
+          vaNumber: sandbox.vaNumber,
+          rawResponse: sandbox.rawResponse,
+        },
+      });
+    },
+    { body: t.Object({ order_id: t.String(), payment_method: t.String() }) },
+  )
+  .get("/payments", async ({ headers, query }) => {
+    const { tenantId, outletId } = resolveTenantContext(headers);
+    return prisma.payment.findMany({
+      where: { tenantId, outletId, orderId: query.order_id as string | undefined },
+      orderBy: { createdAt: "desc" },
+    });
+  })
+  .get("/payments/:id/status", async ({ headers, params }) => {
+    const { tenantId, outletId } = resolveTenantContext(headers);
+    const payment = await prisma.payment.findFirstOrThrow({ where: { id: params.id, tenantId, outletId } });
+    if (payment.status === "pending" && payment.expiredAt < new Date()) {
+      return prisma.payment.update({ where: { id: payment.id }, data: { status: "expired" }, select: { id: true, status: true, paidAt: true } });
+    }
+    return { id: payment.id, status: payment.status, paid_at: payment.paidAt };
+  })
+  .post(
+    "/payments/callback",
+    async ({ body }) => {
+      const status = normalizePaymentStatus(body.status);
+      const payment = await prisma.payment.findFirstOrThrow({
+        where: { OR: [{ id: body.payment_id }, { dokuInvoiceId: body.doku_invoice_id }] },
+      });
+
+      const updated = await prisma.$transaction(async (tx) => {
+        const paidAt = status === "paid" ? new Date() : null;
+        const updatedPayment = await tx.payment.update({
+          where: { id: payment.id },
+          data: { status, paidAt, rawResponse: JSON.stringify(body) },
+        });
+        if (status === "paid") {
+          await tx.order.update({
+            where: { id: payment.orderId },
+            data: { orderStatus: "paid", invoiceNumber: payment.orderId.startsWith("CLT-") ? undefined : `CLT-${new Date().toISOString().slice(0, 10).replaceAll("-", "")}-${Math.floor(Math.random() * 10_000).toString().padStart(4, "0")}` },
+          });
+        }
+        return updatedPayment;
+      });
+
+      return { ok: true, payment: updated };
+    },
+    { body: t.Object({ payment_id: t.Optional(t.String()), doku_invoice_id: t.Optional(t.String()), status: t.String() }) },
+  )
   .get("/reports/recent-orders", async ({ headers, query }) => {
     const { tenantId, outletId } = resolveTenantContext(headers);
     const limit = Math.min(Number(query.limit ?? 10), 50);

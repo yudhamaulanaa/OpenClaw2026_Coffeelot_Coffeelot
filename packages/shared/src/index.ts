@@ -26,6 +26,9 @@ export type OrderChannel = (typeof ORDER_CHANNELS)[number];
 export const PAYMENT_METHODS = ["cash", "qris", "transfer"] as const;
 export type PaymentMethod = (typeof PAYMENT_METHODS)[number];
 
+export const DOKU_PAYMENT_METHODS = ["qris", "va_bca", "va_bni", "ovo", "gopay", "dana", "shopee_pay"] as const;
+export type DokuPaymentMethod = (typeof DOKU_PAYMENT_METHODS)[number];
+
 export const PAYMENT_STATUSES = ["pending", "paid", "expired", "failed"] as const;
 export type PaymentStatus = (typeof PAYMENT_STATUSES)[number];
 
@@ -108,6 +111,10 @@ export function isRole(value: string): value is Role {
 
 export function isPaymentMethod(value: string): value is PaymentMethod {
   return (PAYMENT_METHODS as readonly string[]).includes(value);
+}
+
+export function isDokuPaymentMethod(value: string): value is DokuPaymentMethod {
+  return (DOKU_PAYMENT_METHODS as readonly string[]).includes(value);
 }
 
 export function isPrepStatus(value: string): value is PrepStatus {
