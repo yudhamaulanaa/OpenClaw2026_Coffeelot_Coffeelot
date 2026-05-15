@@ -16,6 +16,15 @@ type CartLine = {
   notes?: string;
 };
 
+type InventoryStatusItem = {
+  id: string;
+  name: string;
+  unit: string;
+  currentStock: number | string;
+  minimumStock: number | string;
+  low_stock?: boolean;
+};
+
 type PaymentResult = {
   id?: string;
   payment_url?: string | null;
@@ -106,6 +115,7 @@ function App() {
   const [cart, setCart] = useState<CartLine[]>([]);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("cash");
   const [kitchenOrders, setKitchenOrders] = useState<KitchenOrder[]>([]);
+  const [inventoryItems, setInventoryItems] = useState<InventoryStatusItem[]>([]);
   const [manualName, setManualName] = useState("");
   const [manualPrice, setManualPrice] = useState(0);
   const [message, setMessage] = useState("Ready");
@@ -117,12 +127,14 @@ function App() {
   const categories = useMemo(() => [...new Set(products.map((product) => product.category))], [products]);
 
   async function load() {
-    const [posProducts, queue] = await Promise.all([
+    const [posProducts, queue, inventory] = await Promise.all([
       api<PosProduct[]>("/products/pos"),
       api<KitchenOrder[]>("/kitchen/orders"),
+      api<InventoryStatusItem[]>("/inventory"),
     ]);
     setProducts(posProducts);
     setKitchenOrders(queue);
+    setInventoryItems(inventory);
   }
 
   useEffect(() => {
@@ -246,6 +258,27 @@ function App() {
           <div className="total">Total {money(total)}</div>
           <button className="checkout" disabled={cart.length === 0} onClick={checkout}>Checkout</button>
           <PaymentBox payment={lastPayment} method={lastPaymentMethod} onCheck={() => checkLastPaymentStatus().catch((error) => setMessage(error.message))} checking={checkingLastPayment} />
+        </div>
+      </section>
+
+
+      <section className="panel stock-status">
+        <h2>Status Stock</h2>
+        <small>Auto-refresh setiap 5 detik.</small>
+        <div className="stock-grid">
+          {inventoryItems.map((item) => {
+            const current = Number(item.currentStock);
+            const minimum = Number(item.minimumStock);
+            const low = item.low_stock ?? current <= minimum;
+            return (
+              <article key={item.id} className={low ? "stock-card low" : "stock-card"}>
+                <strong>{item.name}</strong>
+                <span>{current} {item.unit}</span>
+                <small>Minimum {minimum} {item.unit}</small>
+                <em>{low ? "LOW STOCK" : "OK"}</em>
+              </article>
+            );
+          })}
         </div>
       </section>
 

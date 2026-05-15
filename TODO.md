@@ -87,6 +87,10 @@
 - [ ] Payment confirmation → stock deduction transaction
 - [ ] Verify sandbox end-to-end payment callback flow
 
+## POS / Operations UI
+
+- [x] Add stock status panel to POS root `/` with 5-second refresh
+
 ## Next — Milestone 6 AI Agent Core
 
 - [x] Implement internal agent workflow runner service

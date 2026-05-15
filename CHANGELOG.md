@@ -1,5 +1,20 @@
 # Coffeelot — Changelog
 
+## [POS Stock Status Panel] — 2026-05-15
+
+### Added
+
+- Added a stock status panel to the main POS page at `/`.
+- Stock cards show current stock, minimum stock, unit, and `LOW STOCK` / `OK` state.
+- The stock panel refreshes with the existing 5-second POS/kitchen auto-refresh loop.
+
+### Verification
+
+- `bun run typecheck` passes.
+- `bun run build` passes.
+- `coffeelot-web` restarted successfully.
+- Public root bundle contains `Status Stock` and `LOW STOCK`.
+
 ## [QRIS QR Code Display] — 2026-05-15
 
 ### Added
