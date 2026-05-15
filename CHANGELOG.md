@@ -755,3 +755,8 @@
 
 - Updated `/agent` Insight Comparison table Type column to explain when each insight is used and what operational data it processes.
 - Added workflow-specific context descriptions for daily report, restock alert, risk detection, promo generation, morning briefing, booking seat insight, and BI workflows.
+## 2026-05-15 — Compact 5-Slide Pitch Deck
+
+- Added `docs/reports/COFFEELOT-PITCHDECK-5SLIDES.md` as the primary concise pitch deck.
+- Kept the longer pitch deck as an extended reference deck.
+

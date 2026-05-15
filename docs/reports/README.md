@@ -4,7 +4,8 @@ This folder contains presentation and demo materials for wrapping up the current
 
 ## Files
 
-- [`COFFEELOT-PITCHDECK.md`](COFFEELOT-PITCHDECK.md) — slide-by-slide pitch deck content.
+- [`COFFEELOT-PITCHDECK-5SLIDES.md`](COFFEELOT-PITCHDECK-5SLIDES.md) — compact 5-slide pitch deck for presentation.
+- [`COFFEELOT-PITCHDECK.md`](COFFEELOT-PITCHDECK.md) — extended slide-by-slide reference deck.
 - [`COFFEELOT-VIDEO-SCRIPT.md`](COFFEELOT-VIDEO-SCRIPT.md) — demo video narration, scene list, and recording checklist.
 
 ## Current positioning

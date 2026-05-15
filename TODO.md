@@ -187,3 +187,7 @@
 
 - [x] Add usage context to `/agent` Insight Comparison Type column.
 - [x] Add processed-data descriptions per workflow.
+## Completed — Compact Pitch Deck
+
+- [x] Create 5-slide Coffeelot pitch deck for shorter presentation format.
+

@@ -110,3 +110,7 @@ These are Markdown source materials ready to convert into slides/PDF and a recor
 ## Latest update — Agent Insight Context Labels
 
 The `/agent` Insight Comparison table now makes each workflow easier to understand. The Type column describes when the insight should be used and what data is processed, instead of only showing the raw output type.
+## Latest update — Compact 5-Slide Pitch Deck
+
+A concise 5-slide pitch deck has been added at `docs/reports/COFFEELOT-PITCHDECK-5SLIDES.md`. This is now the preferred deck for quick presentations; the longer deck remains as reference material.
+
