@@ -62,3 +62,6 @@ a { color: #6f3f20; font-weight: 700; }
 .order-status-page { width: min(520px, calc(100vw - 32px)); }
 .customer-badge { padding: 10px 12px; border-radius: 12px; background: #fff3df; border: 1px solid #ead8c1; color: #6f3f20; }
 select:disabled, input:disabled, button:disabled { opacity: .65; }
+.qr-display { display: grid; justify-items: center; gap: 8px; padding: 12px; border-radius: 14px; background: white; border: 1px solid #ead8c1; }
+.qr-display svg { width: min(220px, 100%); height: auto; }
+.qr-display small { color: #7f654f; font-weight: 700; }

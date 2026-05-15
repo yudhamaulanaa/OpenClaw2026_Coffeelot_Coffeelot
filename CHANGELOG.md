@@ -1,5 +1,19 @@
 # Coffeelot — Changelog
 
+## [QRIS QR Code Display] — 2026-05-15
+
+### Added
+
+- Added QR code rendering for QRIS payment payloads in POS and `/chat` payment boxes.
+- QRIS customers now see a scannable QR code instead of raw QR payload text.
+
+### Verification
+
+- `bun run typecheck` passes.
+- `bun run build` passes.
+- `coffeelot-web` restarted successfully.
+- Public `/chat` bundle contains `Scan QRIS untuk bayar`.
+
 ## [Milestone 6 Agent Core Runner] — 2026-05-15
 
 ### Added

@@ -1,5 +1,6 @@
 import { StrictMode, useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
+import { QRCodeSVG } from "qrcode.react";
 import type { DokuPaymentMethod, KitchenOrder, PaymentMethod, PosProduct } from "@coffeelot/shared";
 import "./style.css";
 
@@ -88,7 +89,12 @@ function PaymentBox({ payment, method, onCheck, checking }: { payment: PaymentRe
         </div>
       ) : null}
       {url ? <a href={url} target="_blank">Open payment link</a> : null}
-      {qr ? <code>{qr}</code> : null}
+      {qr ? (
+        <div className="qr-display">
+          <QRCodeSVG value={qr} size={220} level="M" includeMargin />
+          <small>Scan QRIS untuk bayar</small>
+        </div>
+      ) : null}
       <span>Status: {statusText}</span>
       {onCheck ? <button className="secondary-button" onClick={onCheck} disabled={checking}>{checking ? "Checking..." : "Check Pembayaran"}</button> : null}
     </div>

@@ -61,6 +61,7 @@
 - [x] Add customer-facing `/chat` web order screen
 - [x] Wire webchat screen to chat-cart APIs
 - [x] Generate QRIS/VA BCA payment after chat order submit
+- [x] Render QRIS payment payload as scannable QR code
 - [x] Show VA Bank BCA payment instructions and manual status check button on `/chat`
 - [x] Keep `/chat` checkout/payment/status in one page after user feedback
 - [x] Disable `/chat` payment dropdown and ordering controls after checkout
