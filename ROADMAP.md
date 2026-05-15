@@ -163,3 +163,9 @@ Enable colok ke POS eksisting.
 3. **Improved `/chat` tracker UX — next**
 4. **Backend modularization — ongoing, incremental only**
 
+## Booking / Reservation Intelligence
+
+- Booking Seat Insight foundation is now implemented as an Agent Workflow.
+- Current scope: data model, API, capacity guard, LLM/fallback insight, dashboard rendering.
+- Next scope: customer booking form, operator seat map/calendar, and automatic booking-time reminders/release logic.
+

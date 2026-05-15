@@ -9,6 +9,7 @@ import { getDokuTransactionStatus } from "./payment-reconciliation";
 import { createSandboxPayment, normalizePaymentStatus } from "./payments";
 import { AGENT_WORKFLOWS, runAgentWorkflow, type AgentTriggerType, type AgentWorkflowId } from "./agent-workflows";
 import { startAgentScheduler } from "./agent-scheduler";
+import { BOOKING_STATUSES, createBooking, getSeatAvailabilitySnapshot, assertSeatAvailability } from "./booking-seat-service";
 
 const port = Number(process.env.API_PORT ?? 3001);
 const host = process.env.API_HOST ?? "127.0.0.1";
@@ -772,6 +773,74 @@ export const app = new Elysia({ prefix: "/api" })
         .map((item) => ({ name: item.name, current_stock: Number(item.currentStock), minimum_stock: Number(item.minimumStock), unit: item.unit })),
     };
   })
+
+  .get("/bookings/availability", async ({ headers, query }) => {
+    const { tenantId, outletId } = resolveTenantContext(headers);
+    const at = query.at ? new Date(query.at as string) : new Date();
+    if (Number.isNaN(at.getTime())) throw new ApiError("INVALID_PAYLOAD", "Invalid at timestamp", 400);
+    return getSeatAvailabilitySnapshot({ tenantId, outletId, at });
+  })
+  .get("/bookings", async ({ headers, query }) => {
+    const { tenantId, outletId } = resolveTenantContext(headers);
+    const status = query.status as string | undefined;
+    return prisma.booking.findMany({
+      where: { tenantId, outletId, ...(status ? { status } : {}) },
+      orderBy: { bookingStart: "asc" },
+      take: 100,
+    });
+  })
+  .post(
+    "/bookings",
+    async ({ headers, body }) => {
+      const { tenantId, outletId } = resolveTenantContext(headers);
+      const bookingStart = new Date(body.booking_start);
+      const bookingEnd = body.booking_end ? new Date(body.booking_end) : undefined;
+      if (Number.isNaN(bookingStart.getTime()) || (bookingEnd && Number.isNaN(bookingEnd.getTime()))) throw new ApiError("INVALID_PAYLOAD", "Invalid booking timestamp", 400);
+      return createBooking({
+        tenantId,
+        outletId,
+        customerName: body.customer_name,
+        customerContact: body.customer_contact,
+        partySize: body.party_size,
+        bookingStart,
+        bookingEnd,
+        tableLabel: body.table_label,
+        notes: body.notes,
+      });
+    },
+    {
+      body: t.Object({
+        customer_name: t.String({ minLength: 1 }),
+        customer_contact: t.Optional(t.String()),
+        party_size: t.Integer({ minimum: 1 }),
+        booking_start: t.String(),
+        booking_end: t.Optional(t.String()),
+        table_label: t.Optional(t.String()),
+        notes: t.Optional(t.String()),
+      }),
+    },
+  )
+  .patch(
+    "/bookings/:id/status",
+    async ({ headers, params, body }) => {
+      const { tenantId, outletId } = resolveTenantContext(headers);
+      if (!BOOKING_STATUSES.includes(body.status as (typeof BOOKING_STATUSES)[number])) throw new ApiError("INVALID_PAYLOAD", "Invalid booking status", 400);
+      const booking = await prisma.booking.findFirst({ where: { id: params.id, tenantId, outletId } });
+      if (!booking) throw new ApiError("NOT_FOUND", "Booking not found", 404);
+      if (body.status === "arrived") {
+        await assertSeatAvailability({ tenantId, outletId, start: booking.bookingStart, end: booking.bookingEnd, partySize: booking.partySize, excludeId: booking.id });
+      }
+      return prisma.booking.update({
+        where: { id: booking.id },
+        data: {
+          status: body.status,
+          arrivedAt: body.status === "arrived" ? new Date() : booking.arrivedAt,
+          releasedAt: ["completed", "cancelled", "no_show", "released"].includes(body.status) ? new Date() : booking.releasedAt,
+        },
+      });
+    },
+    { body: t.Object({ status: t.String() }) },
+  )
   .get("/agent/workflows", () => ({ workflows: AGENT_WORKFLOWS }))
   .post(
     "/agent/runs",

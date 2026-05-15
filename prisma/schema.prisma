@@ -27,6 +27,7 @@ model Tenant {
   stockMovements   StockMovement[]
   chatCartSessions ChatCartSession[]
   qrOrderLinks     QrOrderLink[]
+  bookings         Booking[]
   agentRuns        AgentRun[]
   agentOutputs     AgentOutput[]
   aiReports        AiReport[]
@@ -78,6 +79,7 @@ model Outlet {
   stockMovements   StockMovement[]
   chatCartSessions ChatCartSession[]
   qrOrderLinks     QrOrderLink[]
+  bookings         Booking[]
   agentRuns        AgentRun[]
   aiReports        AiReport[]
   payments         Payment[]
@@ -297,6 +299,33 @@ model QrOrderLink {
   @@index([tenantId])
   @@index([outletId])
   @@map("qr_order_links")
+}
+
+model Booking {
+  id              String   @id @default(uuid())
+  tenantId        String   @map("tenant_id")
+  outletId        String   @map("outlet_id")
+  customerName    String   @map("customer_name")
+  customerContact String?  @map("customer_contact")
+  partySize       Int      @map("party_size")
+  bookingStart    DateTime @map("booking_start")
+  bookingEnd      DateTime @map("booking_end")
+  status          String   @default("reserved")
+  tableLabel      String?  @map("table_label")
+  notes           String?
+  arrivedAt       DateTime? @map("arrived_at")
+  releasedAt      DateTime? @map("released_at")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  outlet Outlet @relation(fields: [outletId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([outletId])
+  @@index([bookingStart])
+  @@index([bookingEnd])
+  @@map("bookings")
 }
 
 model AgentRun {

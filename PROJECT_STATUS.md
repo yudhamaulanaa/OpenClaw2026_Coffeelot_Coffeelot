@@ -66,3 +66,21 @@ Required runtime env for live LLM mode:
 - `AI_MODEL`
 - optional `AI_TIMEOUT_MS`
 
+## Latest update — Booking Seat Insight
+
+Coffeelot now has a reservation/booking foundation for seat availability control. Bookings reserve seats over a time window and the backend rejects double-booking when requested seats exceed configured capacity.
+
+Agent Workflow added:
+- `booking_seat_insight`
+
+It evaluates:
+- current seats available,
+- reserved seats over the next 2 hours,
+- arrival watchlist for bookings due soon,
+- occupancy/availability risks,
+- operational seat actions for the owner/floor team.
+
+Runtime capacity controls:
+- `BOOKING_DEFAULT_SEAT_CAPACITY` default `24`
+- `BOOKING_DEFAULT_HOLD_MINUTES` default `90`
+

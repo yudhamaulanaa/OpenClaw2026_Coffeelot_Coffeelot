@@ -163,6 +163,56 @@ function AgentInsightCard({ metadata }: { metadata?: string | null }) {
   );
 }
 
+
+type BookingInsight = {
+  summary?: string;
+  availability_status?: "safe" | "watch" | "tight" | "full";
+  current_available_seats?: number;
+  peak_reserved_seats_next_2h?: number;
+  risks?: Array<{ title?: string; description?: string; severity?: "low" | "medium" | "high" }>;
+  arrival_watchlist?: Array<{ customer_name?: string; party_size?: number; booking_start?: string; action?: string }>;
+  seat_actions?: string[];
+  owner_message?: string;
+};
+
+function parseBookingMetadata(metadata?: string | null): { provider?: string; reason?: string; bookingInsight?: BookingInsight } | null {
+  if (!metadata) return null;
+  try {
+    const parsed = JSON.parse(metadata) as { provider?: string; reason?: string; bookingInsight?: BookingInsight };
+    return parsed && typeof parsed === "object" ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+function BookingInsightCard({ metadata }: { metadata?: string | null }) {
+  const parsed = parseBookingMetadata(metadata);
+  const insight = parsed?.bookingInsight;
+  if (!insight) return null;
+  const status = insight.availability_status ?? "safe";
+  return (
+    <div className="agent-insight-card booking-insight-card">
+      <div className="insight-head">
+        <span className={`insight-status ${status}`}>{status}</span>
+        <small>{parsed?.provider === "llm" ? "LLM Booking Insight" : "Fallback Booking Insight"}{parsed?.reason ? ` • ${parsed.reason}` : ""}</small>
+      </div>
+      {insight.summary ? <p>{insight.summary}</p> : null}
+      <div className="seat-metrics">
+        <span><strong>{insight.current_available_seats ?? 0}</strong><small>seat tersedia sekarang</small></span>
+        <span><strong>{insight.peak_reserved_seats_next_2h ?? 0}</strong><small>peak reserved 2 jam</small></span>
+      </div>
+      {insight.risks?.length ? (
+        <div className="insight-section"><strong>Seat risks</strong><ul>{insight.risks.map((risk, index) => <li key={`booking-risk-${index}`}><span className={`risk-dot ${risk.severity ?? "medium"}`}>{risk.severity ?? "medium"}</span> {risk.title}: {risk.description}</li>)}</ul></div>
+      ) : null}
+      {insight.arrival_watchlist?.length ? (
+        <div className="insight-section"><strong>Arrival watchlist</strong><ul>{insight.arrival_watchlist.map((item, index) => <li key={`arrival-${index}`}>{item.customer_name} ({item.party_size} pax) — {item.booking_start ? new Date(item.booking_start).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) : "soon"}: {item.action}</li>)}</ul></div>
+      ) : null}
+      <InsightList title="Seat actions" items={insight.seat_actions} />
+      {insight.owner_message ? <blockquote>{insight.owner_message}</blockquote> : null}
+    </div>
+  );
+}
+
 type AgentRun = {
   id: string;
   workflowId: string;
@@ -541,6 +591,7 @@ function AgentDashboard() {
                   </div>
                 ) : null}
                 <AgentInsightCard metadata={output.metadata} />
+                <BookingInsightCard metadata={output.metadata} />
                 <details>
                   <summary>Raw output</summary>
                   <pre>{output.content}</pre>

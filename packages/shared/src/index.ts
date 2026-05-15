@@ -38,11 +38,14 @@ export type MovementType = (typeof MOVEMENT_TYPES)[number];
 export const AGENT_RUN_STATUSES = ["running", "completed", "failed"] as const;
 export type AgentRunStatus = (typeof AGENT_RUN_STATUSES)[number];
 
-export const AGENT_OUTPUT_TYPES = ["report", "alert", "recommendation", "promo", "briefing"] as const;
+export const AGENT_OUTPUT_TYPES = ["report", "alert", "recommendation", "promo", "briefing", "booking_insight"] as const;
 export type AgentOutputType = (typeof AGENT_OUTPUT_TYPES)[number];
 
 export const AGENT_TRIGGER_TYPES = ["scheduled", "event", "on_demand"] as const;
 export type AgentTriggerType = (typeof AGENT_TRIGGER_TYPES)[number];
+
+export const BOOKING_STATUSES = ["reserved", "arrived", "completed", "cancelled", "no_show", "released"] as const;
+export type BookingStatus = (typeof BOOKING_STATUSES)[number];
 
 export type ApiErrorCode =
   | "INVALID_PAYLOAD"
@@ -54,6 +57,7 @@ export type ApiErrorCode =
   | "INVALID_DOKU_SIGNATURE"
   | "DOKU_SIGNATURE_NOT_CONFIGURED"
   | "PAYMENT_NOT_FOUND"
+  | "SEAT_UNAVAILABLE"
   | "DOKU_MCP_UNAVAILABLE"
   | "INTERNAL_ERROR";
 

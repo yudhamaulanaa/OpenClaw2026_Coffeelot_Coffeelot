@@ -138,3 +138,18 @@
 - [ ] Improve `/chat` order tracker UX.
 - [ ] Continue backend modularization in small safe steps.
 
+## Completed — Booking Seat Insight Foundation
+
+- [x] Add booking/reservation DB model.
+- [x] Add seat availability overlap calculation.
+- [x] Reject booking when remaining seats are insufficient.
+- [x] Add booking status transitions including arrived/completed/cancelled/no_show/released.
+- [x] Add `booking_seat_insight` Agent Workflow using LLM with fallback.
+- [x] Render booking insights on `/agent`.
+
+## Booking follow-up
+
+- [ ] Add public/customer booking UI.
+- [ ] Add operator booking calendar/table map UI.
+- [ ] Add automatic no-show/release reminders around booking time.
+

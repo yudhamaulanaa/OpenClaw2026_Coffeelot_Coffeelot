@@ -1,12 +1,13 @@
 import { chatCompletionJson } from "./ai-client";
+import { getSeatAvailabilitySnapshot } from "./booking-seat-service";
 import { prisma } from "./db";
 
-export const AGENT_WORKFLOWS = ["daily_report", "restock_alert", "risk_detection", "promo_generation", "morning_briefing"] as const;
+export const AGENT_WORKFLOWS = ["daily_report", "restock_alert", "risk_detection", "promo_generation", "morning_briefing", "booking_seat_insight"] as const;
 export type AgentWorkflowId = (typeof AGENT_WORKFLOWS)[number];
 export type AgentTriggerType = "scheduled" | "event" | "on_demand";
 
 type AgentWorkflowOutput = {
-  outputType: "report" | "alert" | "recommendation" | "promo" | "briefing";
+  outputType: "report" | "alert" | "recommendation" | "promo" | "briefing" | "booking_insight";
   title: string;
   content: string;
   metadata: string;
@@ -147,6 +148,91 @@ async function generateLlmInsight(input: AgentRunInput) {
   return { insight: normalizeInsight(result.data, fallback), provider: result.provider, reason: "reason" in result ? result.reason : undefined, snapshot };
 }
 
+type BookingSeatInsight = {
+  summary: string;
+  availability_status: "safe" | "watch" | "tight" | "full";
+  current_available_seats: number;
+  peak_reserved_seats_next_2h: number;
+  risks: Array<{ title: string; description: string; severity: "low" | "medium" | "high" }>;
+  arrival_watchlist: Array<{ customer_name: string; party_size: number; booking_start: string; action: string }>;
+  seat_actions: string[];
+  owner_message: string;
+};
+
+function bookingInsightToContent(insight: BookingSeatInsight, provider: string) {
+  return [
+    `Booking Insight: ${insight.summary}`,
+    `Availability: ${insight.availability_status}`,
+    `Current available seats: ${insight.current_available_seats}`,
+    `Peak reserved seats next 2h: ${insight.peak_reserved_seats_next_2h}`,
+    insight.risks.length ? `Risks:\n${insight.risks.map((risk) => `- [${risk.severity}] ${risk.title}: ${risk.description}`).join("\n")}` : "Risks: no major seating risk detected",
+    insight.arrival_watchlist.length ? `Arrival watchlist:\n${insight.arrival_watchlist.map((item) => `- ${item.customer_name} (${item.party_size} pax) at ${item.booking_start}: ${item.action}`).join("\n")}` : "Arrival watchlist: none",
+    insight.seat_actions.length ? `Seat actions:\n${insight.seat_actions.map((item) => `- ${item}`).join("\n")}` : "Seat actions: keep normal floor monitoring",
+    `Owner message: ${insight.owner_message}`,
+    provider === "llm" ? "Source: LLM booking insight" : "Source: rule-based fallback",
+  ].join("\n\n");
+}
+
+function fallbackBookingInsight(snapshot: Awaited<ReturnType<typeof getSeatAvailabilitySnapshot>>): BookingSeatInsight {
+  const peak = snapshot.nextTwoHours.reduce((max, point) => Math.max(max, point.reservedSeats), snapshot.current.reservedSeats);
+  const minAvailable = snapshot.nextTwoHours.reduce((min, point) => Math.min(min, point.availableSeats), snapshot.current.availableSeats);
+  const occupancy = snapshot.totalSeats <= 0 ? 0 : peak / snapshot.totalSeats;
+  const availability_status: BookingSeatInsight["availability_status"] = minAvailable <= 0 ? "full" : occupancy >= 0.85 ? "tight" : occupancy >= 0.6 ? "watch" : "safe";
+  const risks: BookingSeatInsight["risks"] = [];
+  if (availability_status === "full") risks.push({ title: "Seat penuh", description: "Ada slot dalam 2 jam ke depan dengan kursi tersedia 0.", severity: "high" });
+  if (availability_status === "tight") risks.push({ title: "Seat hampir penuh", description: `Peak reserved ${peak}/${snapshot.totalSeats} seat.`, severity: "medium" });
+  const now = Date.parse(snapshot.checkedAt);
+  const arrivalWatchlist = snapshot.upcomingBookings
+    .filter((booking) => Date.parse(booking.bookingStart) - now <= 30 * 60_000)
+    .slice(0, 5)
+    .map((booking) => ({ customer_name: booking.customerName, party_size: booking.partySize, booking_start: booking.bookingStart, action: "Siapkan/meja kursi dan tahan seat sampai tamu tiba." }));
+  return {
+    summary: `Saat ini tersedia ${snapshot.current.availableSeats}/${snapshot.totalSeats} seat. Peak reserved 2 jam ke depan ${peak} seat.`,
+    availability_status,
+    current_available_seats: snapshot.current.availableSeats,
+    peak_reserved_seats_next_2h: peak,
+    risks,
+    arrival_watchlist: arrivalWatchlist,
+    seat_actions: [
+      arrivalWatchlist.length ? "Prioritaskan seat untuk booking yang datang <30 menit." : "Pantau booking berikutnya dan jangan release seat terlalu cepat.",
+      availability_status === "safe" ? "Masih aman menerima walk-in sesuai kapasitas." : "Batasi walk-in besar sampai booking window lewat.",
+      "Update status booking menjadi arrived/completed/no_show agar availability akurat.",
+    ],
+    owner_message: "Coffeelot menjaga availability seat berdasarkan booking aktif dan jam kedatangan agar seat tidak double-booked.",
+  };
+}
+
+function normalizeBookingInsight(value: Partial<BookingSeatInsight> | null | undefined, fallback: BookingSeatInsight): BookingSeatInsight {
+  const normalized = value && typeof value === "object" ? value : {};
+  const allowedStatus = ["safe", "watch", "tight", "full"];
+  return {
+    summary: typeof normalized.summary === "string" ? normalized.summary : fallback.summary,
+    availability_status: allowedStatus.includes(normalized.availability_status ?? "") ? normalized.availability_status! : fallback.availability_status,
+    current_available_seats: typeof normalized.current_available_seats === "number" ? normalized.current_available_seats : fallback.current_available_seats,
+    peak_reserved_seats_next_2h: typeof normalized.peak_reserved_seats_next_2h === "number" ? normalized.peak_reserved_seats_next_2h : fallback.peak_reserved_seats_next_2h,
+    risks: Array.isArray(normalized.risks) ? normalized.risks.map((risk) => ({ title: risk.title ?? "Seat risk", description: risk.description ?? "Review booking availability.", severity: ["low", "medium", "high"].includes(risk.severity) ? risk.severity : "medium" })) : fallback.risks,
+    arrival_watchlist: Array.isArray(normalized.arrival_watchlist) ? normalized.arrival_watchlist.map((item) => ({ customer_name: item.customer_name ?? "Customer", party_size: item.party_size ?? 0, booking_start: item.booking_start ?? "", action: item.action ?? "Prepare seats." })) : fallback.arrival_watchlist,
+    seat_actions: Array.isArray(normalized.seat_actions) ? normalized.seat_actions.filter((item): item is string => typeof item === "string") : fallback.seat_actions,
+    owner_message: typeof normalized.owner_message === "string" ? normalized.owner_message : fallback.owner_message,
+  };
+}
+
+async function generateBookingSeatInsight(input: AgentRunInput) {
+  const snapshot = await getSeatAvailabilitySnapshot({ tenantId: input.tenantId, outletId: input.outletId });
+  const fallback = fallbackBookingInsight(snapshot);
+  const result = await chatCompletionJson<BookingSeatInsight>({
+    fallback,
+    messages: [
+      {
+        role: "system",
+        content: `Kamu adalah AI Reservation/Booking Insight Agent untuk coffee shop kecil. Tugasmu menilai okupansi seat dari booking aktif, menghitung sisa seat, menjaga seat availability saat jam booking tamu datang, dan memberi instruksi floor operation. Output wajib JSON valid dengan field: summary, availability_status (safe|watch|tight|full), current_available_seats number, peak_reserved_seats_next_2h number, risks array {title,description,severity low|medium|high}, arrival_watchlist array {customer_name,party_size,booking_start,action}, seat_actions array, owner_message. Jangan tambah teks di luar JSON.`,
+      },
+      { role: "user", content: JSON.stringify(snapshot) },
+    ],
+  });
+  return { insight: normalizeBookingInsight(result.data, fallback), provider: result.provider, reason: "reason" in result ? result.reason : undefined, snapshot };
+}
+
 export type AgentRunInput = {
   tenantId: string;
   outletId: string;
@@ -249,12 +335,24 @@ async function runMorningBriefing(input: AgentRunInput): Promise<AgentWorkflowOu
   };
 }
 
+async function runBookingSeatInsight(input: AgentRunInput): Promise<AgentWorkflowOutput> {
+  const { insight, provider, reason, snapshot } = await generateBookingSeatInsight(input);
+  return {
+    outputType: "booking_insight",
+    title: `Booking seat insight — ${new Date().toISOString().slice(0, 10)}`,
+    content: bookingInsightToContent(insight, provider),
+    metadata: JSON.stringify({ provider, reason, bookingInsight: insight, bookingSnapshot: snapshot }),
+    requiresApproval: false,
+  };
+}
+
 async function executeWorkflow(input: AgentRunInput) {
   if (input.workflowId === "daily_report") return runDailyReport(input);
   if (input.workflowId === "restock_alert") return runRestockAlert(input);
   if (input.workflowId === "risk_detection") return runRiskDetection(input);
   if (input.workflowId === "promo_generation") return runPromoGeneration(input);
   if (input.workflowId === "morning_briefing") return runMorningBriefing(input);
+  if (input.workflowId === "booking_seat_insight") return runBookingSeatInsight(input);
   throw new Error(`Unknown workflow ${input.workflowId}`);
 }
 

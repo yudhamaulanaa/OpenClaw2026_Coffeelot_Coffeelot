@@ -717,3 +717,11 @@
 - Agent output metadata now stores provider, fallback reason, structured insight, and source snapshot.
 - Improved `/agent` dashboard to render AI Insight sections, performance status, risk severity, restock recommendations, sales opportunities, next best actions, and owner message.
 
+## 2026-05-15 — Booking Seat Insight
+
+- Added booking/reservation data model with party size, booking window, status, table label, arrival/release timestamps.
+- Added seat availability service with capacity-based overlap checks, reserved-seat calculation, current availability, and next-2-hour occupancy snapshots.
+- Added booking APIs for creating bookings, checking availability, listing bookings, and updating booking status.
+- Added `booking_seat_insight` Agent Workflow using LLM to assess seat availability, arrival watchlist, occupancy risk, and floor actions.
+- Added `/agent` dashboard rendering for booking insight cards.
+
