@@ -126,9 +126,9 @@ Implement individual agent workflows.
 
 - [x] Daily Report workflow — first API-backed version
 - [x] Restock Alert workflow — first API-backed version
-- [ ] Risk Detection workflow
-- [ ] Promo Generation workflow
-- [ ] Morning Briefing workflow
+- [x] Risk Detection workflow
+- [x] Promo Generation workflow
+- [x] Morning Briefing workflow
 
 ---
 

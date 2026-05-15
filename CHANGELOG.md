@@ -1,5 +1,22 @@
 # Coffeelot — Changelog
 
+## [Agent Workflow Pack] — 2026-05-15
+
+### Added
+
+- Added `risk_detection` workflow for inventory/sales risk signals.
+- Added `promo_generation` workflow for draft promo recommendations; outputs require approval.
+- Added `morning_briefing` workflow summarizing yesterday sales, top seller, stock focus, and opening checklist.
+- Agent workflow registry now exposes five workflows: daily report, restock alert, risk detection, promo generation, and morning briefing.
+
+### Verification
+
+- `bun run typecheck` passes.
+- `bun run build` passes.
+- `coffeelot-api` restarted successfully.
+- Public API `GET /api/agent/workflows` returns all five workflows.
+- On-demand runs for `risk_detection`, `promo_generation`, and `morning_briefing` completed and created outputs.
+
 ## [Agent Event Triggers] — 2026-05-15
 
 ### Added

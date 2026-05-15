@@ -106,6 +106,12 @@
 - [x] Add configurable scheduler for daily_report and restock_alert workflows
 - [x] Add event triggers for paid orders and low-stock restock alerts
 
+- [x] Add risk detection workflow
+
+- [x] Add promo generation workflow
+
+- [x] Add morning briefing workflow
+
 ## Later
 
 - [ ] Milestone 6 — AI Agent Core
