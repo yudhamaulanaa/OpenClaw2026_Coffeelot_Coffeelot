@@ -1,5 +1,17 @@
 # Coffeelot — Changelog
 
+## [Milestone 1 Complete] — 2026-05-15
+
+### Updated
+
+- Marked Milestone 1 — Project Brain as complete in `ROADMAP.md`.
+- Updated `PROJECT_STATUS.md` to reflect Milestone 1 completion.
+- Added living document rule so `.md` files remain part of the delivery checklist.
+
+### Notes
+
+- Documentation is treated as a living project tracker and must stay updated with implementation progress.
+
 ## [Clean Blueprint] — 2026-05-15
 
 ### Added

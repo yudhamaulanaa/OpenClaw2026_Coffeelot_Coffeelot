@@ -7,16 +7,19 @@ AI Agent yang bisa colok ke POS manapun.
 
 ---
 
-## Milestone 1 — Project Brain
+## Milestone 1 — Project Brain ✅
 
 Setup dokumentasi dan blueprint project.
 
-- [ ] AGENTS.md + adapter files
-- [ ] README.md
-- [ ] PROJECT_STATUS.md, ROADMAP.md, TODO.md, CHANGELOG.md
-- [ ] docs/ARCHITECTURE.md
-- [ ] docs/DATABASE-SCHEMA.md
-- [ ] docs/API-CONTRACTS.md
+Status: **Complete** — living documents sudah tersedia dan akan terus di-update setiap milestone/phase.
+
+- [x] AGENTS.md + adapter files
+- [x] README.md
+- [x] PROJECT_STATUS.md, ROADMAP.md, TODO.md, CHANGELOG.md
+- [x] docs/ARCHITECTURE.md
+- [x] docs/DATABASE-SCHEMA.md
+- [x] docs/API-CONTRACTS.md
+- [x] docs/ORDER-CHANNELS.md
 
 ---
 
