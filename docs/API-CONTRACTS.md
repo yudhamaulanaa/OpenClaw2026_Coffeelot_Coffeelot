@@ -480,7 +480,28 @@ Reconcile pending DOKU payments in batch. The API service also runs this as a po
 
 DOKU webhook callback (payment confirmation).
 
-**Note:** This endpoint is called by DOKU, not by frontend. Invalid payloads without a payment/provider reference return `400`; unknown references return `404`. Signature verification is still pending until callback signing details are confirmed.
+**Note:** This endpoint is called by DOKU, not by frontend. Invalid payloads without a payment/provider reference return `400`; unknown references return `404`.
+
+Callback security follows DOKU non-SNAP signature docs:
+
+- Required headers when `DOKU_CALLBACK_SIGNATURE_REQUIRED` is true/default:
+  - `Client-Id`
+  - `Request-Id`
+  - `Request-Timestamp`
+  - `Signature`
+- `Request-Target` is derived from the callback path, e.g. `/api/payments/callback`.
+- `Digest` is `base64(sha256(raw JSON body))`.
+- Signature component format:
+
+```text
+Client-Id:<Client-Id>
+Request-Id:<Request-Id>
+Request-Timestamp:<Request-Timestamp>
+Request-Target:/api/payments/callback
+Digest:<base64 sha256 raw body>
+```
+
+The server validates `Signature: HMACSHA256=<base64 hmac-sha256 component using DOKU_SECRET_KEY>`, checks `Client-Id` against `DOKU_CLIENT_ID`, and rejects stale timestamps outside `DOKU_CALLBACK_SIGNATURE_TOLERANCE_MS` (default 15 minutes).
 
 
 ### GET /api/payments/doku/tools

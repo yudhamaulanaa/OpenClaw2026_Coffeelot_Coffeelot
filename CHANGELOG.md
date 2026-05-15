@@ -1,5 +1,21 @@
 # Coffeelot — Changelog
 
+## [DOKU Callback Signature Hardening] — 2026-05-15
+
+### Added
+
+- Added DOKU callback signature validation for `POST /api/payments/callback` using DOKU non-SNAP signature components.
+- Validates `Client-Id`, `Request-Id`, `Request-Timestamp`, `Signature`, request path, raw-body digest, HMAC-SHA256, and timestamp tolerance.
+- Added `DOKU_CALLBACK_SIGNATURE_REQUIRED` and `DOKU_CALLBACK_SIGNATURE_TOLERANCE_MS` environment controls.
+- Expanded callback reference/status parsing for additional DOKU-style fields such as `order_invoice_number` and `transactionStatus`.
+
+### Verification
+
+- `bun run typecheck` passes.
+- `bun run build` passes.
+- Unsigned public callback simulation is rejected with `401 INVALID_DOKU_SIGNATURE`.
+- Correctly signed callback simulation passes signature validation and reaches payment lookup (`404 PAYMENT_NOT_FOUND` for intentionally unknown invoice).
+
 ## [Agent Output Approval Flow] — 2026-05-15
 
 ### Added

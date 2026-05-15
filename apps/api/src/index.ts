@@ -1,3 +1,4 @@
+import { createHash, createHmac, timingSafeEqual } from "node:crypto";
 import { Elysia, t } from "elysia";
 import { isDokuPaymentMethod, isPaymentMethod } from "@coffeelot/shared";
 import { resolveTenantContext } from "./context";
@@ -25,6 +26,75 @@ const allowedOrigins = new Set([
   "http://localhost:5173",
   "http://127.0.0.1:5173",
 ]);
+
+
+function base64Sha256(value: string) {
+  return createHash("sha256").update(value).digest("base64");
+}
+
+function safeEquals(left: string, right: string) {
+  const leftBuffer = Buffer.from(left);
+  const rightBuffer = Buffer.from(right);
+  return leftBuffer.length === rightBuffer.length && timingSafeEqual(leftBuffer, rightBuffer);
+}
+
+function validateDokuCallbackSignature(input: { request: Request; rawBody: string }) {
+  const signatureRequired = process.env.DOKU_CALLBACK_SIGNATURE_REQUIRED !== "false";
+  const secretKey = process.env.DOKU_SECRET_KEY;
+  if (!secretKey) {
+    if (signatureRequired) throw new ApiError("DOKU_SIGNATURE_NOT_CONFIGURED", "DOKU_SECRET_KEY is required to validate callback signature", 500);
+    return { verified: false, reason: "secret_not_configured" };
+  }
+
+  const headers = input.request.headers;
+  const clientId = headers.get("client-id");
+  const requestId = headers.get("request-id");
+  const requestTimestamp = headers.get("request-timestamp");
+  const signature = headers.get("signature");
+  const configuredClientId = process.env.DOKU_CLIENT_ID;
+
+  if (!clientId || !requestId || !requestTimestamp || !signature) {
+    if (signatureRequired) throw new ApiError("INVALID_DOKU_SIGNATURE", "Missing DOKU signature headers", 401);
+    return { verified: false, reason: "missing_headers" };
+  }
+
+  if (configuredClientId && clientId !== configuredClientId) {
+    throw new ApiError("INVALID_DOKU_SIGNATURE", "DOKU Client-Id mismatch", 401);
+  }
+
+  const toleranceMs = Number(process.env.DOKU_CALLBACK_SIGNATURE_TOLERANCE_MS ?? 15 * 60 * 1000);
+  const timestampMs = Date.parse(requestTimestamp);
+  if (!Number.isFinite(timestampMs) || Math.abs(Date.now() - timestampMs) > toleranceMs) {
+    throw new ApiError("INVALID_DOKU_SIGNATURE", "DOKU callback timestamp is outside tolerance", 401);
+  }
+
+  const requestTarget = new URL(input.request.url).pathname;
+  const digest = base64Sha256(input.rawBody);
+  const component = [
+    `Client-Id:${clientId}`,
+    `Request-Id:${requestId}`,
+    `Request-Timestamp:${requestTimestamp}`,
+    `Request-Target:${requestTarget}`,
+    `Digest:${digest}`,
+  ].join("\n");
+  const expectedSignature = `HMACSHA256=${createHmac("sha256", secretKey).update(component).digest("base64")}`;
+
+  if (!safeEquals(signature, expectedSignature)) {
+    throw new ApiError("INVALID_DOKU_SIGNATURE", "Invalid DOKU callback signature", 401);
+  }
+
+  return { verified: true, requestId, requestTarget, digest };
+}
+
+function parseJsonObject(rawBody: string) {
+  try {
+    const parsed = JSON.parse(rawBody) as unknown;
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) throw new Error("Expected JSON object");
+    return parsed as Record<string, unknown>;
+  } catch {
+    throw new ApiError("INVALID_CALLBACK", "Invalid JSON callback payload", 400);
+  }
+}
 
 function applyCors(origin: string | null, set: { headers?: Record<string, unknown> }) {
   const allowOrigin = origin && allowedOrigins.has(origin) ? origin : "https://coffeelot.app";
@@ -628,35 +698,35 @@ export const app = new Elysia({ prefix: "/api" })
     const results = await reconcilePendingPayments(limit);
     return { ok: true, count: results.length, results };
   })
-  .post(
-    "/payments/callback",
-    async ({ body }) => {
-      const callbackBody = body as Record<string, unknown>;
-      const paymentId = typeof callbackBody.payment_id === "string" ? callbackBody.payment_id : undefined;
-      const dokuInvoiceId = typeof callbackBody.doku_invoice_id === "string" ? callbackBody.doku_invoice_id : undefined;
-      const providerReference =
-        dokuInvoiceId ??
-        (typeof callbackBody.invoice_number === "string" ? callbackBody.invoice_number : undefined) ??
-        (typeof callbackBody.transaction_id === "string" ? callbackBody.transaction_id : undefined) ??
-        (typeof callbackBody.reference_id === "string" ? callbackBody.reference_id : undefined);
-      if (!paymentId && !providerReference) throw new ApiError("INVALID_CALLBACK", "Missing payment_id or provider reference", 400);
+  .post("/payments/callback", async ({ request }) => {
+    const rawBody = await request.text();
+    const signature = validateDokuCallbackSignature({ request, rawBody });
+    const callbackBody = parseJsonObject(rawBody);
+    const paymentId = typeof callbackBody.payment_id === "string" ? callbackBody.payment_id : undefined;
+    const dokuInvoiceId = typeof callbackBody.doku_invoice_id === "string" ? callbackBody.doku_invoice_id : undefined;
+    const providerReference =
+      dokuInvoiceId ??
+      (typeof callbackBody.invoice_number === "string" ? callbackBody.invoice_number : undefined) ??
+      (typeof callbackBody.transaction_id === "string" ? callbackBody.transaction_id : undefined) ??
+      (typeof callbackBody.reference_id === "string" ? callbackBody.reference_id : undefined) ??
+      (typeof callbackBody.order_invoice_number === "string" ? callbackBody.order_invoice_number : undefined);
+    if (!paymentId && !providerReference) throw new ApiError("INVALID_CALLBACK", "Missing payment_id or provider reference", 400);
 
-      const statusValue =
-        (typeof callbackBody.status === "string" ? callbackBody.status : undefined) ??
-        (typeof callbackBody.transaction_status === "string" ? callbackBody.transaction_status : undefined) ??
-        (typeof callbackBody.payment_status === "string" ? callbackBody.payment_status : undefined);
-      const status = normalizePaymentStatus(statusValue);
-      const payment = await prisma.payment.findFirst({
-        where: { OR: [{ id: paymentId ?? "" }, { dokuInvoiceId: providerReference ?? "" }] },
-      });
-      if (!payment) throw new ApiError("PAYMENT_NOT_FOUND", "Payment not found for callback reference", 404);
+    const statusValue =
+      (typeof callbackBody.status === "string" ? callbackBody.status : undefined) ??
+      (typeof callbackBody.transaction_status === "string" ? callbackBody.transaction_status : undefined) ??
+      (typeof callbackBody.payment_status === "string" ? callbackBody.payment_status : undefined) ??
+      (typeof callbackBody.transactionStatus === "string" ? callbackBody.transactionStatus : undefined);
+    const status = normalizePaymentStatus(statusValue);
+    const payment = await prisma.payment.findFirst({
+      where: { OR: [{ id: paymentId ?? "" }, { dokuInvoiceId: providerReference ?? "" }] },
+    });
+    if (!payment) throw new ApiError("PAYMENT_NOT_FOUND", "Payment not found for callback reference", 404);
 
-      const updated = await markPaymentFromProviderStatus(payment, status, { source: "doku-callback", body });
+    const updated = await markPaymentFromProviderStatus(payment, status, { source: "doku-callback", signature, body: callbackBody });
 
-      return { ok: true, payment: updated };
-    },
-    { body: t.Record(t.String(), t.Unknown()) },
-  )
+    return { ok: true, payment: updated };
+  })
   .get("/reports/recent-orders", async ({ headers, query }) => {
     const { tenantId, outletId } = resolveTenantContext(headers);
     const limit = Math.min(Number(query.limit ?? 10), 50);

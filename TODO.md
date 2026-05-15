@@ -85,7 +85,7 @@
 - [x] Add fallback DOKU MCP reconciliation/polling for pending payments
 - [x] Add manual payment reconciliation endpoint
 - [x] Sync DOKU `SUCCESS` status to local paid payment/order state
-- [ ] Add callback signature/security validation
+- [x] Add callback signature/security validation
 - [x] Payment confirmation → stock deduction transaction
 - [x] Prevent paid orders/payment creation from making inventory negative
 - [x] Show temporary/projected stock while items are in POS and chat carts
