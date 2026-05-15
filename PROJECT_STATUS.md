@@ -12,7 +12,7 @@ Milestone 2 — Database Foundation is complete and merged to `main`. The Bun mo
 
 Milestone 3 — Backend Foundation is complete and merged to `main`.
 
-Milestone 4 — Built-in POS / Order Channels MVP foundation is complete and merged to `main`.
+Milestone 4 — Built-in POS / Order Channels MVP foundation is complete and merged to `main`. A customer-facing `/chat` web order screen is now implemented and deployed for browser/QR-based self-order testing.
 
 Milestone 5 — DOKU Payment Integration is in progress on branch `feat/doku-payment-reconciliation`: sandbox placeholder payment creation, status polling, callback handling, and POS payment link/QR/VA display are implemented. The public deployment serves `https://coffeelot.app` and `https://api.coffeelot.app`; frontend API calls use the public API origin and backend CORS allows the app origin. DOKU MCP sandbox discovery and payment creation are verified for QRIS, DOKU Checkout, and BCA Virtual Account paths with runtime-only credentials. Fallback reconciliation/polling is implemented and has synced paid sandbox VA transactions from DOKU `SUCCESS` to local `paid`. Next target: callback signature/security validation and stock deduction hardening.
 

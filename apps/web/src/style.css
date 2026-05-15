@@ -23,3 +23,23 @@ input, select { padding: 10px 12px; border-radius: 12px; border: 1px solid #d8be
 
 .payment-box { margin-top: 14px; padding: 12px; border-radius: 14px; background: #f1e1cc; display: grid; gap: 8px; }
 .payment-box code { white-space: pre-wrap; word-break: break-word; }
+
+.chat-shell { padding: 18px; max-width: 1120px; margin: 0 auto; }
+.chat-hero { background: linear-gradient(135deg, #fff3df, #f3dbc0); border: 1px solid #ead8c1; border-radius: 24px; padding: 22px; margin-bottom: 18px; display: grid; gap: 8px; }
+.chat-hero h1 { font-size: clamp(28px, 8vw, 52px); line-height: 1; }
+.chat-layout { display: grid; grid-template-columns: 1fr 360px; gap: 18px; align-items: start; }
+.chat-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 18px; }
+.chat-product-grid button { min-height: 112px; font-size: 16px; }
+.chat-cart { position: sticky; top: 16px; display: grid; gap: 12px; }
+.chat-cart-line { align-items: center; gap: 12px; }
+.chat-cart-line div:first-child { display: grid; gap: 4px; }
+.qty-actions { display: flex; gap: 6px; }
+.qty-actions button { width: 34px; height: 34px; border: 0; border-radius: 999px; background: #6f3f20; color: #fff; cursor: pointer; }
+.chat-cart small { color: #7f654f; word-break: break-word; }
+label { display: grid; gap: 6px; font-weight: 700; }
+a { color: #6f3f20; font-weight: 700; }
+@media (max-width: 900px) {
+  .chat-layout { grid-template-columns: 1fr; }
+  .chat-cart { position: static; }
+  .chat-fields { grid-template-columns: 1fr; }
+}

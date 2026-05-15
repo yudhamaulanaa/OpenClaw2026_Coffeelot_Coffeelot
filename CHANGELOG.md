@@ -1,5 +1,20 @@
 # Coffeelot — Changelog
 
+## [Webchat Order Screen] — 2026-05-15
+
+### Added
+
+- Added customer-facing webchat order screen at `/chat`.
+- Customers can enter name/table, pick catalog products, adjust quantities, submit a chat cart, and receive QRIS or VA BCA payment instructions.
+- The screen uses existing `chat-carts` APIs and DOKU payment creation so chat orders enter the same kitchen/payment pipeline.
+
+### Verification
+
+- `bun run typecheck` passes.
+- `bun run build` passes.
+- `https://coffeelot.app/chat` returns HTTP 200 and serves the new webchat bundle.
+- Public API smoke test created a webchat cart, submitted a `pending_payment` chat order, and generated a pending QRIS payment.
+
 ## [DOKU Payment Reconciliation] — 2026-05-15
 
 ### Added

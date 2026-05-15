@@ -94,6 +94,7 @@ Integrate DOKU MCP Server untuk payment processing.
 - [x] Payment status checking endpoint
 - [x] Payment webhook/callback endpoint
 - [x] Payment UI di POS checkout
+- [x] Customer-facing `/chat` web order screen for order-by-chat/browser flow
 - [x] Public HTTPS deployment for web/API payment callback URL
 - [x] Real DOKU MCP sandbox tool discovery using runtime credentials
 - [x] QRIS payment creation through DOKU MCP sandbox

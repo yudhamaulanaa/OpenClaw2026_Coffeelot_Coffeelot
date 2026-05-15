@@ -118,3 +118,29 @@ Payment should support:
 - Payment confirmation that changes order to paid
 - Stock deduction after paid confirmation
 - Order entering kitchen queue after paid confirmation
+
+## Webchat Browser Flow
+
+A customer-facing MVP webchat order screen is available at:
+
+```text
+https://coffeelot.app/chat
+```
+
+Optional query parameters:
+
+```text
+https://coffeelot.app/chat?table=A1&name=Yudha
+```
+
+Current flow:
+
+1. Customer enters name/table label.
+2. Customer picks catalog products and adjusts quantities.
+3. Frontend creates a `chat-carts` session with `source_channel=webchat`.
+4. Frontend adds cart items to the session.
+5. Frontend submits the cart into an order with `order_channel=chat` and `order_status=pending_payment`.
+6. Frontend creates a DOKU payment using QRIS or VA BCA.
+7. Payment confirmation is handled by callback when available, with reconciliation/polling as fallback.
+
+Next improvement: QR order links should generate customer URLs that open `/chat?table=<label>` directly.

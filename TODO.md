@@ -56,6 +56,13 @@
 - [x] Fix frontend production API base URL to `https://api.coffeelot.app/api`
 - [x] Add API CORS support for `https://coffeelot.app`
 
+### Order Channels / Webchat
+
+- [x] Add customer-facing `/chat` web order screen
+- [x] Wire webchat screen to chat-cart APIs
+- [x] Generate QRIS/VA BCA payment after chat order submit
+- [ ] Generate QR order links that point customers directly to `/chat?table=...`
+
 ### Real DOKU Hardening
 
 - [x] Collect DOKU sandbox credentials/config
