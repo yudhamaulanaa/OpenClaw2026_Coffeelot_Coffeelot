@@ -1,5 +1,18 @@
 # Coffeelot — Changelog
 
+## [Webchat Paid Order Status] — 2026-05-15
+
+### Added
+
+- Updated `/chat` so once payment status is `paid`, the customer sees an order-status panel instead of payment instructions.
+- The paid view shows payment paid, order paid/processing, and current kitchen/barista prep status placeholder.
+
+### Verification
+
+- `bun run typecheck` passes.
+- `bun run build` passes.
+- `https://coffeelot.app/chat` serves the updated bundle containing `Status pesanan` and `Pembayaran: lunas`.
+
 ## [POS Payment Status UI] — 2026-05-15
 
 ### Added

@@ -50,3 +50,7 @@ a { color: #6f3f20; font-weight: 700; }
 .va-instructions strong { font-size: 18px; }
 .va-instructions code { font-size: 22px; font-weight: 800; letter-spacing: .06em; background: white; padding: 10px; border-radius: 10px; }
 .va-instructions small { color: #7f654f; line-height: 1.4; }
+.order-status-box { margin-top: 14px; padding: 14px; border-radius: 16px; background: #e5f5e5; border: 1px solid #8acb8a; display: grid; gap: 8px; }
+.order-status-box strong { font-size: 18px; color: #275a27; }
+.order-status-box span { display: flex; justify-content: space-between; gap: 10px; border-bottom: 1px solid rgba(39, 90, 39, .18); padding-bottom: 6px; }
+.order-status-box small { color: #446344; line-height: 1.4; }

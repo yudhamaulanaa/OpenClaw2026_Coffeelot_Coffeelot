@@ -248,6 +248,8 @@ function WebChatOrder() {
   const [paymentMethod, setPaymentMethod] = useState<DokuPaymentMethod>("qris");
   const [session, setSession] = useState<ChatCartSession | null>(null);
   const [submittedOrderId, setSubmittedOrderId] = useState<string | null>(null);
+  const [submittedOrderStatus, setSubmittedOrderStatus] = useState<string | null>(null);
+  const [submittedPrepStatus, setSubmittedPrepStatus] = useState<string | null>(null);
   const [payment, setPayment] = useState<PaymentResult | null>(null);
   const [checkingPayment, setCheckingPayment] = useState(false);
   const [message, setMessage] = useState("Pilih menu untuk mulai order.");
@@ -301,8 +303,10 @@ function WebChatOrder() {
       });
     }
 
-    const result = await api<{ order: { id: string; total: number } }>(`/chat-carts/${createdSession.id}/submit`, { method: "POST" });
+    const result = await api<{ order: { id: string; total: number; orderStatus?: string; prepStatus?: string } }>(`/chat-carts/${createdSession.id}/submit`, { method: "POST" });
     setSubmittedOrderId(result.order.id);
+    setSubmittedOrderStatus(result.order.orderStatus ?? "pending_payment");
+    setSubmittedPrepStatus(result.order.prepStatus ?? "new");
 
     const createdPayment = await api<PaymentResult>("/payments/create", {
       method: "POST",
@@ -319,7 +323,12 @@ function WebChatOrder() {
     try {
       const status = await api<{ id: string; status: string; paid_at?: string | null }>(`/payments/${payment.id}/status`);
       setPayment((current) => current ? { ...current, status: status.status } : current);
-      setMessage(status.status === "paid" ? "Pembayaran sudah diterima. Terima kasih!" : `Status pembayaran: ${status.status}`);
+      if (status.status === "paid") {
+        setSubmittedOrderStatus("paid");
+        setMessage("Pembayaran diterima. Pesanan sedang diproses.");
+      } else {
+        setMessage(`Status pembayaran: ${status.status}`);
+      }
     } finally {
       setCheckingPayment(false);
     }
@@ -380,7 +389,17 @@ function WebChatOrder() {
           <button className="checkout" disabled={cart.length === 0} onClick={() => submitChatOrder().catch((error) => setMessage(error.message))}>Kirim order</button>
           {session ? <small>Chat session: {session.id}</small> : null}
           {submittedOrderId ? <small>Order: {submittedOrderId}</small> : null}
-          <PaymentBox payment={payment} method={paymentMethod} onCheck={() => checkPaymentStatus().catch((error) => setMessage(error.message))} checking={checkingPayment} />
+          {payment?.status === "paid" ? (
+            <div className="order-status-box">
+              <strong>Status pesanan</strong>
+              <span>Pembayaran: lunas</span>
+              <span>Order: {submittedOrderStatus === "paid" ? "dibayar" : submittedOrderStatus ?? "diproses"}</span>
+              <span>Dapur/barista: {submittedPrepStatus ?? "new"}</span>
+              <small>Simpan halaman ini untuk cek status pesanan. Setelah barista update antrean, status dapur akan ikut ditampilkan di versi berikutnya.</small>
+            </div>
+          ) : (
+            <PaymentBox payment={payment} method={paymentMethod} onCheck={() => checkPaymentStatus().catch((error) => setMessage(error.message))} checking={checkingPayment} />
+          )}
         </aside>
       </section>
     </main>

@@ -143,6 +143,7 @@ Current flow:
 6. Frontend creates a DOKU payment using QRIS or VA BCA.
 7. If VA BCA is selected, the screen shows the Bank BCA VA number and payment instructions.
 8. Customer/operator can press `Check Pembayaran` to refresh local payment status.
-9. Payment confirmation is handled by callback when available, with reconciliation/polling as fallback.
+9. After payment becomes `paid`, `/chat` switches from payment instructions to a customer order-status panel.
+10. Payment confirmation is handled by callback when available, with reconciliation/polling as fallback.
 
 Next improvement: QR order links should generate customer URLs that open `/chat?table=<label>` directly.
