@@ -540,3 +540,8 @@ Return recent agent runs with outputs for the current tenant/outlet.
 ### GET /api/agent/outputs
 
 Return recent agent outputs for the current tenant.
+
+
+### POS product recipe metadata
+
+`GET /api/products/pos` includes a `recipes` array with linked inventory metadata so POS/chat clients can calculate temporary projected stock before checkout.

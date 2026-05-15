@@ -1,5 +1,22 @@
 # Coffeelot — Changelog
 
+## [Projected Cart Stock] — 2026-05-15
+
+### Added
+
+- Product POS API now includes recipe + linked inventory metadata for live cart stock projection.
+- POS stock panel now shows temporary/projected stock after current cart quantities.
+- POS checkout is disabled when projected stock would go below zero, with a clear stock warning.
+- `/chat` also calculates temporary stock while the customer adjusts cart quantities and blocks checkout if projected stock is insufficient.
+
+### Verification
+
+- `bun run typecheck` passes.
+- `bun run build` passes.
+- `coffeelot-api` and `coffeelot-web` restarted successfully.
+- Public API `/products/pos` returns recipe metadata for Americano.
+- Public bundle includes `Temporary stock setelah cart`, `STOCK TIDAK CUKUP`, and `Stok sementara tidak cukup`.
+
 ## [POS Payment Reconcile Button] — 2026-05-15
 
 ### Fixed

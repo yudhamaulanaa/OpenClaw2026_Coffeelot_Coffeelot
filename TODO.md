@@ -88,6 +88,7 @@
 - [ ] Add callback signature/security validation
 - [x] Payment confirmation → stock deduction transaction
 - [x] Prevent paid orders/payment creation from making inventory negative
+- [x] Show temporary/projected stock while items are in POS and chat carts
 - [ ] Verify sandbox end-to-end payment callback flow
 
 ## POS / Operations UI

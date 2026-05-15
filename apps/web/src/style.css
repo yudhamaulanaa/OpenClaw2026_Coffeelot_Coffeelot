@@ -86,3 +86,22 @@ select:disabled, input:disabled, button:disabled { opacity: .65; }
 .agent-output-card { background: #fffaf2; border: 1px solid #ead8c1; border-radius: 14px; padding: 12px; display: grid; gap: 6px; }
 .agent-output-card em { color: #9b6235; font-style: normal; font-weight: 800; text-transform: uppercase; font-size: 12px; }
 .agent-output-card pre { margin: 0; white-space: pre-wrap; font: inherit; line-height: 1.45; }
+
+.stock-card.insufficient {
+  border-color: #ef4444;
+  background: #fff1f2;
+}
+
+.stock-warning {
+  color: #b91c1c;
+  font-weight: 800;
+}
+
+.temporary-stock {
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.75rem;
+  border-radius: 0.9rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+}

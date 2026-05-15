@@ -72,6 +72,17 @@ export type PosProduct = {
   category: string;
   price: Money;
   isActive: boolean;
+  recipes?: Array<{
+    inventoryItemId: string;
+    qtyUsed: Quantity;
+    inventoryItem?: {
+      id: string;
+      name: string;
+      unit: string;
+      currentStock: Quantity;
+      minimumStock: Quantity;
+    };
+  }>;
 };
 
 export type CartItemInput = {

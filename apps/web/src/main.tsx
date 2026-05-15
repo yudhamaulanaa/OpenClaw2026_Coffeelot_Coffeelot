@@ -25,6 +25,31 @@ type InventoryStatusItem = {
   low_stock?: boolean;
 };
 
+
+type ProjectedStockItem = InventoryStatusItem & {
+  reserved: number;
+  projected: number;
+  insufficient: boolean;
+};
+
+function projectedStockItems(inventoryItems: InventoryStatusItem[], products: PosProduct[], cart: CartLine[]): ProjectedStockItem[] {
+  const reserved = new Map<string, number>();
+  const productMap = new Map(products.map((product) => [product.id, product]));
+  for (const line of cart) {
+    if (!line.productId) continue;
+    const product = productMap.get(line.productId);
+    for (const recipe of product?.recipes ?? []) {
+      reserved.set(recipe.inventoryItemId, (reserved.get(recipe.inventoryItemId) ?? 0) + Number(recipe.qtyUsed) * line.qty);
+    }
+  }
+  return inventoryItems.map((item) => {
+    const current = Number(item.currentStock);
+    const itemReserved = reserved.get(item.id) ?? 0;
+    const projected = current - itemReserved;
+    return { ...item, reserved: itemReserved, projected, insufficient: projected < 0 };
+  });
+}
+
 type PaymentResult = {
   id?: string;
   payment_url?: string | null;
@@ -145,6 +170,8 @@ function App() {
 
   const total = useMemo(() => cart.reduce((sum, item) => sum + item.qty * item.unitPrice, 0), [cart]);
   const categories = useMemo(() => [...new Set(products.map((product) => product.category))], [products]);
+  const projectedStock = useMemo(() => projectedStockItems(inventoryItems, products, cart), [inventoryItems, products, cart]);
+  const hasInsufficientProjectedStock = projectedStock.some((item) => item.insufficient);
 
   async function load() {
     const [posProducts, queue, inventory] = await Promise.all([
@@ -278,7 +305,8 @@ function App() {
             </select>
           </label>
           <div className="total">Total {money(total)}</div>
-          <button className="checkout" disabled={cart.length === 0} onClick={checkout}>Checkout</button>
+          {hasInsufficientProjectedStock ? <small className="stock-warning">Stok sementara tidak cukup. Kurangi qty cart sebelum checkout.</small> : null}
+          <button className="checkout" disabled={cart.length === 0 || hasInsufficientProjectedStock} onClick={checkout}>Checkout</button>
           <PaymentBox payment={lastPayment} method={lastPaymentMethod} onCheck={() => checkLastPaymentStatus().catch((error) => setMessage(error.message))} checking={checkingLastPayment} />
         </div>
       </section>
@@ -288,16 +316,19 @@ function App() {
         <h2>Status Stock</h2>
         <small>Auto-refresh setiap 5 detik.</small>
         <div className="stock-grid">
-          {inventoryItems.map((item) => {
+          {projectedStock.map((item) => {
             const current = Number(item.currentStock);
             const minimum = Number(item.minimumStock);
             const low = item.low_stock ?? current <= minimum;
+            const projectedLow = item.projected <= minimum;
             return (
-              <article key={item.id} className={low ? "stock-card low" : "stock-card"}>
+              <article key={item.id} className={item.insufficient ? "stock-card low insufficient" : projectedLow ? "stock-card low" : "stock-card"}>
                 <strong>{item.name}</strong>
                 <span>{current} {item.unit}</span>
+                {item.reserved > 0 ? <small>Di cart: -{item.reserved} {item.unit}</small> : null}
+                <small>Temporary setelah cart: {item.projected} {item.unit}</small>
                 <small>Minimum {minimum} {item.unit}</small>
-                <em>{low ? "LOW STOCK" : "OK"}</em>
+                <em>{item.insufficient ? "STOCK TIDAK CUKUP" : projectedLow ? "LOW STOCK" : low ? "LOW STOCK" : "OK"}</em>
               </article>
             );
           })}
@@ -407,6 +438,7 @@ function AgentDashboard() {
 
 function WebChatOrder() {
   const [products, setProducts] = useState<PosProduct[]>([]);
+  const [inventoryItems, setInventoryItems] = useState<InventoryStatusItem[]>([]);
   const [cart, setCart] = useState<CartLine[]>([]);
   const [customerName, setCustomerName] = useState(readSearchParam("name"));
   const [tableLabel, setTableLabel] = useState(readSearchParam("table") || readSearchParam("meja"));
@@ -422,9 +454,13 @@ function WebChatOrder() {
 
   const categories = useMemo(() => [...new Set(products.map((product) => product.category))], [products]);
   const total = useMemo(() => cart.reduce((sum, item) => sum + item.qty * item.unitPrice, 0), [cart]);
+  const projectedStock = useMemo(() => projectedStockItems(inventoryItems, products, cart), [inventoryItems, products, cart]);
+  const hasInsufficientProjectedStock = projectedStock.some((item) => item.insufficient);
 
   useEffect(() => {
-    api<PosProduct[]>("/products/pos").then(setProducts).catch((error) => setMessage(error.message));
+    Promise.all([api<PosProduct[]>("/products/pos"), api<InventoryStatusItem[]>("/inventory")])
+      .then(([nextProducts, nextInventory]) => { setProducts(nextProducts); setInventoryItems(nextInventory); })
+      .catch((error) => setMessage(error.message));
   }, []);
 
   function addProduct(product: PosProduct) {
@@ -445,6 +481,10 @@ function WebChatOrder() {
 
   async function submitChatOrder() {
     if (cart.length === 0) return;
+    if (hasInsufficientProjectedStock) {
+      setMessage("Stok sementara tidak cukup. Kurangi qty sebelum checkout.");
+      return;
+    }
     setMessage("Membuat order chat...");
     const createdSession = await api<ChatCartSession>("/chat-carts", {
       method: "POST",
@@ -588,7 +628,16 @@ function WebChatOrder() {
             </select>
           </label>
           <div className="total">Total {money(total)}</div>
-          <button className="checkout" disabled={cart.length === 0 || locked} onClick={() => submitChatOrder().catch((error) => setMessage(error.message))}>{locked ? "Order terkirim" : "Kirim order"}</button>
+          {hasInsufficientProjectedStock && !locked ? <small className="stock-warning">Stok sementara tidak cukup. Kurangi qty sebelum checkout.</small> : null}
+          <button className="checkout" disabled={cart.length === 0 || locked || hasInsufficientProjectedStock} onClick={() => submitChatOrder().catch((error) => setMessage(error.message))}>{locked ? "Order terkirim" : "Kirim order"}</button>
+          {!locked && cart.length > 0 ? (
+            <div className="temporary-stock">
+              <strong>Temporary stock setelah cart</strong>
+              {projectedStock.filter((item) => item.reserved > 0).map((item) => (
+                <small key={item.id} className={item.insufficient ? "stock-warning" : ""}>{item.name}: {Number(item.currentStock)} - {item.reserved} = {item.projected} {item.unit}</small>
+              ))}
+            </div>
+          ) : null}
           {session ? <small>Chat session: {session.id}</small> : null}
           {submittedOrderId ? <small>Order: {submittedOrderId}</small> : null}
           {payment?.status === "paid" ? (

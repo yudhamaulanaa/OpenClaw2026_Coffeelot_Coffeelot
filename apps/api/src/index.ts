@@ -204,6 +204,15 @@ export const app = new Elysia({ prefix: "/api" })
     const { tenantId, outletId } = resolveTenantContext(headers);
     return prisma.product.findMany({
       where: { tenantId, isActive: true, OR: [{ outletId: null }, { outletId }] },
+      include: {
+        recipes: {
+          include: {
+            inventoryItem: {
+              select: { id: true, name: true, unit: true, currentStock: true, minimumStock: true },
+            },
+          },
+        },
+      },
       orderBy: [{ category: "asc" }, { name: "asc" }],
     });
   })
