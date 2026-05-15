@@ -1,5 +1,19 @@
 # Coffeelot — Changelog
 
+## [Webchat Payment Status UI] — 2026-05-15
+
+### Added
+
+- Added a `Check Pembayaran` button on the `/chat` customer order screen.
+- Added explicit Bank BCA Virtual Account payment instructions when VA BCA is selected/generated.
+- The payment box now highlights paid status after a successful status check.
+
+### Verification
+
+- `bun run typecheck` passes.
+- `bun run build` passes.
+- `https://coffeelot.app/chat` serves the updated bundle containing `Check Pembayaran` and `Bank BCA`.
+
 ## [Webchat Order Screen] — 2026-05-15
 
 ### Added

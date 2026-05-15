@@ -61,6 +61,7 @@
 - [x] Add customer-facing `/chat` web order screen
 - [x] Wire webchat screen to chat-cart APIs
 - [x] Generate QRIS/VA BCA payment after chat order submit
+- [x] Show VA Bank BCA payment instructions and manual status check button on `/chat`
 - [ ] Generate QR order links that point customers directly to `/chat?table=...`
 
 ### Real DOKU Hardening

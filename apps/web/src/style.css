@@ -43,3 +43,10 @@ a { color: #6f3f20; font-weight: 700; }
   .chat-cart { position: static; }
   .chat-fields { grid-template-columns: 1fr; }
 }
+.secondary-button { border: 1px solid #6f3f20; border-radius: 999px; padding: 10px 14px; background: #fffaf2; color: #6f3f20; cursor: pointer; font-weight: 700; }
+.secondary-button:disabled { opacity: .6; cursor: wait; }
+.payment-box.paid { background: #dff3df; border: 1px solid #87c987; }
+.va-instructions { display: grid; gap: 6px; padding: 12px; border-radius: 14px; background: #fffaf2; border: 1px dashed #c99b68; }
+.va-instructions strong { font-size: 18px; }
+.va-instructions code { font-size: 22px; font-weight: 800; letter-spacing: .06em; background: white; padding: 10px; border-radius: 10px; }
+.va-instructions small { color: #7f654f; line-height: 1.4; }

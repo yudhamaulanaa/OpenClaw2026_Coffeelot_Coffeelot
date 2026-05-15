@@ -52,15 +52,25 @@ function readSearchParam(name: string) {
   return new URLSearchParams(window.location.search).get(name) ?? "";
 }
 
-function PaymentBox({ payment }: { payment: PaymentResult | null }) {
+function PaymentBox({ payment, method, onCheck, checking }: { payment: PaymentResult | null; method?: DokuPaymentMethod; onCheck?: () => void; checking?: boolean }) {
   if (!payment) return null;
+  const isVaBca = method === "va_bca" || Boolean(payment.va_number);
+  const statusText = payment.status === "paid" ? "Pembayaran diterima" : payment.status ?? "pending";
   return (
-    <div className="payment-box">
-      <strong>Payment pending</strong>
+    <div className={`payment-box ${payment.status === "paid" ? "paid" : ""}`}>
+      <strong>{payment.status === "paid" ? "Payment paid" : "Payment pending"}</strong>
+      {isVaBca && payment.va_number ? (
+        <div className="va-instructions">
+          <span>Bayar ke Virtual Account</span>
+          <strong>Bank BCA</strong>
+          <code>{payment.va_number}</code>
+          <small>Gunakan nomor VA BCA di atas dari m-BCA/ATM/internet banking. Status akan berubah otomatis, atau tekan Check Pembayaran.</small>
+        </div>
+      ) : null}
       {payment.payment_url ? <a href={payment.payment_url} target="_blank">Open payment link</a> : null}
       {payment.qr_code ? <code>{payment.qr_code}</code> : null}
-      {payment.va_number ? <code>VA: {payment.va_number}</code> : null}
-      {payment.status ? <span>Status: {payment.status}</span> : null}
+      <span>Status: {statusText}</span>
+      {onCheck ? <button className="secondary-button" onClick={onCheck} disabled={checking}>{checking ? "Checking..." : "Check Pembayaran"}</button> : null}
     </div>
   );
 }
@@ -189,7 +199,7 @@ function App() {
           </label>
           <div className="total">Total {money(total)}</div>
           <button className="checkout" disabled={cart.length === 0} onClick={checkout}>Checkout</button>
-          <PaymentBox payment={lastPayment} />
+          <PaymentBox payment={lastPayment} method={paymentMethod === "qris" ? "qris" : paymentMethod === "transfer" ? "va_bca" : undefined} />
         </div>
       </section>
 
@@ -223,6 +233,7 @@ function WebChatOrder() {
   const [session, setSession] = useState<ChatCartSession | null>(null);
   const [submittedOrderId, setSubmittedOrderId] = useState<string | null>(null);
   const [payment, setPayment] = useState<PaymentResult | null>(null);
+  const [checkingPayment, setCheckingPayment] = useState(false);
   const [message, setMessage] = useState("Pilih menu untuk mulai order.");
 
   const categories = useMemo(() => [...new Set(products.map((product) => product.category))], [products]);
@@ -286,6 +297,18 @@ function WebChatOrder() {
     setMessage("Order terkirim. Silakan lanjut pembayaran.");
   }
 
+  async function checkPaymentStatus() {
+    if (!payment?.id) return;
+    setCheckingPayment(true);
+    try {
+      const status = await api<{ id: string; status: string; paid_at?: string | null }>(`/payments/${payment.id}/status`);
+      setPayment((current) => current ? { ...current, status: status.status } : current);
+      setMessage(status.status === "paid" ? "Pembayaran sudah diterima. Terima kasih!" : `Status pembayaran: ${status.status}`);
+    } finally {
+      setCheckingPayment(false);
+    }
+  }
+
   return (
     <main className="chat-shell">
       <section className="chat-hero">
@@ -341,7 +364,7 @@ function WebChatOrder() {
           <button className="checkout" disabled={cart.length === 0} onClick={() => submitChatOrder().catch((error) => setMessage(error.message))}>Kirim order</button>
           {session ? <small>Chat session: {session.id}</small> : null}
           {submittedOrderId ? <small>Order: {submittedOrderId}</small> : null}
-          <PaymentBox payment={payment} />
+          <PaymentBox payment={payment} method={paymentMethod} onCheck={() => checkPaymentStatus().catch((error) => setMessage(error.message))} checking={checkingPayment} />
         </aside>
       </section>
     </main>
