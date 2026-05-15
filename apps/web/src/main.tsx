@@ -57,6 +57,26 @@ type ChatCartSession = {
 
 type OrderDetail = KitchenOrder & { updatedAt?: string };
 
+type AgentOutput = {
+  id: string;
+  outputType: string;
+  title: string;
+  content: string;
+  createdAt: string;
+  metadata?: string | null;
+};
+
+type AgentRun = {
+  id: string;
+  workflowId: string;
+  triggerType: string;
+  status: string;
+  startedAt: string;
+  completedAt?: string | null;
+  errorMessage?: string | null;
+  outputs: AgentOutput[];
+};
+
 async function api<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${API_BASE_URL}${path}`, {
     ...init,
@@ -304,6 +324,85 @@ function App() {
   );
 }
 
+function AgentDashboard() {
+  const [workflows, setWorkflows] = useState<string[]>([]);
+  const [runs, setRuns] = useState<AgentRun[]>([]);
+  const [message, setMessage] = useState("Ready");
+  const [runningWorkflow, setRunningWorkflow] = useState<string | null>(null);
+
+  async function loadAgentData() {
+    const [workflowResponse, runResponse] = await Promise.all([
+      api<{ workflows: string[] }>("/agent/workflows"),
+      api<AgentRun[]>("/agent/runs"),
+    ]);
+    setWorkflows(workflowResponse.workflows);
+    setRuns(runResponse);
+  }
+
+  useEffect(() => {
+    loadAgentData().catch((error) => setMessage(error.message));
+    const timer = window.setInterval(() => loadAgentData().catch((error) => setMessage(error.message)), 10_000);
+    return () => window.clearInterval(timer);
+  }, []);
+
+  async function runWorkflow(workflowId: string) {
+    setRunningWorkflow(workflowId);
+    setMessage(`Running ${workflowId}...`);
+    try {
+      await api("/agent/runs", { method: "POST", body: JSON.stringify({ workflow_id: workflowId, trigger_type: "on_demand" }) });
+      await loadAgentData();
+      setMessage(`${workflowId} completed`);
+    } finally {
+      setRunningWorkflow(null);
+    }
+  }
+
+  return (
+    <main className="shell">
+      <section className="header">
+        <div>
+          <p className="eyebrow">Coffeelot Agent</p>
+          <h1>Agent dashboard & activity timeline</h1>
+        </div>
+        <span>{message}</span>
+      </section>
+
+      <section className="panel agent-controls">
+        <h2>Run workflow</h2>
+        <div className="agent-workflows">
+          {workflows.map((workflow) => (
+            <button key={workflow} onClick={() => runWorkflow(workflow).catch((error) => setMessage(error.message))} disabled={Boolean(runningWorkflow)}>
+              {runningWorkflow === workflow ? "Running..." : workflow.replaceAll("_", " ")}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <section className="panel agent-timeline">
+        <h2>Activity timeline</h2>
+        {runs.length === 0 ? <p>No agent runs yet.</p> : null}
+        {runs.map((run) => (
+          <article key={run.id} className="agent-run-card">
+            <div className="agent-run-head">
+              <strong>{run.workflowId.replaceAll("_", " ")}</strong>
+              <span className={run.status === "completed" ? "status-ok" : run.status === "failed" ? "status-bad" : "status-warn"}>{run.status}</span>
+            </div>
+            <small>{new Date(run.startedAt).toLocaleString("id-ID")} • {run.triggerType}</small>
+            {run.errorMessage ? <code>{run.errorMessage}</code> : null}
+            {run.outputs.map((output) => (
+              <div key={output.id} className="agent-output-card">
+                <strong>{output.title}</strong>
+                <em>{output.outputType}</em>
+                <pre>{output.content}</pre>
+              </div>
+            ))}
+          </article>
+        ))}
+      </section>
+    </main>
+  );
+}
+
 function WebChatOrder() {
   const [products, setProducts] = useState<PosProduct[]>([]);
   const [cart, setCart] = useState<CartLine[]>([]);
@@ -503,6 +602,6 @@ function WebChatOrder() {
 const route = window.location.pathname;
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    {route.startsWith("/chat") ? <WebChatOrder /> : <App />}
+    {route.startsWith("/chat") ? <WebChatOrder /> : route.startsWith("/agent") ? <AgentDashboard /> : <App />}
   </StrictMode>,
 );

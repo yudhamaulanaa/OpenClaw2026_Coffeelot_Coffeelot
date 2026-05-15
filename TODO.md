@@ -97,7 +97,7 @@
 - [x] Add agent run creation/status/output API endpoints
 - [x] Add daily report workflow using existing sales/report data
 - [x] Add restock alert workflow using inventory thresholds
-- [ ] Add agent dashboard/activity timeline page
+- [x] Add agent dashboard/activity timeline page
 
 ## Later
 

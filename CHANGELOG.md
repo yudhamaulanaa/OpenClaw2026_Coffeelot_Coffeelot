@@ -1,5 +1,20 @@
 # Coffeelot — Changelog
 
+## [Agent Dashboard UI] — 2026-05-15
+
+### Added
+
+- Added web agent dashboard at `/agent`.
+- Dashboard lists available workflows, runs `daily_report` / `restock_alert` on demand, and displays recent agent run/output activity timeline.
+- Timeline auto-refreshes every 10 seconds.
+
+### Verification
+
+- `bun run typecheck` passes.
+- `bun run build` passes.
+- `coffeelot-web` restarted successfully.
+- Public `/agent` bundle contains `Agent dashboard & activity timeline`, `Run workflow`, and `Activity timeline`.
+
 ## [POS Stock Status Panel] — 2026-05-15
 
 ### Added
