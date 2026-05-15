@@ -2,12 +2,14 @@
 
 ## Current Focus: Milestone 2 — Database Foundation
 
-- [ ] Create Prisma schema (SQLite) — all tables
+- [x] Create milestone branch: `feat/milestone-2-database-foundation`
+- [ ] Setup monorepo workspace config (Bun workspace)
+- [ ] Create `.env.example`
+- [ ] Create Prisma schema (SQLite) — all tables from `docs/DATABASE-SCHEMA.md`
 - [ ] Run migration
 - [ ] Create seed data (tenant, outlet, user, products, inventory, recipes, sample orders)
-- [ ] Create .env.example
-- [ ] Setup monorepo workspace config (bun workspace)
-- [ ] Define shared types in packages/shared
+- [ ] Define shared types in `packages/shared`
+- [ ] Verify database setup with seed + basic Prisma query
 
 ## Up Next: Milestone 3 — Backend Foundation
 

@@ -27,11 +27,18 @@ Status: **Complete** — living documents sudah tersedia dan akan terus di-updat
 
 Setup database schema (SQLite), migration, dan seed data.
 
+Status: **Started** — branch `feat/milestone-2-database-foundation` created; implementation will begin from workspace/env/Prisma foundation.
+
+- [x] Milestone branch created
+- [ ] Bun workspace config
+- [ ] `.env.example`
 - [ ] Prisma schema (all tables: tenant, POS, agent, payment)
 - [ ] Migration (SQLite)
 - [ ] Seed: demo tenant, outlet, user
 - [ ] Seed: sample products, inventory, recipes
 - [ ] Seed: sample orders (for agent to analyze)
+- [ ] Shared types/enums in `packages/shared`
+- [ ] Seed/query verification
 
 ---
 

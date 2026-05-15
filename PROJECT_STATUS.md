@@ -2,13 +2,13 @@
 
 Last updated: 2026-05-15
 
-## Overall Progress: Milestone 1 Complete — Clean Blueprint Ready
+## Overall Progress: Milestone 2 Started — Database Foundation Planning
 
 ### Current State
 
 Milestone 1 — Project Brain is complete.
 
-This branch is a clean restart blueprint. It intentionally contains no implementation code yet.
+Milestone 2 — Database Foundation has been started on branch `feat/milestone-2-database-foundation`. The current phase is still planning/bootstrap: no implementation code has been added yet. The immediate goal is to create the monorepo foundation, Prisma SQLite schema, initial migration, and demo seed data.
 
 Roadmap and docs are updated with the latest MVP direction:
 
@@ -31,17 +31,19 @@ Keep `.md` files updated as part of the work, not afterthoughts:
 
 ### What's Next
 
-Start implementation from Milestone 2 on a new feature branch:
+Continue Milestone 2 in this order:
 
-1. Database Foundation
-2. Backend Foundation
-3. Built-in POS / Kitchen / Self-order
-4. DOKU Payment
-5. Agent Core
+1. Setup monorepo workspace config with Bun.
+2. Create `.env.example` with SQLite/demo tenant placeholders.
+3. Create `prisma/schema.prisma` from `docs/DATABASE-SCHEMA.md`.
+4. Add initial migration for SQLite.
+5. Create seed data for demo tenant/outlet/user/products/inventory/recipes/sample orders.
+6. Define shared enums/types in `packages/shared`.
+7. Update living docs and changelog after each completed phase.
 
 ### Modules Created
 
-None yet. Create modules as implementation begins.
+None yet. Create module folders only when implementation reaches the related module scope. Milestone 2 can start with `prisma/`, root workspace config, and `packages/shared`.
 
 ### Blockers
 

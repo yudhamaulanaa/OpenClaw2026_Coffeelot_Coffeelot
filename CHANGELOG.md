@@ -1,5 +1,17 @@
 # Coffeelot — Changelog
 
+## [Milestone 2 Started] — 2026-05-15
+
+### Updated
+
+- Created milestone implementation branch: `feat/milestone-2-database-foundation`.
+- Updated `PROJECT_STATUS.md` to reflect Milestone 2 planning/bootstrap state.
+- Updated `TODO.md` and `ROADMAP.md` so living documents track the next implementation sequence.
+
+### Notes
+
+- Follow root `AGENTS.md`: do not build directly on `main`; keep `.md` living documents updated before/with code changes.
+
 ## [Milestone 1 Complete] — 2026-05-15
 
 ### Updated
