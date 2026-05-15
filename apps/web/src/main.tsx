@@ -504,6 +504,11 @@ type InsightComparisonRow = {
   key: string;
   workflowId: string;
   outputType: string;
+  typeContext: {
+    label: string;
+    whenToUse: string;
+    dataProcessed: string[];
+  };
   title: string;
   provider: string;
   status: string;
@@ -514,6 +519,72 @@ type InsightComparisonRow = {
   ownerMessage: string;
   createdAt: string;
 };
+
+const INSIGHT_TYPE_CONTEXT: Record<string, InsightComparisonRow["typeContext"]> = {
+  daily_report: {
+    label: "Daily performance report",
+    whenToUse: "Dipakai untuk review performa harian dan closing/opening owner.",
+    dataProcessed: ["paid orders hari ini", "revenue vs kemarin", "AOV", "best seller", "stok kritis"],
+  },
+  restock_alert: {
+    label: "Stock replenishment alert",
+    whenToUse: "Dipakai saat owner perlu tahu item yang harus dibeli/diisi ulang.",
+    dataProcessed: ["inventory", "minimum stock", "current stock", "unit bahan"],
+  },
+  risk_detection: {
+    label: "Operational risk audit",
+    whenToUse: "Dipakai untuk early warning sebelum masalah operasional membesar.",
+    dataProcessed: ["sales hari ini", "sales kemarin", "stok kritis", "AOV", "order count"],
+  },
+  promo_generation: {
+    label: "Promo recommendation",
+    whenToUse: "Dipakai saat owner ingin ide promo yang tetap butuh approval.",
+    dataProcessed: ["best seller", "menu aktif", "sales opportunity", "stok pendukung", "risiko promo"],
+  },
+  morning_briefing: {
+    label: "Opening shift briefing",
+    whenToUse: "Dipakai sebelum buka/awal shift untuk checklist tim.",
+    dataProcessed: ["stok kritis", "menu prioritas", "kitchen readiness", "payment readiness", "sales kemarin"],
+  },
+  booking_seat_insight: {
+    label: "Booking seat availability",
+    whenToUse: "Dipakai saat ada booking atau menjelang jam kedatangan tamu.",
+    dataProcessed: ["booking aktif", "overlap waktu booking", "seat capacity", "arrival watchlist", "reserved seats 2 jam"],
+  },
+  menu_engineering: {
+    label: "Menu engineering BI",
+    whenToUse: "Dipakai untuk keputusan menu: push, bundle, reprice, atau evaluasi.",
+    dataProcessed: ["menu sales", "qty sold", "revenue per menu", "price", "recipe stock risk"],
+  },
+  demand_forecast: {
+    label: "Demand forecast BI",
+    whenToUse: "Dipakai untuk prediksi demand shift berikutnya/rush hour.",
+    dataProcessed: ["hourly sales", "today vs yesterday", "best seller", "inventory", "order pattern"],
+  },
+  prep_planning: {
+    label: "Prep planning BI",
+    whenToUse: "Dipakai sebelum rush/shift untuk menentukan bahan dan menu yang harus disiapkan.",
+    dataProcessed: ["best seller", "critical stock", "recipe risks", "kitchen queue", "inventory"],
+  },
+  kitchen_sla: {
+    label: "Kitchen SLA monitor",
+    whenToUse: "Dipakai saat memantau antrean kitchen dan order yang terlalu lama.",
+    dataProcessed: ["active orders", "prep status", "order age", "queue count", "item list"],
+  },
+  payment_reconciliation_insight: {
+    label: "Payment reconciliation BI",
+    whenToUse: "Dipakai untuk mengecek pending payment dan potensi mismatch payment/order.",
+    dataProcessed: ["pending payments", "oldest pending", "pending amount", "payment method", "reconcile status"],
+  },
+};
+
+function insightTypeContext(workflowId: string, outputType: string): InsightComparisonRow["typeContext"] {
+  return INSIGHT_TYPE_CONTEXT[workflowId] ?? {
+    label: outputType.replaceAll("_", " "),
+    whenToUse: "Dipakai sesuai konteks workflow ini.",
+    dataProcessed: ["agent output", "workflow metadata", "operational snapshot"],
+  };
+}
 
 function latestInsightRows(runs: AgentRun[]): InsightComparisonRow[] {
   const rows: InsightComparisonRow[] = [];
@@ -526,6 +597,7 @@ function latestInsightRows(runs: AgentRun[]): InsightComparisonRow[] {
           key: output.id,
           workflowId: agent.workflowFocus ?? run.workflowId,
           outputType: output.outputType,
+          typeContext: insightTypeContext(agent.workflowFocus ?? run.workflowId, output.outputType),
           title: output.title,
           provider: agent.provider ?? "unknown",
           status: agent.insight.performance_status ?? "-",
@@ -541,6 +613,7 @@ function latestInsightRows(runs: AgentRun[]): InsightComparisonRow[] {
           key: output.id,
           workflowId: run.workflowId,
           outputType: output.outputType,
+          typeContext: insightTypeContext(run.workflowId, output.outputType),
           title: output.title,
           provider: booking.provider ?? "unknown",
           status: booking.bookingInsight.availability_status ?? "-",
@@ -567,7 +640,7 @@ function AgentInsightComparisonTable({ runs }: { runs: AgentRun[] }) {
     <section className="panel insight-comparison-panel">
       <div className="agent-run-head">
         <h2>Insight comparison</h2>
-        <small>Latest AI-generated output per workflow. Use this to compare focus and avoid repetitive insight.</small>
+        <small>Latest AI-generated output per workflow. Type explains when to use each insight and what data it processes.</small>
       </div>
       {rows.length === 0 ? <p>No structured insights yet. Run workflows first.</p> : (
         <div className="insight-table-wrap">
@@ -588,7 +661,13 @@ function AgentInsightComparisonTable({ runs }: { runs: AgentRun[] }) {
               {rows.map((row) => (
                 <tr key={row.key}>
                   <td><strong>{row.workflowId.replaceAll("_", " ")}</strong></td>
-                  <td>{row.outputType}</td>
+                  <td>
+                    <div className="insight-type-cell">
+                      <strong>{row.typeContext.label}</strong>
+                      <span>{row.typeContext.whenToUse}</span>
+                      <small>Data: {row.typeContext.dataProcessed.join(" • ")}</small>
+                    </div>
+                  </td>
                   <td><span className={row.provider === "llm" ? "provider-pill llm" : "provider-pill fallback"}>{row.provider}</span></td>
                   <td><span className={`insight-status ${row.status}`}>{row.status}</span></td>
                   <td>{row.summary}</td>

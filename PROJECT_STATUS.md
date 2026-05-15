@@ -106,3 +106,7 @@ The current MVP/BI build phase has been wrapped with reporting assets in `docs/r
 - Demo video script covering POS, `/chat`, payment/inventory reliability, `/agent`, Booking Seat Insight, and BI workflows.
 
 These are Markdown source materials ready to convert into slides/PDF and a recorded demo video.
+
+## Latest update — Agent Insight Context Labels
+
+The `/agent` Insight Comparison table now makes each workflow easier to understand. The Type column describes when the insight should be used and what data is processed, instead of only showing the raw output type.

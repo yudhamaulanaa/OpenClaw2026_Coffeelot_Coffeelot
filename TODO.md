@@ -182,3 +182,8 @@
 - [ ] Convert pitch deck markdown into slides/PDF.
 - [ ] Capture product screenshots for deck.
 - [ ] Record demo video using safe browser tabs only.
+
+## Completed — Agent Insight Context Labels
+
+- [x] Add usage context to `/agent` Insight Comparison Type column.
+- [x] Add processed-data descriptions per workflow.

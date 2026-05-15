@@ -750,3 +750,8 @@
   - `docs/reports/README.md`
 - The pitch deck positions Coffeelot as an AI Business Intelligence & Operations Agent for coffee shops/small F&B.
 - The video script includes demo flow, narration, recording checklist, and secret-safety reminder.
+
+## 2026-05-15 — Agent Insight Context Labels
+
+- Updated `/agent` Insight Comparison table Type column to explain when each insight is used and what operational data it processes.
+- Added workflow-specific context descriptions for daily report, restock alert, risk detection, promo generation, morning briefing, booking seat insight, and BI workflows.

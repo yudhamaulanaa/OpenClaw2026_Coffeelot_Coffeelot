@@ -200,3 +200,8 @@ select:disabled, input:disabled, button:disabled { opacity: .65; }
 .provider-pill { border-radius: 999px; padding: 4px 8px; font-size: 12px; font-weight: 900; text-transform: uppercase; }
 .provider-pill.llm { background: #dbeafe; color: #1d4ed8; }
 .provider-pill.fallback { background: #f3f4f6; color: #4b5563; }
+
+.insight-type-cell { display: grid; gap: 4px; min-width: 220px; }
+.insight-type-cell strong { color: #24160f; text-transform: none; }
+.insight-type-cell span { color: #4f3422; line-height: 1.35; }
+.insight-type-cell small { color: #7f654f; line-height: 1.35; }
