@@ -107,8 +107,8 @@ curl -fsSL https://bun.sh/install | bash
 ### 1. Clone
 
 ```bash
-git clone git@github.com:yudhamaulanaa/coffeelot-ai.git
-cd coffeelot-ai
+git clone git@github.com:yudhamaulanaa/OpenClaw2026_Coffeelot_Coffeelot.git
+cd OpenClaw2026_Coffeelot_Coffeelot
 ```
 
 If the repository is renamed for the hackathon requirement, use:

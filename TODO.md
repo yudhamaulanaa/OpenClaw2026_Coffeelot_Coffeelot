@@ -200,4 +200,7 @@
 - [ ] Rename or duplicate repository to `OpenClaw2026_Coffeelot_Coffeelot` if required.
 - [ ] Record and upload public max-2-minute demo video.
 - [ ] Add final demo video URL to Devpost submission.
+## Completed — Submission Repository Link
+
+- [x] Update submission docs to point to `OpenClaw2026_Coffeelot_Coffeelot`.
 

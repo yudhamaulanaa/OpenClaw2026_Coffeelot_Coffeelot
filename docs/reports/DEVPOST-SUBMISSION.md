@@ -10,11 +10,11 @@ Recommended final repo name:
 
 **OpenClaw2026_Coffeelot_Coffeelot**
 
-Current repository:
+Submission repository:
 
-<https://github.com/yudhamaulanaa/coffeelot-ai>
+<https://github.com/yudhamaulanaa/OpenClaw2026_Coffeelot_Coffeelot>
 
-> Action needed before final submission: ensure the GitHub repository is public. If required by organizers, rename or duplicate the repo to `OpenClaw2026_Coffeelot_Coffeelot`.
+> Action needed before final submission: ensure the GitHub repository is public.
 
 ## Project Title
 
@@ -32,9 +32,9 @@ The MVP includes a live POS page, a customer-facing `/chat` self-order flow, DOK
 
 Current:
 
-<https://github.com/yudhamaulanaa/coffeelot-ai>
+<https://github.com/yudhamaulanaa/OpenClaw2026_Coffeelot_Coffeelot>
 
-Required/ideal naming:
+Required naming:
 
 <https://github.com/yudhamaulanaa/OpenClaw2026_Coffeelot_Coffeelot>
 
@@ -97,7 +97,7 @@ Summary:
 ## Final Submission Checklist
 
 - [ ] GitHub repository public.
-- [ ] Repository name follows `OpenClaw2026_TeamName_ProjectName`, or Devpost notes current repo if not renamed.
+- [x] Repository name follows `OpenClaw2026_TeamName_ProjectName`.
 - [x] README includes installation/setup instructions.
 - [x] Project description drafted.
 - [x] AI tools/models list drafted.

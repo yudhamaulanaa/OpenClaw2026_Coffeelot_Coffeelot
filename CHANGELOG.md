@@ -766,4 +766,7 @@
 - Added AI tools/models list at `docs/reports/AI-TOOLS-MODELS.md`.
 - Generated 5-page PDF pitch deck: `docs/reports/OpenClaw2026_Coffeelot_Coffeelot.pdf`.
 - Added `scripts/generate_pitchdeck_pdf.py` to regenerate the PDF without external dependencies.
+## 2026-05-15 — Submission Repository Link
+
+- Updated README and Devpost submission draft to use the required GitHub repository URL: `https://github.com/yudhamaulanaa/OpenClaw2026_Coffeelot_Coffeelot`.
 
