@@ -8,8 +8,8 @@
 - [x] Create Prisma schema (SQLite) — all tables from `docs/DATABASE-SCHEMA.md`
 - [x] Run migration
 - [x] Create seed data (tenant, outlet, user, products, inventory, recipes, sample orders)
-- [ ] Define shared types in `packages/shared`
-- [ ] Verify database setup with seed + basic Prisma query
+- [x] Define shared types in `packages/shared`
+- [x] Verify database setup with seed + basic Prisma query
 
 ## Up Next: Milestone 3 — Backend Foundation
 

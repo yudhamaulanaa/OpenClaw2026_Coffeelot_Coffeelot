@@ -1,5 +1,21 @@
 # Coffeelot — Changelog
 
+## [Milestone 2 Complete] — 2026-05-15
+
+### Added
+
+- Added shared enum/type constants in `packages/shared` for roles, tenant/business statuses, order/payment/prep/channel states, stock movements, agent states, API errors, POS products, cart inputs, order inputs, and kitchen orders.
+
+### Updated
+
+- Marked Milestone 2 complete in `ROADMAP.md`.
+- Marked shared types and seed/query verification complete in `TODO.md`.
+- Updated `PROJECT_STATUS.md` to point next work at Milestone 3 backend API foundation.
+
+### Verification
+
+- `bun run typecheck` passes for shared, API, and web workspaces.
+
 ## [Tooling Verification] — 2026-05-15
 
 ### Added
