@@ -285,6 +285,10 @@ export const app = new Elysia({ prefix: "/api" })
     const { tenantId, outletId } = resolveTenantContext(headers);
     return prisma.order.findMany({ where: { tenantId, outletId }, include: { items: true }, orderBy: { createdAt: "desc" } });
   })
+  .get("/orders/:id", async ({ headers, params }) => {
+    const { tenantId, outletId } = resolveTenantContext(headers);
+    return prisma.order.findFirstOrThrow({ where: { id: params.id, tenantId, outletId }, include: { items: true } });
+  })
 
 
   .get("/kitchen/orders", async ({ headers, query }) => {

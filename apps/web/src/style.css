@@ -60,3 +60,5 @@ a { color: #6f3f20; font-weight: 700; }
 .payment-only-va { font-size: clamp(30px, 9vw, 48px); letter-spacing: .08em; color: #24160f; background: white; border: 1px dashed #c99b68; border-radius: 18px; padding: 18px; word-break: break-all; }
 .payment-only-qr { text-align: left; white-space: pre-wrap; word-break: break-word; background: white; border-radius: 14px; padding: 14px; }
 .order-status-page { width: min(520px, calc(100vw - 32px)); }
+.customer-badge { padding: 10px 12px; border-radius: 12px; background: #fff3df; border: 1px solid #ead8c1; color: #6f3f20; }
+select:disabled, input:disabled, button:disabled { opacity: .65; }

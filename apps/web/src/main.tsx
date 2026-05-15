@@ -45,6 +45,8 @@ type ChatCartSession = {
   status: string;
 };
 
+type OrderDetail = KitchenOrder & { updatedAt?: string };
+
 async function api<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${API_BASE_URL}${path}`, {
     ...init,
@@ -90,56 +92,6 @@ function PaymentBox({ payment, method, onCheck, checking }: { payment: PaymentRe
       <span>Status: {statusText}</span>
       {onCheck ? <button className="secondary-button" onClick={onCheck} disabled={checking}>{checking ? "Checking..." : "Check Pembayaran"}</button> : null}
     </div>
-  );
-}
-
-function ChatPaymentOnlyView({
-  payment,
-  method,
-  checking,
-  onCheck,
-}: {
-  payment: PaymentResult;
-  method: DokuPaymentMethod;
-  checking: boolean;
-  onCheck: () => void;
-}) {
-  const va = vaNumber(payment);
-  const qr = qrCode(payment);
-  const url = paymentUrl(payment);
-  return (
-    <main className="chat-shell payment-only-shell">
-      <section className="payment-only-card">
-        <p className="eyebrow">Pembayaran</p>
-        {method === "va_bca" ? (
-          <>
-            <span className="payment-only-label">Nomor VA Bank BCA</span>
-            <strong className="payment-only-va">{va ?? "Menyiapkan nomor VA..."}</strong>
-          </>
-        ) : (
-          <>
-            <span className="payment-only-label">QR / QRIS</span>
-            {qr ? <code className="payment-only-qr">{qr}</code> : null}
-            {url ? <a href={url} target="_blank">Buka pembayaran</a> : null}
-          </>
-        )}
-        <button className="checkout" onClick={onCheck} disabled={checking}>{checking ? "Checking..." : "Check Pembayaran"}</button>
-      </section>
-    </main>
-  );
-}
-
-function ChatOrderStatusView({ orderStatus, prepStatus }: { orderStatus: string | null; prepStatus: string | null }) {
-  return (
-    <main className="chat-shell payment-only-shell">
-      <section className="order-status-box order-status-page">
-        <strong>Status pesanan</strong>
-        <span>Pembayaran: lunas</span>
-        <span>Order: {orderStatus === "paid" ? "dibayar" : orderStatus ?? "diproses"}</span>
-        <span>Dapur/barista: {prepStatus ?? "new"}</span>
-        <small>Pesanan sudah masuk antrean. Silakan tunggu diproses barista.</small>
-      </section>
-    </main>
   );
 }
 
@@ -318,6 +270,7 @@ function WebChatOrder() {
   const [submittedOrderId, setSubmittedOrderId] = useState<string | null>(null);
   const [submittedOrderStatus, setSubmittedOrderStatus] = useState<string | null>(null);
   const [submittedPrepStatus, setSubmittedPrepStatus] = useState<string | null>(null);
+  const [orderDetail, setOrderDetail] = useState<OrderDetail | null>(null);
   const [payment, setPayment] = useState<PaymentResult | null>(null);
   const [checkingPayment, setCheckingPayment] = useState(false);
   const [message, setMessage] = useState("Pilih menu untuk mulai order.");
@@ -393,6 +346,11 @@ function WebChatOrder() {
       setPayment((current) => current ? { ...current, status: status.status } : current);
       if (status.status === "paid") {
         setSubmittedOrderStatus("paid");
+        if (submittedOrderId) {
+          const order = await api<OrderDetail>(`/orders/${submittedOrderId}`);
+          setOrderDetail(order);
+          setSubmittedPrepStatus(order.prepStatus);
+        }
         setMessage("Pembayaran diterima. Pesanan sedang diproses.");
       } else {
         setMessage(`Status pembayaran: ${status.status}`);
@@ -402,13 +360,25 @@ function WebChatOrder() {
     }
   }
 
-  if (payment?.status === "paid") {
-    return <ChatOrderStatusView orderStatus={submittedOrderStatus} prepStatus={submittedPrepStatus} />;
-  }
+  useEffect(() => {
+    if (!submittedOrderId || payment?.status !== "paid") return;
+    let cancelled = false;
+    const loadOrder = async () => {
+      const order = await api<OrderDetail>(`/orders/${submittedOrderId}`);
+      if (cancelled) return;
+      setOrderDetail(order);
+      setSubmittedOrderStatus(order.orderStatus);
+      setSubmittedPrepStatus(order.prepStatus);
+    };
+    loadOrder().catch((error) => setMessage(error.message));
+    const timer = window.setInterval(() => loadOrder().catch((error) => setMessage(error.message)), 5_000);
+    return () => {
+      cancelled = true;
+      window.clearInterval(timer);
+    };
+  }, [submittedOrderId, payment?.status]);
 
-  if (payment) {
-    return <ChatPaymentOnlyView payment={payment} method={paymentMethod} checking={checkingPayment} onCheck={() => checkPaymentStatus().catch((error) => setMessage(error.message))} />;
-  }
+  const locked = Boolean(payment);
 
   return (
     <main className="chat-shell">
@@ -421,15 +391,15 @@ function WebChatOrder() {
       <section className="chat-layout">
         <div className="panel products">
           <div className="chat-fields">
-            <input placeholder="Nama customer" value={customerName} onChange={(event) => setCustomerName(event.target.value)} />
-            <input placeholder="No meja / pickup label" value={tableLabel} onChange={(event) => setTableLabel(event.target.value)} />
+            <input placeholder="Nama customer" value={customerName} disabled={locked} onChange={(event) => setCustomerName(event.target.value)} />
+            <input placeholder="No meja / pickup label" value={tableLabel} disabled={locked} onChange={(event) => setTableLabel(event.target.value)} />
           </div>
           {categories.map((category) => (
             <div key={category}>
               <h2>{category}</h2>
               <div className="product-grid chat-product-grid">
                 {products.filter((product) => product.category === category).map((product) => (
-                  <button key={product.id} onClick={() => addProduct(product)}>
+                  <button key={product.id} disabled={locked} onClick={() => addProduct(product)}>
                     <strong>{product.name}</strong>
                     <span>{money(Number(product.price))}</span>
                   </button>
@@ -441,7 +411,8 @@ function WebChatOrder() {
 
         <aside className="panel chat-cart">
           <h2>Order kamu</h2>
-          {cart.length === 0 ? <p>Belum ada item.</p> : null}
+          {customerName ? <div className="customer-badge">Pemesan: <strong>{customerName}</strong></div> : null}
+          {cart.length === 0 && !locked ? <p>Belum ada item.</p> : null}
           {cart.map((item, index) => (
             <div className="cart-line chat-cart-line" key={`${item.name}-${index}`}>
               <div>
@@ -449,20 +420,34 @@ function WebChatOrder() {
                 <span>{money(item.unitPrice)} × {item.qty}</span>
               </div>
               <div className="qty-actions">
-                <button onClick={() => changeQty(index, -1)}>-</button>
-                <button onClick={() => changeQty(index, 1)}>+</button>
+                <button disabled={locked} onClick={() => changeQty(index, -1)}>-</button>
+                <button disabled={locked} onClick={() => changeQty(index, 1)}>+</button>
               </div>
             </div>
           ))}
           <label>
             Pembayaran
-            <select value={paymentMethod} onChange={(event) => setPaymentMethod(event.target.value as DokuPaymentMethod)}>
+            <select value={paymentMethod} disabled={locked} onChange={(event) => setPaymentMethod(event.target.value as DokuPaymentMethod)}>
               <option value="qris">QR / QRIS</option>
               <option value="va_bca">VA BCA</option>
             </select>
           </label>
           <div className="total">Total {money(total)}</div>
-          <button className="checkout" disabled={cart.length === 0} onClick={() => submitChatOrder().catch((error) => setMessage(error.message))}>Kirim order</button>
+          <button className="checkout" disabled={cart.length === 0 || locked} onClick={() => submitChatOrder().catch((error) => setMessage(error.message))}>{locked ? "Order terkirim" : "Kirim order"}</button>
+          {session ? <small>Chat session: {session.id}</small> : null}
+          {submittedOrderId ? <small>Order: {submittedOrderId}</small> : null}
+          {payment?.status === "paid" ? (
+            <div className="order-status-box">
+              <strong>Status pesanan</strong>
+              <span>Pemesan: {customerName || "Customer"}</span>
+              <span>Pembayaran: lunas</span>
+              <span>Order: {orderDetail?.orderStatus ?? submittedOrderStatus ?? "diproses"}</span>
+              <span>Dapur/barista: {orderDetail?.prepStatus ?? submittedPrepStatus ?? "new"}</span>
+              <small>Status otomatis diperbarui setiap 5 detik.</small>
+            </div>
+          ) : payment ? (
+            <PaymentBox payment={payment} method={paymentMethod} onCheck={() => checkPaymentStatus().catch((error) => setMessage(error.message))} checking={checkingPayment} />
+          ) : null}
 
         </aside>
       </section>

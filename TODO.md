@@ -62,8 +62,10 @@
 - [x] Wire webchat screen to chat-cart APIs
 - [x] Generate QRIS/VA BCA payment after chat order submit
 - [x] Show VA Bank BCA payment instructions and manual status check button on `/chat`
-- [x] Switch `/chat` checkout into payment-only page
-- [x] Switch `/chat` paid payment view into customer order-status panel
+- [x] Keep `/chat` checkout/payment/status in one page after user feedback
+- [x] Disable `/chat` payment dropdown and ordering controls after checkout
+- [x] Show customer name in `/chat` order panel
+- [x] Poll `/chat` order status every 5 seconds after payment is paid
 - [x] Show VA Bank BCA payment instructions and manual status check button on POS root `/`
 - [ ] Generate QR order links that point customers directly to `/chat?table=...`
 

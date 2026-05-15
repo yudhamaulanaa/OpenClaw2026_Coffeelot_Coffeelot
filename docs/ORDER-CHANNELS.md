@@ -141,9 +141,10 @@ Current flow:
 4. Frontend adds cart items to the session.
 5. Frontend submits the cart into an order with `order_channel=chat` and `order_status=pending_payment`.
 6. Frontend creates a DOKU payment using QRIS or VA BCA.
-7. After checkout, `/chat` switches to a focused payment-only page. If VA BCA is selected, the page highlights only the Bank BCA VA number plus the payment check button.
-8. Customer/operator can press `Check Pembayaran` to refresh local payment status.
-9. After payment becomes `paid`, `/chat` switches from payment instructions to a customer order-status panel.
-10. Payment confirmation is handled by callback when available, with reconciliation/polling as fallback.
+7. After checkout, `/chat` stays on one page but disables ordering controls and the payment dropdown.
+8. If VA BCA is selected, the page shows the Bank BCA VA number and check-payment button.
+9. Customer/operator can press `Check Pembayaran` to refresh local payment status.
+10. After payment becomes `paid`, `/chat` shows a customer order-status panel and polls order status every 5 seconds for kitchen/barista updates.
+11. Payment confirmation is handled by callback when available, with reconciliation/polling as fallback.
 
 Next improvement: QR order links should generate customer URLs that open `/chat?table=<label>` directly.

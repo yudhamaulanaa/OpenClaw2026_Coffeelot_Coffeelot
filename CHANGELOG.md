@@ -1,5 +1,26 @@
 # Coffeelot — Changelog
 
+## [Webchat Single-Page Live Order Status] — 2026-05-15
+
+### Changed
+
+- Reverted `/chat` back to a single-page checkout/payment/status flow.
+- After checkout, menu/cart stay visible but ordering controls and payment dropdown are disabled.
+- Customer name is shown in the order panel.
+- Paid chat orders now show order status in the same page and poll the order detail endpoint every 5 seconds for kitchen/barista status updates.
+
+### Added
+
+- Added `GET /api/orders/:id` to fetch one order with items for customer/kitchen status polling.
+
+### Verification
+
+- `bun run typecheck` passes.
+- `bun run build` passes.
+- `coffeelot-api` and `coffeelot-web` restarted successfully.
+- `GET https://api.coffeelot.app/api/orders/:id` returns chat order status.
+- `/chat` public bundle includes `Pemesan:` and the 5-second status polling text.
+
 ## [Webchat Payment-Only Checkout View] — 2026-05-15
 
 ### Changed
