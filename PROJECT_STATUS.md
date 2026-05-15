@@ -113,4 +113,7 @@ The `/agent` Insight Comparison table now makes each workflow easier to understa
 ## Latest update — Compact 5-Slide Pitch Deck
 
 A concise 5-slide pitch deck has been added at `docs/reports/COFFEELOT-PITCHDECK-5SLIDES.md`. This is now the preferred deck for quick presentations; the longer deck remains as reference material.
+## Latest update — Devpost Submission Package
+
+The project now includes a Devpost-ready submission package: reproducible README setup, submission draft, AI tools/models list, and a 5-slide PDF pitch deck named `OpenClaw2026_Coffeelot_Coffeelot.pdf`. Remaining manual steps are making/confirming the GitHub repo public, optionally renaming it to the required format, and uploading a public max-2-minute demo video.
 

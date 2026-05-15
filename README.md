@@ -1,180 +1,256 @@
 # Coffeelot
 
-Autonomous Coffee Shop / F&B Operator berbasis AI Agent.
+**AI Business Intelligence & Operations Agent for Coffee Shops / Small F&B**
 
-Coffeelot membantu owner kedai kopi menjalankan operasional harian dengan membaca data POS dan inventory, mendeteksi risiko, memberi rekomendasi, membuat laporan, serta menjalankan workflow seperti restock alert, promo generation, payment, kitchen queue, dan self-order.
+Coffeelot combines a built-in POS, customer self-order, DOKU payment integration, inventory control, booking/seat availability, kitchen queue, and LLM-powered agent workflows into one operational intelligence layer for coffee shop owners.
 
-## Branch Purpose
+> From daily transactions to autonomous operational intelligence.
 
-Branch ini adalah **clean blueprint** untuk implementasi dan rebuild dari awal.
+## Live Demo
 
-Gunakan branch ini kalau ingin membangun ulang Coffeelot dari nol, tapi tetap memakai roadmap dan scope MVP terbaru. i tried to build a clean adn replicatable blueprint for the Coffeelot.
+- POS: <https://coffeelot.app/>
+- Customer self-order: <https://coffeelot.app/chat>
+- Agent dashboard: <https://coffeelot.app/agent>
+- API health: <https://api.coffeelot.app/api/health>
 
-## Updated MVP Roadmap
+## Submission Package
 
-### Milestone 1 — Project Brain
-
-Dokumentasi awal, agent instructions, roadmap, dan architecture docs.
-
-### Milestone 2 — Database Foundation
-
-SQLite + Prisma schema, migration, seed demo tenant/outlet/user, products, inventory, recipes, dan sample orders.
-
-### Milestone 3 — Backend Foundation
-
-Elysia API server, Prisma client, tenant context, products, inventory, orders, stock engine, invoice generator, dan operational reports.
-
-### Milestone 4 — Built-in POS / Order Channels
-
-Built-in POS bukan cuma layar kasir. Milestone ini mencakup:
-
-- cashier POS product grid
-- cart management
-- manual cart/custom item input
-- checkout flow
-- receipt/invoice preview
-- kitchen/barista queue
-- prep status: `new → preparing → ready → completed`
-- QR order link generator
-- self-order via chat
-- customer chat cart flow
-- chat order masuk ke POS + kitchen queue
-
-Detail: baca [`docs/ORDER-CHANNELS.md`](docs/ORDER-CHANNELS.md).
-
-### Milestone 5 — DOKU Payment Integration
-
-Payment menjadi milestone sebelum Agent Core:
-
-- DOKU MCP sandbox connection
-- QRIS payment generation
-- Virtual Account payment
-- payment status checking
-- webhook/callback handling
-- payment UI di POS checkout
-- payment confirmation → order paid + stock deduction
-
-### Milestone 6 — AI Agent Core
-
-Agent runtime foundation:
-
-- workflow registry
-- execution loop
-- scheduler
-- event trigger system
-- agent run/output storage
-- agent dashboard activity timeline
-
-### Milestone 7 — Agent Workflows
-
-Workflow AI operasional:
-
-- Daily Report
-- Restock Alert
-- Risk Detection
-- Promo Generation
-- Morning Briefing
-
-### Milestone 8 — POS Connector
-
-Agar Coffeelot bisa colok ke POS eksisting:
-
-- CSV/Excel import
-- data mapping/transformation
-- import history & validation
-- scheduled import later
+- 5-slide pitch deck source: [`docs/reports/COFFEELOT-PITCHDECK-5SLIDES.md`](docs/reports/COFFEELOT-PITCHDECK-5SLIDES.md)
+- Pitch deck PDF: [`docs/reports/OpenClaw2026_Coffeelot_Coffeelot.pdf`](docs/reports/OpenClaw2026_Coffeelot_Coffeelot.pdf)
+- Demo video script: [`docs/reports/COFFEELOT-VIDEO-SCRIPT.md`](docs/reports/COFFEELOT-VIDEO-SCRIPT.md)
+- Devpost submission draft: [`docs/reports/DEVPOST-SUBMISSION.md`](docs/reports/DEVPOST-SUBMISSION.md)
+- AI tools/models list: [`docs/reports/AI-TOOLS-MODELS.md`](docs/reports/AI-TOOLS-MODELS.md)
 
 ## What Coffeelot Does
 
-- 📊 **Daily Report** — ringkasan performa harian otomatis
-- ⚠️ **Restock Alert** — deteksi stok rendah + rekomendasi restock
-- 🎯 **Promo Generation** — ide promo berdasarkan pola penjualan
-- 🔍 **Risk Detection** — early warning stok, revenue drop, dan operasional
-- ☀️ **Morning Briefing** — fokus hari ini + prep checklist
-- 🧾 **Built-in POS** — kasir internal untuk user yang belum punya POS
-- 👨‍🍳 **Kitchen Queue** — barista klik order masuk → proses → ready → completed
-- 💬 **Self-order via Chat** — QR → chat cart → order masuk POS/kitchen
-- 💳 **DOKU Payment** — QRIS, VA, e-wallet/payment link via sandbox integration
+### Commerce
 
-## Key Differentiator
+- Built-in POS product grid and checkout.
+- Customer `/chat` self-order flow for QR/table ordering.
+- DOKU sandbox payment integration for QRIS, VA BCA, and Checkout-style payment flows.
+- Kitchen/barista queue with prep status updates.
 
-- **Bukan POS app biasa** — Coffeelot adalah AI Agent layer di atas data operasional.
-- **Colok ke POS manapun** — owner tidak wajib ganti POS yang sudah ada.
-- **Built-in POS tersedia** — untuk kedai yang belum punya POS.
-- **Order channel lengkap** — cashier POS, manual cart, kitchen queue, dan self-order via chat.
-- **Payment sebelum Agent Core** — payment dibuat stabil dulu agar agent punya data transaksi yang valid.
-- **Autonomous analysis, human-approved action** — agent boleh analisis dan buat draft, aksi penting tetap butuh approval owner.
+### Operations
 
-## Clean Blueprint Quick Start
+- Inventory items and product recipes.
+- Paid-order recipe stock deduction.
+- Insufficient-stock guard before payment creation.
+- Projected cart stock in POS and `/chat`.
+- Booking/seat availability guard using overlapping reservation windows.
+- Payment reconciliation fallback for pending DOKU payments.
 
-Karena branch ini belum berisi implementasi, quick start-nya adalah membaca blueprint lalu mulai milestone baru.
+### AI Agent / Business Intelligence
 
-```bash
-# Clone repo
-git clone <repo-url>
-cd coffeelot
+Coffeelot includes an agent workflow runner with persisted runs and outputs. Workflows can run on demand, by schedule, or from operational events.
 
-# Checkout clean blueprint branch
-git checkout blueprint/clean-updated-milestones
+Current workflows:
 
-# Buat branch implementasi baru dari blueprint
-git checkout -b feat/milestone-2-database-foundation
-```
+1. `daily_report`
+2. `restock_alert`
+3. `risk_detection`
+4. `promo_generation`
+5. `morning_briefing`
+6. `booking_seat_insight`
+7. `menu_engineering`
+8. `demand_forecast`
+9. `prep_planning`
+10. `kitchen_sla`
+11. `payment_reconciliation_insight`
 
-Setelah mulai implementasi Milestone 2, barulah tambahkan runtime/dependency seperti Bun workspace, Prisma, Elysia, React, dan seterusnya.
+The `/agent` dashboard shows workflow controls, agent timeline, structured LLM insight cards, approval controls for promo outputs, booking insight cards, and an insight comparison table explaining when each insight is used and what data it processes.
 
-## Planned Tech Stack
+## Tech Stack
 
-- **Runtime**: Bun
-- **Language**: TypeScript
-- **Frontend**: React + Vite + Tailwind CSS/shadcn-style components
-- **Backend**: Elysia.js
-- **Database**: SQLite + Prisma ORM
-- **Validation**: Zod
-- **Charts**: Recharts
-- **AI**: OpenAI-compatible API
-- **Scheduler**: cron-based (`bun-cron` atau `node-cron`)
-- **Payment**: DOKU MCP Server sandbox
+- Runtime/package manager: Bun
+- Language: TypeScript
+- Backend: Elysia.js
+- Frontend: React + Vite
+- Database: SQLite + Prisma ORM
+- Shared types: TypeScript workspace package
+- AI: OpenAI-compatible Chat Completions API
+- Payment: DOKU MCP sandbox integration
+- QR rendering: `qrcode.react`
+- Deployment: systemd services behind Nginx Proxy Manager
 
-## Planned Project Structure
-
-Struktur ini belum ada di clean blueprint branch. Buat saat implementasi dimulai.
+## Repository Structure
 
 ```text
-coffeelot/
-├── AGENTS.md
+coffeelot-ai/
+├── apps/
+│   ├── api/              # Elysia backend API
+│   └── web/              # React/Vite frontend
+├── packages/shared/      # Shared domain constants/types
+├── prisma/               # Prisma schema, migrations, seed data
+├── docs/                 # Architecture, API, order channels, reports
+├── scripts/              # Utility scripts
+├── README.md
 ├── PROJECT_STATUS.md
 ├── ROADMAP.md
 ├── TODO.md
-├── CHANGELOG.md
-├── apps/
-│   ├── web/                  # Frontend React + Vite
-│   └── api/                  # Backend Elysia.js
-├── packages/shared/          # Shared types & utilities
-├── modules/                  # Specs & documentation per module
-├── prisma/                   # Database schema & migrations
-├── docs/                     # Dokumentasi arsitektur
-└── scripts/                  # Utility scripts
+└── CHANGELOG.md
 ```
 
-## Important Docs
+## Local Setup
 
-- [`AGENTS.md`](AGENTS.md) — instruksi utama untuk coding agent
-- [`ROADMAP.md`](ROADMAP.md) — milestone terbaru
-- [`TODO.md`](TODO.md) — task aktif untuk mulai implementasi
-- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — arsitektur sistem
-- [`docs/DATABASE-SCHEMA.md`](docs/DATABASE-SCHEMA.md) — schema database target
-- [`docs/API-CONTRACTS.md`](docs/API-CONTRACTS.md) — kontrak API target
-- [`docs/ORDER-CHANNELS.md`](docs/ORDER-CHANNELS.md) — POS, kitchen, self-order, QR, chat cart
+### Prerequisites
 
-## Target User
+- Linux/macOS shell
+- Bun 1.x or newer
+- Git
 
-- Owner kedai kopi kecil
-- Coffee cart operator
-- Booth minuman event
-- UMKM F&B
-- Owner yang sudah punya POS dan tidak mau ganti sistem
+Install Bun if needed:
+
+```bash
+curl -fsSL https://bun.sh/install | bash
+```
+
+### 1. Clone
+
+```bash
+git clone git@github.com:yudhamaulanaa/coffeelot-ai.git
+cd coffeelot-ai
+```
+
+If the repository is renamed for the hackathon requirement, use:
+
+```bash
+git clone git@github.com:yudhamaulanaa/OpenClaw2026_Coffeelot_Coffeelot.git
+cd OpenClaw2026_Coffeelot_Coffeelot
+```
+
+### 2. Install dependencies
+
+```bash
+bun install
+```
+
+### 3. Configure environment
+
+```bash
+cp .env.example .env
+```
+
+For local reproducible judging without external services, the app can run with empty DOKU/AI credentials. AI workflows will use deterministic fallback when no AI provider is configured, and payment creation will use fallback behavior when DOKU MCP is unavailable.
+
+Recommended local `.env` values:
+
+```bash
+DATABASE_URL="file:./prisma/dev.db"
+API_HOST="127.0.0.1"
+API_PORT="3001"
+VITE_API_BASE_URL="http://127.0.0.1:3001/api"
+DEMO_TENANT_ID="demo-tenant-kopi-jagoan"
+DEMO_OUTLET_ID="demo-outlet-booth-ciputat"
+AGENT_SCHEDULER_ENABLED="false"
+AGENT_EVENT_TRIGGERS_ENABLED="true"
+DOKU_CALLBACK_SIGNATURE_REQUIRED="false"
+BOOKING_DEFAULT_SEAT_CAPACITY="24"
+BOOKING_DEFAULT_HOLD_MINUTES="90"
+```
+
+Optional AI provider config:
+
+```bash
+AI_BASE_URL="https://your-openai-compatible-provider/v1"
+AI_API_KEY="your-api-key"
+AI_MODEL="your-model"
+AI_TIMEOUT_MS="60000"
+```
+
+Optional DOKU sandbox config:
+
+```bash
+DOKU_ENV="sandbox"
+DOKU_CLIENT_ID="your-doku-client-id"
+DOKU_API_KEY="your-doku-api-key"
+DOKU_SECRET_KEY="your-doku-secret-key"
+DOKU_MCP_URL="https://api-sandbox.doku.com/doku-mcp-server/mcp"
+DOKU_CALLBACK_URL="http://127.0.0.1:3001/api/payments/callback"
+DOKU_RETURN_URL="http://127.0.0.1:5173"
+```
+
+Never commit real secrets.
+
+### 4. Prepare database
+
+```bash
+bun run db:generate
+DATABASE_URL="file:./prisma/dev.db" bunx prisma migrate deploy
+DATABASE_URL="file:./prisma/dev.db" bun run db:seed
+```
+
+For development migration creation, use:
+
+```bash
+DATABASE_URL="file:./prisma/dev.db" bunx prisma migrate dev
+```
+
+### 5. Run backend and frontend
+
+Terminal 1 — API:
+
+```bash
+DATABASE_URL="file:./prisma/dev.db" bun run --cwd apps/api dev
+```
+
+Terminal 2 — Web:
+
+```bash
+VITE_API_BASE_URL="http://127.0.0.1:3001/api" bun run --cwd apps/web dev
+```
+
+Open:
+
+- POS: <http://127.0.0.1:5173/>
+- Customer order: <http://127.0.0.1:5173/chat?table=A1&name=Demo>
+- Agent dashboard: <http://127.0.0.1:5173/agent>
+- API health: <http://127.0.0.1:3001/api/health>
+
+## Verification
+
+```bash
+bun run typecheck
+bun run build
+```
+
+Useful API checks:
+
+```bash
+curl http://127.0.0.1:3001/api/health
+curl -H 'x-tenant-id: demo-tenant-kopi-jagoan' \
+     -H 'x-outlet-id: demo-outlet-booth-ciputat' \
+     http://127.0.0.1:3001/api/agent/workflows
+```
+
+Run an agent workflow:
+
+```bash
+curl -X POST http://127.0.0.1:3001/api/agent/runs \
+  -H 'content-type: application/json' \
+  -H 'x-tenant-id: demo-tenant-kopi-jagoan' \
+  -H 'x-outlet-id: demo-outlet-booth-ciputat' \
+  -d '{"workflow_id":"daily_report","trigger_type":"on_demand"}'
+```
+
+## Demo Flow for Judges
+
+1. Open `/` and show POS, cart, projected stock, and kitchen queue.
+2. Open `/chat?table=A1&name=Demo` and show customer self-order/payment flow.
+3. Open `/agent` and run or review AI workflows.
+4. Show Insight Comparison table with context: when each insight is used and what data it processes.
+5. Highlight Booking Seat Insight and BI workflows such as Menu Engineering, Demand Forecast, Kitchen SLA, and Payment Reconciliation Insight.
+
+## AI Tools / Models
+
+See [`docs/reports/AI-TOOLS-MODELS.md`](docs/reports/AI-TOOLS-MODELS.md).
+
+## Security Notes
+
+- Runtime credentials are not committed.
+- `.env.example` contains placeholders only.
+- DOKU callback signature validation is implemented for public callback hardening.
+- Local fallback modes exist so judges can reproduce the app without secret credentials.
 
 ## License
 
-Private — All rights reserved.
+Hackathon/MVP prototype. License to be finalized.

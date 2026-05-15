@@ -4,6 +4,7 @@ This folder contains presentation and demo materials for wrapping up the current
 
 ## Files
 
+- [`OpenClaw2026_Coffeelot_Coffeelot.pdf`](OpenClaw2026_Coffeelot_Coffeelot.pdf) — PDF pitch deck in required submission naming format.
 - [`COFFEELOT-PITCHDECK-5SLIDES.md`](COFFEELOT-PITCHDECK-5SLIDES.md) — compact 5-slide pitch deck for presentation.
 - [`COFFEELOT-PITCHDECK.md`](COFFEELOT-PITCHDECK.md) — extended slide-by-slide reference deck.
 - [`COFFEELOT-VIDEO-SCRIPT.md`](COFFEELOT-VIDEO-SCRIPT.md) — demo video narration, scene list, and recording checklist.

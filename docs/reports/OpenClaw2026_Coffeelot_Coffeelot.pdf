@@ -1,0 +1,141 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [6 0 R 8 0 R 10 0 R 12 0 R 14 0 R] /Count 5 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>
+endobj
+5 0 obj
+<< /Length 761 >>
+stream
+0.98 0.95 0.89 rg 0 0 842 595 re f
+0.44 0.25 0.13 rg 0 545 842 50 re f
+BT /F2 14 Tf 48 562 Td (OpenClaw2026_Coffeelot_Coffeelot) Tj ET
+BT /F2 14 Tf 735 562 Td (1/5) Tj ET
+BT /F2 34 Tf 48 485 Td (Coffeelot Coffee) Tj ET
+BT /F1 20 Tf 48 448 Td (AI Business Intelligence & Operations Agent for Coffee Shops) Tj ET
+BT /F1 17 Tf 70 395 Td (? Combines POS, self-order, DOKU payment, inventory, booking, kitchen queue, and LLM) Tj ET
+BT /F1 17 Tf 92 370 Td (insight.) Tj ET
+BT /F1 17 Tf 70 335 Td (? Turns daily transactions into operational decisions.) Tj ET
+BT /F1 17 Tf 70 300 Td (? Built for coffee shops and small F&B owners.) Tj ET
+0.93 0.85 0.75 rg 48 52 746 54 re f
+BT /F2 16 Tf 66 73 Td (From daily transactions to autonomous operational intelligence.) Tj ET
+endstream
+endobj
+6 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 842 595] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 5 0 R >>
+endobj
+7 0 obj
+<< /Length 770 >>
+stream
+0.98 0.95 0.89 rg 0 0 842 595 re f
+0.44 0.25 0.13 rg 0 545 842 50 re f
+BT /F2 14 Tf 48 562 Td (OpenClaw2026_Coffeelot_Coffeelot) Tj ET
+BT /F2 14 Tf 735 562 Td (2/5) Tj ET
+BT /F2 34 Tf 48 485 Td (Problem) Tj ET
+BT /F1 20 Tf 48 448 Td (F&B owners still operate blind) Tj ET
+BT /F1 17 Tf 70 395 Td (? POS records sales but does not explain what to do next.) Tj ET
+BT /F1 17 Tf 70 360 Td (? Inventory, payment, kitchen queue, booking, and reports are disconnected.) Tj ET
+BT /F1 17 Tf 70 325 Td (? Dashboards show charts; owners still interpret everything manually.) Tj ET
+BT /F1 17 Tf 70 290 Td (? Owners need operational decisions, not just raw data.) Tj ET
+0.93 0.85 0.75 rg 48 52 746 54 re f
+BT /F2 16 Tf 66 73 Td (Coffeelot changes reports into recommendations.) Tj ET
+endstream
+endobj
+8 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 842 595] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 7 0 R >>
+endobj
+9 0 obj
+<< /Length 872 >>
+stream
+0.98 0.95 0.89 rg 0 0 842 595 re f
+0.44 0.25 0.13 rg 0 545 842 50 re f
+BT /F2 14 Tf 48 562 Td (OpenClaw2026_Coffeelot_Coffeelot) Tj ET
+BT /F2 14 Tf 735 562 Td (3/5) Tj ET
+BT /F2 34 Tf 48 485 Td (Solution) Tj ET
+BT /F1 20 Tf 48 448 Td (One AI-native operating layer) Tj ET
+BT /F1 17 Tf 70 395 Td (? Commerce: POS, /chat self-order, QRIS/VA BCA/DOKU Checkout, kitchen queue.) Tj ET
+BT /F1 17 Tf 70 360 Td (? Operations: inventory, recipe stock deduction, booking seats, payment) Tj ET
+BT /F1 17 Tf 92 335 Td (reconciliation.) Tj ET
+BT /F1 17 Tf 70 300 Td (? Intelligence: daily report, risk detection, promo, booking insight, BI pack.) Tj ET
+BT /F1 17 Tf 70 265 Td (? Autonomy: scheduler, event triggers, approval flow, /agent dashboard.) Tj ET
+0.93 0.85 0.75 rg 48 52 746 54 re f
+BT /F2 16 Tf 66 73 Td (Live: coffeelot.app ? coffeelot.app/chat ? coffeelot.app/agent) Tj ET
+endstream
+endobj
+10 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 842 595] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 9 0 R >>
+endobj
+11 0 obj
+<< /Length 931 >>
+stream
+0.98 0.95 0.89 rg 0 0 842 595 re f
+0.44 0.25 0.13 rg 0 545 842 50 re f
+BT /F2 14 Tf 48 562 Td (OpenClaw2026_Coffeelot_Coffeelot) Tj ET
+BT /F2 14 Tf 735 562 Td (4/5) Tj ET
+BT /F2 34 Tf 48 485 Td (Product Demo) Tj ET
+BT /F1 20 Tf 48 448 Td (From order to AI insight) Tj ET
+BT /F1 17 Tf 70 395 Td (? Create order from POS or /chat customer self-order.) Tj ET
+BT /F1 17 Tf 70 360 Td (? Generate QRIS or VA BCA payment via DOKU sandbox.) Tj ET
+BT /F1 17 Tf 70 325 Td (? Reconcile payment, update kitchen queue, and deduct recipe inventory.) Tj ET
+BT /F1 17 Tf 70 290 Td (? Run 11 workflows: daily report, booking seat, menu engineering, demand forecast,) Tj ET
+BT /F1 17 Tf 92 265 Td (kitchen SLA, and more.) Tj ET
+BT /F1 17 Tf 70 230 Td (? /agent shows structured insight cards and comparison table.) Tj ET
+0.93 0.85 0.75 rg 48 52 746 54 re f
+BT /F2 16 Tf 66 73 Td (Operational signals become LLM-powered business intelligence.) Tj ET
+endstream
+endobj
+12 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 842 595] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 11 0 R >>
+endobj
+13 0 obj
+<< /Length 930 >>
+stream
+0.98 0.95 0.89 rg 0 0 842 595 re f
+0.44 0.25 0.13 rg 0 545 842 50 re f
+BT /F2 14 Tf 48 562 Td (OpenClaw2026_Coffeelot_Coffeelot) Tj ET
+BT /F2 14 Tf 735 562 Td (5/5) Tj ET
+BT /F2 34 Tf 48 485 Td (Impact + Roadmap) Tj ET
+BT /F1 20 Tf 48 448 Td (Beyond POS: an owner copilot) Tj ET
+BT /F1 17 Tf 70 395 Td (? Traditional POS records sales; Coffeelot explains sales and recommends actions.) Tj ET
+BT /F1 17 Tf 70 360 Td (? MVP foundation complete: POS, payment, inventory, booking, Agent Core, BI Insight) Tj ET
+BT /F1 17 Tf 92 335 Td (Pack.) Tj ET
+BT /F1 17 Tf 70 300 Td (? Next: rate limiter, /chat UX polish, QR table generator, booking UI, BI charts,) Tj ET
+BT /F1 17 Tf 92 275 Td (COGS/margin, POS connector.) Tj ET
+BT /F1 17 Tf 70 240 Td (? Coffeelot keeps the owner in control with human-approved actions.) Tj ET
+0.93 0.85 0.75 rg 48 52 746 54 re f
+BT /F2 16 Tf 66 73 Td (Coffeelot turns coffee shop data into decisions.) Tj ET
+endstream
+endobj
+14 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 842 595] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 13 0 R >>
+endobj
+xref
+0 15
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000148 00000 n 
+0000000218 00000 n 
+0000000293 00000 n 
+0000001104 00000 n 
+0000001240 00000 n 
+0000002060 00000 n 
+0000002196 00000 n 
+0000003118 00000 n 
+0000003255 00000 n 
+0000004237 00000 n 
+0000004375 00000 n 
+0000005356 00000 n 
+trailer
+<< /Size 15 /Root 1 0 R >>
+startxref
+5494
+%%EOF

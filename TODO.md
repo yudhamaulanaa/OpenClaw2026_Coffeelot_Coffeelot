@@ -190,4 +190,14 @@
 ## Completed — Compact Pitch Deck
 
 - [x] Create 5-slide Coffeelot pitch deck for shorter presentation format.
+## Devpost Submission Follow-up
+
+- [x] Update README with reproducible setup instructions.
+- [x] Add Devpost submission draft.
+- [x] Add AI tools/models list.
+- [x] Generate required 5-slide pitch deck PDF.
+- [ ] Confirm GitHub repository is public.
+- [ ] Rename or duplicate repository to `OpenClaw2026_Coffeelot_Coffeelot` if required.
+- [ ] Record and upload public max-2-minute demo video.
+- [ ] Add final demo video URL to Devpost submission.
 

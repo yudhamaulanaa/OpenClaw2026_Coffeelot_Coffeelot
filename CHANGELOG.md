@@ -759,4 +759,11 @@
 
 - Added `docs/reports/COFFEELOT-PITCHDECK-5SLIDES.md` as the primary concise pitch deck.
 - Kept the longer pitch deck as an extended reference deck.
+## 2026-05-15 — Devpost Submission Package
+
+- Updated README with reproducible local setup, verification, demo flow, live links, and AI/tools references.
+- Added Devpost submission draft at `docs/reports/DEVPOST-SUBMISSION.md`.
+- Added AI tools/models list at `docs/reports/AI-TOOLS-MODELS.md`.
+- Generated 5-page PDF pitch deck: `docs/reports/OpenClaw2026_Coffeelot_Coffeelot.pdf`.
+- Added `scripts/generate_pitchdeck_pdf.py` to regenerate the PDF without external dependencies.
 
