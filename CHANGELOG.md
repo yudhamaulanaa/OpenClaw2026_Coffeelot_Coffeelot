@@ -1,5 +1,17 @@
 # Coffeelot — Changelog
 
+## [Milestone 5 MVP Wrap-up] — 2026-05-15
+
+### Updated
+
+- Marked the DOKU/Webchat MVP slice as wrapped for now after sandbox DOKU MCP payment creation, fallback reconciliation, webchat ordering, POS/webchat payment checks, and live kitchen status refresh were deployed.
+- Moved remaining DOKU items into follow-up hardening: callback signature/security validation and recipe-based stock deduction.
+- Set next active work to Milestone 6 — AI Agent Core.
+
+### Verification
+
+- Repository is clean and synced with `origin/main` before starting Milestone 6.
+
 ## [Chat Check Payment Reconcile Fix] — 2026-05-15
 
 ### Fixed

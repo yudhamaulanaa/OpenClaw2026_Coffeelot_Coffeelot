@@ -86,6 +86,14 @@
 - [ ] Payment confirmation → stock deduction transaction
 - [ ] Verify sandbox end-to-end payment callback flow
 
+## Next — Milestone 6 AI Agent Core
+
+- [ ] Implement internal agent workflow runner service
+- [ ] Add agent run creation/status/output API endpoints
+- [ ] Add daily report workflow using existing sales/report data
+- [ ] Add restock alert workflow using inventory thresholds
+- [ ] Add agent dashboard/activity timeline page
+
 ## Later
 
 - [ ] Milestone 6 — AI Agent Core

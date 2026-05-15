@@ -2,7 +2,7 @@
 
 Last updated: 2026-05-15
 
-## Overall Progress: Milestone 5 In Progress — Real DOKU MCP Sandbox Integrated
+## Overall Progress: Milestone 5 MVP Wrapped — Continuing Milestone 6
 
 ### Current State
 
@@ -14,7 +14,7 @@ Milestone 3 — Backend Foundation is complete and merged to `main`.
 
 Milestone 4 — Built-in POS / Order Channels MVP foundation is complete and merged to `main`. A customer-facing `/chat` web order screen is now implemented and deployed for browser/QR-based self-order testing.
 
-Milestone 5 — DOKU Payment Integration is in progress on branch `feat/doku-payment-reconciliation`: sandbox placeholder payment creation, status polling, callback handling, and POS payment link/QR/VA display are implemented. The public deployment serves `https://coffeelot.app` and `https://api.coffeelot.app`; frontend API calls use the public API origin and backend CORS allows the app origin. DOKU MCP sandbox discovery and payment creation are verified for QRIS, DOKU Checkout, and BCA Virtual Account paths with runtime-only credentials. Fallback reconciliation/polling is implemented and has synced paid sandbox VA transactions from DOKU `SUCCESS` to local `paid`. Next target: callback signature/security validation and stock deduction hardening.
+Milestone 5 — DOKU Payment Integration MVP is wrapped for now. DOKU MCP sandbox discovery and payment creation are verified for QRIS, DOKU Checkout, and BCA Virtual Account paths with runtime-only credentials. Fallback reconciliation/polling is implemented, manual payment reconciliation works, webchat/POS payment status UX is deployed, and paid DOKU sandbox payments can sync to local `paid`. Remaining DOKU hardening items are tracked as follow-ups: callback signature/security validation and recipe-based stock deduction.
 
 Roadmap and docs are updated with the latest MVP direction:
 
@@ -37,14 +37,7 @@ Keep `.md` files updated as part of the work, not afterthoughts:
 
 ### What's Next
 
-Continue Milestone 5 in this order:
-
-1. Add callback signature/security validation using confirmed DOKU callback headers/canonical string.
-2. Harden successful payment flow: payment paid → order paid → recipe-based stock deduction → stock movement records.
-3. Fix POS order creation so DOKU payments remain `pending_payment` until callback/reconciliation confirms payment.
-4. Add an internal/safe callback simulation script for existing sandbox payment records.
-5. Verify with `bun run typecheck`, `bun run build`, and sandbox callback/reconciliation tests.
-6. Update living docs and changelog before merging.
+Continue with Milestone 6 — AI Agent Core. First target: implement an internal workflow runner API that records `agent_runs` and `agent_outputs`, then wire daily report / stock alert workflows on top of existing reporting and inventory data. DOKU callback security and stock deduction remain tracked follow-up hardening tasks.
 
 ### Modules Created
 

@@ -111,7 +111,7 @@ Integrate DOKU MCP Server untuk payment processing.
 
 Build agent orchestrator dan workflow engine.
 
-- [ ] Agent core (execution loop)
+- [ ] Agent core (execution loop) — starting next
 - [ ] Workflow registry
 - [ ] Scheduler (cron-based)
 - [ ] Event trigger system
