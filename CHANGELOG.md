@@ -1,5 +1,21 @@
 # Coffeelot — Changelog
 
+## [Prevent Negative Stock] — 2026-05-15
+
+### Fixed
+
+- Added insufficient-stock guard before recipe-based sale deduction so paid orders cannot push inventory below zero.
+- Added stock validation before DOKU payment creation, preventing customers from paying for orders that cannot be fulfilled from current stock.
+- Sale deduction now aggregates ingredient requirements per order and returns `INSUFFICIENT_STOCK` with item details when unavailable.
+- Restored Es Batu stock from `-1100g` to `10000g` using a restock movement after the oversell test case.
+
+### Verification
+
+- `bun run typecheck` passes.
+- `bun run build` passes.
+- `coffeelot-api` restarted successfully.
+- Oversell test `Americano ×100` returns HTTP 409 `INSUFFICIENT_STOCK` and Es Batu remains `10000g`.
+
 ## [Chat Auto Payment Status Polling] — 2026-05-15
 
 ### Fixed

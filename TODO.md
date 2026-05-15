@@ -86,6 +86,7 @@
 - [x] Sync DOKU `SUCCESS` status to local paid payment/order state
 - [ ] Add callback signature/security validation
 - [x] Payment confirmation → stock deduction transaction
+- [x] Prevent paid orders/payment creation from making inventory negative
 - [ ] Verify sandbox end-to-end payment callback flow
 
 ## POS / Operations UI

@@ -39,46 +39,70 @@ function applyCors(origin: string | null, set: { headers?: Record<string, unknow
 
 type PaymentRecord = Awaited<ReturnType<typeof prisma.payment.findFirstOrThrow>>;
 
-async function deductStockForPaidOrder(tx: Parameters<Parameters<typeof prisma.$transaction>[0]>[0], orderId: string) {
-  const existingSaleMovement = await tx.stockMovement.findFirst({ where: { orderId, movementType: "sale" } });
-  if (existingSaleMovement) return { deducted: false, reason: "already_deducted" };
-
+async function getOrderStockRequirements(tx: Parameters<Parameters<typeof prisma.$transaction>[0]>[0], orderId: string) {
   const order = await tx.order.findUniqueOrThrow({ where: { id: orderId }, include: { items: true } });
   const productIds = [...new Set(order.items.map((item) => item.productId))];
   const recipes = await tx.productRecipe.findMany({
     where: { tenantId: order.tenantId, productId: { in: productIds } },
     include: { inventoryItem: true },
   });
-  const recipeMap = new Map<string, typeof recipes>();
-  for (const recipe of recipes) {
-    const list = recipeMap.get(recipe.productId) ?? [];
-    list.push(recipe);
-    recipeMap.set(recipe.productId, list);
+  const requirements = new Map<string, { inventoryItemId: string; name: string; unit: string; required: number; available: number; lines: string[] }>();
+  for (const item of order.items) {
+    for (const recipe of recipes.filter((candidate) => candidate.productId === item.productId)) {
+      const current = requirements.get(recipe.inventoryItemId) ?? {
+        inventoryItemId: recipe.inventoryItemId,
+        name: recipe.inventoryItem.name,
+        unit: recipe.inventoryItem.unit,
+        required: 0,
+        available: Number(recipe.inventoryItem.currentStock),
+        lines: [],
+      };
+      const qty = Number(recipe.qtyUsed) * item.qty;
+      current.required += qty;
+      current.lines.push(`${item.qty}× ${item.productName}`);
+      requirements.set(recipe.inventoryItemId, current);
+    }
+  }
+  return { order, requirements: [...requirements.values()] };
+}
+
+async function assertSufficientStockForOrder(tx: Parameters<Parameters<typeof prisma.$transaction>[0]>[0], orderId: string) {
+  const { requirements } = await getOrderStockRequirements(tx, orderId);
+  const insufficient = requirements.filter((item) => item.available < item.required);
+  if (insufficient.length > 0) {
+    throw new ApiError("INSUFFICIENT_STOCK", `Insufficient stock: ${insufficient.map((item) => `${item.name} needs ${item.required} ${item.unit}, available ${item.available} ${item.unit}`).join("; ")}`, 409);
+  }
+}
+
+async function deductStockForPaidOrder(tx: Parameters<Parameters<typeof prisma.$transaction>[0]>[0], orderId: string) {
+  const existingSaleMovement = await tx.stockMovement.findFirst({ where: { orderId, movementType: "sale" } });
+  if (existingSaleMovement) return { deducted: false, reason: "already_deducted" };
+
+  const { order, requirements } = await getOrderStockRequirements(tx, orderId);
+  const insufficient = requirements.filter((item) => item.available < item.required);
+  if (insufficient.length > 0) {
+    throw new ApiError("INSUFFICIENT_STOCK", `Insufficient stock: ${insufficient.map((item) => `${item.name} needs ${item.required} ${item.unit}, available ${item.available} ${item.unit}`).join("; ")}`, 409);
   }
 
   let movements = 0;
-  for (const item of order.items) {
-    const itemRecipes = recipeMap.get(item.productId) ?? [];
-    for (const recipe of itemRecipes) {
-      const stockBefore = Number(recipe.inventoryItem.currentStock);
-      const qty = Number(recipe.qtyUsed) * item.qty;
-      const stockAfter = stockBefore - qty;
-      await tx.inventoryItem.update({ where: { id: recipe.inventoryItemId }, data: { currentStock: stockAfter } });
-      await tx.stockMovement.create({
-        data: {
-          tenantId: order.tenantId,
-          outletId: order.outletId,
-          inventoryItemId: recipe.inventoryItemId,
-          movementType: "sale",
-          qty,
-          stockBefore,
-          stockAfter,
-          orderId: order.id,
-          note: `Sale deduction: ${item.qty}× ${item.productName}`,
-        },
-      });
-      movements += 1;
-    }
+  for (const requirement of requirements) {
+    const stockBefore = requirement.available;
+    const stockAfter = stockBefore - requirement.required;
+    await tx.inventoryItem.update({ where: { id: requirement.inventoryItemId }, data: { currentStock: stockAfter } });
+    await tx.stockMovement.create({
+      data: {
+        tenantId: order.tenantId,
+        outletId: order.outletId,
+        inventoryItemId: requirement.inventoryItemId,
+        movementType: "sale",
+        qty: requirement.required,
+        stockBefore,
+        stockAfter,
+        orderId: order.id,
+        note: `Sale deduction: ${requirement.lines.join(", ")}`,
+      },
+    });
+    movements += 1;
   }
   return { deducted: movements > 0, movements };
 }
@@ -467,6 +491,7 @@ export const app = new Elysia({ prefix: "/api" })
       if (!isDokuPaymentMethod(body.payment_method)) throw new ApiError("INVALID_PAYLOAD", "Invalid DOKU payment_method");
 
       const order = await prisma.order.findFirstOrThrow({ where: { id: body.order_id, tenantId, outletId } });
+      await prisma.$transaction((tx) => assertSufficientStockForOrder(tx, order.id));
       const expiredAt = new Date(Date.now() + 30 * 60 * 1000);
 
       const payment = await prisma.payment.create({
