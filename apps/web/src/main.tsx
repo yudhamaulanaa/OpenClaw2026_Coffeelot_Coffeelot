@@ -121,6 +121,10 @@ function App() {
 
   useEffect(() => {
     load().catch((error) => setMessage(error.message));
+    const timer = window.setInterval(() => {
+      load().catch((error) => setMessage(error.message));
+    }, 5_000);
+    return () => window.clearInterval(timer);
   }, []);
 
   function addProduct(product: PosProduct) {
@@ -241,6 +245,7 @@ function App() {
 
       <section className="panel kitchen">
         <h2>Kitchen / Barista Queue</h2>
+        <small>Status kitchen auto-refresh setiap 5 detik.</small>
         <div className="queue">
           {kitchenOrders.map((order) => (
             <article key={order.id}>

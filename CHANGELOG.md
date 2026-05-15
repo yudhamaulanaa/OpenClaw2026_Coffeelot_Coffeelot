@@ -1,5 +1,20 @@
 # Coffeelot — Changelog
 
+## [Realtime Kitchen Refresh] — 2026-05-15
+
+### Added
+
+- Main POS/kitchen page now auto-refreshes product/kitchen queue data every 5 seconds.
+- Kitchen panel now communicates that kitchen status auto-refreshes every 5 seconds.
+- `/chat` keeps its existing 5-second paid order-status polling.
+
+### Verification
+
+- `bun run typecheck` passes.
+- `bun run build` passes.
+- `coffeelot-web` restarted successfully.
+- Public bundle contains both kitchen auto-refresh and chat order-status polling text.
+
 ## [Webchat Single-Page Live Order Status] — 2026-05-15
 
 ### Changed

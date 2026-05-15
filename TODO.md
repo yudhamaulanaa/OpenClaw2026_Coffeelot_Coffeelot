@@ -66,6 +66,7 @@
 - [x] Disable `/chat` payment dropdown and ordering controls after checkout
 - [x] Show customer name in `/chat` order panel
 - [x] Poll `/chat` order status every 5 seconds after payment is paid
+- [x] Auto-refresh POS kitchen queue/status every 5 seconds
 - [x] Show VA Bank BCA payment instructions and manual status check button on POS root `/`
 - [ ] Generate QR order links that point customers directly to `/chat?table=...`
 
