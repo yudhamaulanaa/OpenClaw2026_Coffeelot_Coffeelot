@@ -205,3 +205,7 @@ select:disabled, input:disabled, button:disabled { opacity: .65; }
 .insight-type-cell strong { color: #24160f; text-transform: none; }
 .insight-type-cell span { color: #4f3422; line-height: 1.35; }
 .insight-type-cell small { color: #7f654f; line-height: 1.35; }
+
+.pos-cart-line { align-items: center; gap: 12px; }
+.pos-cart-line div:first-child { display: grid; gap: 4px; }
+.pos-cart-line small { color: #7f654f; }

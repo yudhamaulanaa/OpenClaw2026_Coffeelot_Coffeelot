@@ -209,3 +209,7 @@
 - [x] Add GPT-5.5 as main LLM model in submission materials.
 - [x] Regenerate pitch deck PDF after AI stack update.
 
+
+## Completed — POS Cart Quantity Controls
+
+- [x] Add `-` and `+` buttons to main POS `/` cart rows.

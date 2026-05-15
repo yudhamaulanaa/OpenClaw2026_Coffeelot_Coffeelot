@@ -773,3 +773,8 @@
 
 - Updated submission docs, README, report materials, and generated pitch deck PDF to explicitly list **OpenClaw** and **GPT-5.5** as the main AI stack/model.
 
+
+## 2026-05-15 — POS Cart Quantity Controls
+
+- Added `-` and `+` quantity controls to the main POS `/` cart.
+- POS cart rows now show item name, unit price × quantity, subtotal, and quantity buttons matching the `/chat` cart behavior.

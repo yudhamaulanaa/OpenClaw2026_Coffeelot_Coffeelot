@@ -348,6 +348,14 @@ function App() {
     setManualPrice(0);
   }
 
+  function changeCartQty(index: number, delta: number) {
+    setCart((current) => current.flatMap((line, lineIndex) => {
+      if (lineIndex !== index) return [line];
+      const qty = line.qty + delta;
+      return qty <= 0 ? [] : [{ ...line, qty }];
+    }));
+  }
+
   async function checkout() {
     const catalogItems = cart.filter((item) => item.productId);
     if (catalogItems.length !== cart.length) {
@@ -427,10 +435,18 @@ function App() {
 
         <div className="panel cart">
           <h2>Cart</h2>
+          {cart.length === 0 ? <p>Belum ada item.</p> : null}
           {cart.map((item, index) => (
-            <div className="cart-line" key={`${item.name}-${index}`}>
-              <span>{item.name} × {item.qty}</span>
-              <strong>{money(item.qty * item.unitPrice)}</strong>
+            <div className="cart-line pos-cart-line" key={`${item.name}-${index}`}>
+              <div>
+                <strong>{item.name}</strong>
+                <span>{money(item.unitPrice)} × {item.qty}</span>
+                <small>Subtotal: {money(item.qty * item.unitPrice)}</small>
+              </div>
+              <div className="qty-actions">
+                <button aria-label={`Kurangi ${item.name}`} onClick={() => changeCartQty(index, -1)}>-</button>
+                <button aria-label={`Tambah ${item.name}`} onClick={() => changeCartQty(index, 1)}>+</button>
+              </div>
             </div>
           ))}
           <div className="manual">
