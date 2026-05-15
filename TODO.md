@@ -25,13 +25,13 @@
 
 ## Milestone 4 — Built-in POS / Order Channels
 
-- [ ] Product grid UI
-- [ ] Cart management
-- [ ] Manual cart/custom item input
-- [ ] Checkout flow
-- [ ] Receipt preview
-- [ ] Kitchen/barista queue UI
-- [ ] Prep status API: new → preparing → ready → completed
+- [x] Product grid UI
+- [x] Cart management
+- [x] Manual cart/custom item input
+- [x] Checkout flow
+- [x] Receipt preview
+- [x] Kitchen/barista queue UI
+- [x] Prep status API: new → preparing → ready → completed
 - [ ] QR order link generator
 - [ ] Chat cart session model/API
 - [ ] Self-order via chat MVP flow

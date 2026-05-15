@@ -1,5 +1,26 @@
 # Coffeelot — Changelog
 
+## [Milestone 4 POS MVP] — 2026-05-15
+
+### Added
+
+- Added React POS screen with product grid, categories, cart management, manual item input, payment method selection, total, and checkout action.
+- Added kitchen/barista queue UI with status actions for `new`, `preparing`, `ready`, and `completed`.
+- Added Vite env typings and POS styling for responsive/tablet-friendly layout.
+
+### Updated
+
+- Marked core POS and kitchen queue tasks complete in `TODO.md` and `ROADMAP.md`.
+
+### Notes
+
+- Manual/custom item UI is present; checkout currently accepts catalog-backed items until backend custom-order support is expanded.
+- Self-order/chat cart and QR order link APIs remain next within Milestone 4.
+
+### Verification
+
+- `bun run typecheck` passes for shared, API, and web workspaces.
+
 ## [Milestone 3 Reports and Stock Closeout] — 2026-05-15
 
 ### Added

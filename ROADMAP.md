@@ -61,18 +61,18 @@ Setup API server dan core services.
 
 Build POS module sebagai data source dan workflow operasional kasir/barista.
 
-- [ ] Product grid UI
-- [ ] Cart management
-- [ ] Checkout flow
-- [ ] Order creation + stock deduction
-- [ ] Invoice generation
-- [ ] Receipt preview
-- [ ] Manual cart / custom item input untuk order cepat di kasir
-- [ ] Kitchen / Barista order queue
-- [ ] Order prep status: new → preparing → ready → completed
-- [ ] Barista click actions per order
-- [ ] Highlight waiting time / order age
-- [ ] Tablet-friendly kitchen display
+- [x] Product grid UI
+- [x] Cart management
+- [x] Checkout flow
+- [x] Order creation + stock deduction
+- [x] Invoice generation
+- [x] Receipt preview
+- [x] Manual cart / custom item input untuk order cepat di kasir
+- [x] Kitchen / Barista order queue
+- [x] Order prep status: new → preparing → ready → completed
+- [x] Barista click actions per order
+- [x] Highlight waiting time / order age
+- [x] Tablet-friendly kitchen display
 - [ ] Self-order via chat sebagai order channel MVP
 - [ ] QR order link generator untuk self-order
 - [ ] Customer cart flow via chat
