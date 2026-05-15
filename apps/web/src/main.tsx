@@ -481,9 +481,9 @@ function WebChatOrder() {
     setMessage("Order terkirim. Silakan lanjut pembayaran.");
   }
 
-  async function checkPaymentStatus() {
+  async function checkPaymentStatus({ silent = false } = {}) {
     if (!payment?.id) return;
-    setCheckingPayment(true);
+    if (!silent) setCheckingPayment(true);
     try {
       const reconcile = await api<{ payment?: { status?: string; paidAt?: string | null }; provider?: { status?: string } }>(`/payments/${payment.id}/reconcile`, { method: "POST" });
       const nextStatus = reconcile.payment?.status ?? reconcile.provider?.status ?? payment.status ?? "pending";
@@ -495,14 +495,23 @@ function WebChatOrder() {
           setOrderDetail(order);
           setSubmittedPrepStatus(order.prepStatus);
         }
-        setMessage("Pembayaran diterima. Pesanan sedang diproses.");
-      } else {
+        if (!silent) setMessage("Pembayaran diterima. Pesanan sedang diproses.");
+      } else if (!silent) {
         setMessage(`Status pembayaran: ${nextStatus}`);
       }
     } finally {
-      setCheckingPayment(false);
+      if (!silent) setCheckingPayment(false);
     }
   }
+
+
+  useEffect(() => {
+    if (!payment?.id || payment.status === "paid") return;
+    const timer = window.setInterval(() => {
+      checkPaymentStatus({ silent: true }).catch((error) => setMessage(error.message));
+    }, 5_000);
+    return () => window.clearInterval(timer);
+  }, [payment?.id, payment?.status, submittedOrderId]);
 
   useEffect(() => {
     if (!submittedOrderId || payment?.status !== "paid") return;
@@ -587,7 +596,7 @@ function WebChatOrder() {
               <span>Pembayaran: lunas</span>
               <span>Order: {orderDetail?.orderStatus ?? submittedOrderStatus ?? "diproses"}</span>
               <span>Dapur/barista: {orderDetail?.prepStatus ?? submittedPrepStatus ?? "new"}</span>
-              <small>Status otomatis diperbarui setiap 5 detik.</small>
+              <small>Status pembayaran dan pesanan otomatis diperbarui setiap 5 detik.</small>
             </div>
           ) : payment ? (
             <PaymentBox payment={payment} method={paymentMethod} onCheck={() => checkPaymentStatus().catch((error) => setMessage(error.message))} checking={checkingPayment} />

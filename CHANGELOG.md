@@ -1,5 +1,20 @@
 # Coffeelot — Changelog
 
+## [Chat Auto Payment Status Polling] — 2026-05-15
+
+### Fixed
+
+- `/chat` now auto-reconciles pending payment status every 5 seconds after checkout.
+- Once payment becomes `paid`, the customer order-status panel appears and continues polling order/kitchen status every 5 seconds.
+- The status text now clarifies that payment and order status both auto-update.
+
+### Verification
+
+- `bun run typecheck` passes.
+- `bun run build` passes.
+- `coffeelot-web` restarted successfully.
+- Public `/chat` bundle contains the new payment/order auto-update text.
+
 ## [Paid Order Stock Deduction] — 2026-05-15
 
 ### Added

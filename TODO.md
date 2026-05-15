@@ -67,6 +67,7 @@
 - [x] Disable `/chat` payment dropdown and ordering controls after checkout
 - [x] Show customer name in `/chat` order panel
 - [x] Poll `/chat` order status every 5 seconds after payment is paid
+- [x] Auto-reconcile `/chat` payment status every 5 seconds after checkout
 - [x] Auto-refresh POS kitchen queue/status every 5 seconds
 - [x] Make `/chat` Check Pembayaran trigger DOKU reconciliation, not just local status read
 - [x] Show VA Bank BCA payment instructions and manual status check button on POS root `/`
