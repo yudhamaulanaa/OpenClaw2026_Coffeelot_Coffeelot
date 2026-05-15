@@ -781,4 +781,7 @@
 ## 2026-05-15 — GitHub Hero Image
 
 - Added `docs/assets/coffeelot-github-hero.jpg` and embedded it near the top of the README for the GitHub project page.
+## 2026-05-15 — Uploaded Final PDF Report
+
+- Replaced the generated placeholder PDF with the user-provided final report PDF at `docs/reports/OpenClaw2026_Coffeelot_Coffeelot.pdf`.
 

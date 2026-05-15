@@ -216,4 +216,7 @@
 ## Completed — GitHub Hero Image
 
 - [x] Add user-provided hero image to the repository README.
+## Completed — Uploaded Final PDF Report
+
+- [x] Add the user-provided final PDF report to the repository using the required submission filename.
 

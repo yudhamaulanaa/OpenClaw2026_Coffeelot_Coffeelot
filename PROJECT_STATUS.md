@@ -119,4 +119,7 @@ The project now includes a Devpost-ready submission package: reproducible README
 ## Latest update — Main AI Stack Clarification
 
 Submission materials now explicitly identify OpenClaw as the main AI agent runtime/tool and GPT-5.5 as the main LLM model powering Coffeelot's Agent Workflow insights.
+## Latest update — Uploaded Final PDF Report
+
+The final user-provided PDF report has replaced the generated placeholder PDF at `docs/reports/OpenClaw2026_Coffeelot_Coffeelot.pdf` for submission.
 
