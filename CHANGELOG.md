@@ -1,5 +1,18 @@
 # Coffeelot — Changelog
 
+## [POS Payment Status UI] — 2026-05-15
+
+### Added
+
+- Added the same Bank BCA VA instructions and `Check Pembayaran` button to the main POS page payment box.
+- Cashier can now refresh payment status from `https://coffeelot.app/` after QRIS/VA BCA payment creation.
+
+### Verification
+
+- `bun run typecheck` passes.
+- `bun run build` passes.
+- `https://coffeelot.app/` serves the updated bundle containing `Check Pembayaran` and `Bank BCA`.
+
 ## [Webchat Payment Status UI] — 2026-05-15
 
 ### Added

@@ -84,6 +84,8 @@ function App() {
   const [manualPrice, setManualPrice] = useState(0);
   const [message, setMessage] = useState("Ready");
   const [lastPayment, setLastPayment] = useState<PaymentResult | null>(null);
+  const [lastPaymentMethod, setLastPaymentMethod] = useState<DokuPaymentMethod | undefined>();
+  const [checkingLastPayment, setCheckingLastPayment] = useState(false);
 
   const total = useMemo(() => cart.reduce((sum, item) => sum + item.qty * item.unitPrice, 0), [cart]);
   const categories = useMemo(() => [...new Set(products.map((product) => product.category))], [products]);
@@ -135,8 +137,10 @@ function App() {
         body: JSON.stringify({ order_id: result.order.id, payment_method: paymentMethod === "qris" ? "qris" : "va_bca" }),
       });
       setLastPayment(payment);
+      setLastPaymentMethod(paymentMethod === "qris" ? "qris" : "va_bca");
     } else {
       setLastPayment(null);
+      setLastPaymentMethod(undefined);
     }
     setCart([]);
     setMessage("Checkout complete. Order masuk kitchen queue.");
@@ -146,6 +150,18 @@ function App() {
   async function updatePrepStatus(orderId: string, prep_status: KitchenOrder["prepStatus"]) {
     await api(`/kitchen/orders/${orderId}/status`, { method: "PATCH", body: JSON.stringify({ prep_status }) });
     await load();
+  }
+
+  async function checkLastPaymentStatus() {
+    if (!lastPayment?.id) return;
+    setCheckingLastPayment(true);
+    try {
+      const status = await api<{ id: string; status: string; paid_at?: string | null }>(`/payments/${lastPayment.id}/status`);
+      setLastPayment((current) => current ? { ...current, status: status.status } : current);
+      setMessage(status.status === "paid" ? "Pembayaran sudah diterima." : `Status pembayaran: ${status.status}`);
+    } finally {
+      setCheckingLastPayment(false);
+    }
   }
 
   return (
@@ -199,7 +215,7 @@ function App() {
           </label>
           <div className="total">Total {money(total)}</div>
           <button className="checkout" disabled={cart.length === 0} onClick={checkout}>Checkout</button>
-          <PaymentBox payment={lastPayment} method={paymentMethod === "qris" ? "qris" : paymentMethod === "transfer" ? "va_bca" : undefined} />
+          <PaymentBox payment={lastPayment} method={lastPaymentMethod} onCheck={() => checkLastPaymentStatus().catch((error) => setMessage(error.message))} checking={checkingLastPayment} />
         </div>
       </section>
 
