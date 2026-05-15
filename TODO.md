@@ -3,8 +3,8 @@
 ## Current Focus: Milestone 2 — Database Foundation
 
 - [x] Create milestone branch: `feat/milestone-2-database-foundation`
-- [ ] Setup monorepo workspace config (Bun workspace)
-- [ ] Create `.env.example`
+- [x] Setup monorepo workspace config (Bun workspace)
+- [x] Create `.env.example`
 - [ ] Create Prisma schema (SQLite) — all tables from `docs/DATABASE-SCHEMA.md`
 - [ ] Run migration
 - [ ] Create seed data (tenant, outlet, user, products, inventory, recipes, sample orders)

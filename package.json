@@ -1,0 +1,32 @@
+{
+  "name": "coffeelot-ai",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Autonomous Coffee Shop / F&B Operator berbasis AI Agent.",
+  "type": "module",
+  "packageManager": "bun@1.1.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "bun run --filter '*' dev",
+    "build": "bun run --filter '*' build",
+    "typecheck": "bun run --filter '*' typecheck",
+    "lint": "bun run --filter '*' lint",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:seed": "bun run prisma/seed.ts"
+  },
+  "devDependencies": {
+    "@types/node": "latest",
+    "prisma": "latest",
+    "typescript": "latest"
+  },
+  "dependencies": {
+    "@prisma/client": "latest"
+  },
+  "prisma": {
+    "seed": "bun run prisma/seed.ts"
+  }
+}

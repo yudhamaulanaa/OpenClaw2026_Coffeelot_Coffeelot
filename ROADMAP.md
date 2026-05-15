@@ -30,8 +30,8 @@ Setup database schema (SQLite), migration, dan seed data.
 Status: **Started** — branch `feat/milestone-2-database-foundation` created; implementation will begin from workspace/env/Prisma foundation.
 
 - [x] Milestone branch created
-- [ ] Bun workspace config
-- [ ] `.env.example`
+- [x] Bun workspace config
+- [x] `.env.example`
 - [ ] Prisma schema (all tables: tenant, POS, agent, payment)
 - [ ] Migration (SQLite)
 - [ ] Seed: demo tenant, outlet, user
