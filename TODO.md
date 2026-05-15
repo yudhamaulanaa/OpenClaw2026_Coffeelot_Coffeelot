@@ -1,6 +1,6 @@
 # Coffeelot — Active Tasks
 
-## Current Focus: Milestone 2 — Database Foundation
+## Current Focus: Milestone 5 — DOKU Payment Hardening + Deployment
 
 - [x] Create milestone branch: `feat/milestone-2-database-foundation`
 - [x] Setup monorepo workspace config (Bun workspace)
@@ -39,13 +39,30 @@
 
 ## Milestone 5 — DOKU Payment Integration
 
-- [x] Setup DOKU MCP connection (sandbox)
-- [x] QRIS payment generation
-- [x] Virtual Account payment
-- [x] Payment status checking
-- [x] Payment webhook/callback handling
+### Foundation / Sandbox Placeholder
+
+- [x] Setup DOKU payment foundation placeholder (sandbox-compatible API contract)
+- [x] QRIS payment generation placeholder
+- [x] Virtual Account payment placeholder
+- [x] Payment status checking endpoint
+- [x] Payment webhook/callback endpoint
 - [x] Payment UI di POS checkout
-- [x] Payment confirmation → order paid + stock deduction
+
+### Deployment / Public Access
+
+- [x] Configure Nginx Proxy Manager for `coffeelot.app` web app
+- [x] Configure Nginx Proxy Manager for `api.coffeelot.app` API
+- [x] Issue and attach SSL certificates for root and API domains
+- [x] Fix frontend production API base URL to `https://api.coffeelot.app/api`
+- [x] Add API CORS support for `https://coffeelot.app`
+
+### Real DOKU Hardening
+
+- [ ] Collect DOKU sandbox credentials/config
+- [ ] Replace sandbox placeholder with real DOKU MCP/API calls
+- [ ] Add callback signature/security validation
+- [ ] Payment confirmation → order paid + stock deduction transaction
+- [ ] Verify sandbox end-to-end payment flow
 
 ## Later
 

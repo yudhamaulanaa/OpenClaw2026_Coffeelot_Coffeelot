@@ -88,13 +88,16 @@ Status: **Complete for MVP foundation** — cashier POS, cart, checkout, kitchen
 
 Integrate DOKU MCP Server untuk payment processing.
 
-- [x] Setup DOKU MCP connection (sandbox)
-- [x] QRIS payment generation
-- [x] Virtual Account payment
-- [x] Payment status checking
-- [x] Payment webhook/callback handling
+- [x] Setup DOKU payment foundation placeholder (sandbox-compatible API contract)
+- [x] QRIS payment generation placeholder
+- [x] Virtual Account payment placeholder
+- [x] Payment status checking endpoint
+- [x] Payment webhook/callback endpoint
 - [x] Payment UI di POS checkout
-- [x] Payment confirmation → trigger stock deduction
+- [x] Public HTTPS deployment for web/API payment callback URL
+- [ ] Real DOKU MCP/API integration using sandbox credentials
+- [ ] Callback signature/security validation
+- [ ] Payment confirmation → trigger stock deduction
 
 ---
 

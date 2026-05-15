@@ -1,5 +1,25 @@
 # Coffeelot — Changelog
 
+## [Deployment API URL and CORS Fix] — 2026-05-15
+
+### Fixed
+
+- Changed the production frontend API fallback from `http://127.0.0.1:3001/api` to `https://api.coffeelot.app/api` so browser users call the public backend instead of their own local machine.
+- Added API CORS headers and preflight handling for `https://coffeelot.app`, with local Vite dev origins still allowed.
+
+### Updated
+
+- Updated deployment/Milestone 5 living docs to distinguish completed sandbox foundation from pending real DOKU integration.
+
+### Verification
+
+- `bun run typecheck` passes.
+- `bun run build` passes.
+- `https://coffeelot.app` serves the fresh frontend asset.
+- Served frontend asset contains `https://api.coffeelot.app/api` and no `127.0.0.1:3001` API reference.
+- `OPTIONS https://api.coffeelot.app/api/kitchen/orders` from origin `https://coffeelot.app` returns `HTTP/2 204` with CORS headers.
+- `GET https://api.coffeelot.app/api/kitchen/orders` from origin `https://coffeelot.app` returns `HTTP/2 200`.
+
 ## [Deployment Proxy Setup] — 2026-05-15
 
 ### Added

@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import type { KitchenOrder, PaymentMethod, PosProduct } from "@coffeelot/shared";
 import "./style.css";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://127.0.0.1:3001/api";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "https://api.coffeelot.app/api";
 const TENANT_ID = import.meta.env.VITE_DEMO_TENANT_ID ?? "demo-tenant-kopi-jagoan";
 const OUTLET_ID = import.meta.env.VITE_DEMO_OUTLET_ID ?? "demo-outlet-booth-ciputat";
 
