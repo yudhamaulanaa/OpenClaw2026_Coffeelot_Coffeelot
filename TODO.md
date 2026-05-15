@@ -6,8 +6,8 @@
 - [x] Setup monorepo workspace config (Bun workspace)
 - [x] Create `.env.example`
 - [x] Create Prisma schema (SQLite) — all tables from `docs/DATABASE-SCHEMA.md`
-- [ ] Run migration
-- [ ] Create seed data (tenant, outlet, user, products, inventory, recipes, sample orders)
+- [x] Run migration
+- [x] Create seed data (tenant, outlet, user, products, inventory, recipes, sample orders)
 - [ ] Define shared types in `packages/shared`
 - [ ] Verify database setup with seed + basic Prisma query
 

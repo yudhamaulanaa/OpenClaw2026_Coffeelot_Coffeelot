@@ -8,7 +8,7 @@ Last updated: 2026-05-15
 
 Milestone 1 — Project Brain is complete.
 
-Milestone 2 — Database Foundation is in progress on branch `feat/milestone-2-database-foundation`. The monorepo foundation, `.env.example`, and validated Prisma SQLite schema are now created. Prisma packages are pinned to `^6.19.3` because Prisma 7 changes datasource configuration. Bun is not installed on the current host yet, so dependency installation, Prisma generate, migration, and Bun script verification are pending. Next implementation target: initial SQLite migration and demo seed data.
+Milestone 2 — Database Foundation is in progress on branch `feat/milestone-2-database-foundation`. The monorepo foundation, `.env.example`, validated Prisma SQLite schema, initial SQLite migration, and demo seed source are now created. Prisma packages are pinned to `^6.19.3` because Prisma 7 changes datasource configuration. Bun is not installed on the current host yet, so dependency installation, Prisma generate, runtime seed execution, and Bun script verification are pending. Next implementation target: shared enums/types and backend API foundation.
 
 Roadmap and docs are updated with the latest MVP direction:
 
@@ -33,11 +33,10 @@ Keep `.md` files updated as part of the work, not afterthoughts:
 
 Continue Milestone 2 in this order:
 
-1. Add initial migration for SQLite.
-2. Create seed data for demo tenant/outlet/user/products/inventory/recipes/sample orders.
-3. Expand shared enums/types in `packages/shared`.
-4. Install Bun/dependencies and run typecheck once host tooling is available.
-5. Update living docs and changelog after each completed phase.
+1. Expand shared enums/types in `packages/shared`.
+2. Install Bun/dependencies and run Prisma generate + seed execution once host tooling is available.
+3. Begin Milestone 3 backend API foundation after Milestone 2 closeout.
+4. Update living docs and changelog after each completed phase.
 
 ### Modules Created
 

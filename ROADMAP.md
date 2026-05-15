@@ -33,10 +33,10 @@ Status: **Started** — branch `feat/milestone-2-database-foundation` created; i
 - [x] Bun workspace config
 - [x] `.env.example`
 - [x] Prisma schema (all tables: tenant, POS, agent, payment)
-- [ ] Migration (SQLite)
-- [ ] Seed: demo tenant, outlet, user
+- [x] Migration (SQLite)
+- [x] Seed: demo tenant, outlet, user
 - [ ] Seed: sample products, inventory, recipes
-- [ ] Seed: sample orders (for agent to analyze)
+- [x] Seed: sample orders (for agent to analyze)
 - [ ] Shared types/enums in `packages/shared`
 - [ ] Seed/query verification
 

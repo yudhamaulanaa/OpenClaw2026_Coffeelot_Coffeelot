@@ -1,5 +1,24 @@
 # Coffeelot — Changelog
 
+## [Milestone 2 Migration and Seed] — 2026-05-15
+
+### Added
+
+- Added initial SQLite migration under `prisma/migrations`.
+- Added `prisma/seed.ts` with idempotent demo data for Kopi Jagoan / Booth Ciputat.
+- Seed source covers demo owner, tenant-user role, products, inventory, recipes, customer, and sample paid order.
+
+### Updated
+
+- Marked migration and seed tasks complete in `TODO.md` and `ROADMAP.md`.
+- Updated `PROJECT_STATUS.md` toward shared types and backend foundation.
+
+### Verification
+
+- Applied migration successfully with `DATABASE_URL=file:./dev.db npx --yes prisma@6.19.3 migrate reset --schema prisma/schema.prisma --force --skip-seed --skip-generate`.
+- Confirmed `prisma migrate status` reports the database schema is up to date.
+- Verified seed source markers for demo tenant, outlet, products, recipes, and sample order. Runtime seed execution is pending Bun/dependency installation.
+
 ## [Milestone 2 Prisma Schema] — 2026-05-15
 
 ### Added
