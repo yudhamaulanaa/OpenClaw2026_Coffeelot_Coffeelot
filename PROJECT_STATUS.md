@@ -116,4 +116,7 @@ A concise 5-slide pitch deck has been added at `docs/reports/COFFEELOT-PITCHDECK
 ## Latest update — Devpost Submission Package
 
 The project now includes a Devpost-ready submission package: reproducible README setup, submission draft, AI tools/models list, and a 5-slide PDF pitch deck named `OpenClaw2026_Coffeelot_Coffeelot.pdf`. Remaining manual steps are making/confirming the GitHub repo public, optionally renaming it to the required format, and uploading a public max-2-minute demo video.
+## Latest update — Main AI Stack Clarification
+
+Submission materials now explicitly identify OpenClaw as the main AI agent runtime/tool and GPT-5.5 as the main LLM model powering Coffeelot's Agent Workflow insights.
 

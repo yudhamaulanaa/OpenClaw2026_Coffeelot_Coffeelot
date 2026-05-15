@@ -769,4 +769,7 @@
 ## 2026-05-15 — Submission Repository Link
 
 - Updated README and Devpost submission draft to use the required GitHub repository URL: `https://github.com/yudhamaulanaa/OpenClaw2026_Coffeelot_Coffeelot`.
+## 2026-05-15 — Main AI Stack Clarification
+
+- Updated submission docs, README, report materials, and generated pitch deck PDF to explicitly list **OpenClaw** and **GPT-5.5** as the main AI stack/model.
 

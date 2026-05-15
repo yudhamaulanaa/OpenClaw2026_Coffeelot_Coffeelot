@@ -226,13 +226,14 @@ Trigger modes:
 
 ## Slide 11 — LLM Insight Engine
 
-Coffeelot uses an OpenAI-compatible LLM runtime.
+Coffeelot uses an OpenClaw + GPT-5.5 AI runtime.
 
 Runtime verified:
 
 - Base URL configured outside repo
 - API key stored only in runtime env
-- Model: `gpt-5.5`
+- Main model: `gpt-5.5`
+- Main AI tool/runtime: OpenClaw
 - Fallback: deterministic rule-based insight if LLM fails
 
 Structured AI insight fields:

@@ -1,19 +1,22 @@
 # AI Tools / Models Used
 
+## Main AI Stack
+
+Coffeelot's primary AI stack is:
+
+- **OpenClaw** — autonomous agent runtime/development environment used to build, iterate, verify, document, and coordinate the Coffeelot project.
+- **GPT-5.5** — the main LLM model used by Coffeelot Agent Workflows for business intelligence and operational insight generation.
+
 ## Runtime AI Model
 
-Coffeelot uses an OpenAI-compatible Chat Completions API for LLM-backed operational insight generation.
+Coffeelot uses **GPT-5.5** through an OpenAI-compatible Chat Completions API for LLM-backed operational insight generation.
 
 Runtime configuration keys:
 
 - `AI_BASE_URL`
 - `AI_API_KEY`
-- `AI_MODEL`
+- `AI_MODEL` — configured as `gpt-5.5` for the live MVP runtime.
 - `AI_TIMEOUT_MS`
-
-Verified runtime model during the MVP build:
-
-- `gpt-5.5` through an OpenAI-compatible provider endpoint.
 
 Secrets are runtime-only and are not committed to the repository.
 
@@ -81,7 +84,7 @@ Fallback logic uses operational snapshots including:
 
 ### OpenClaw
 
-OpenClaw was used as the autonomous AI development/runtime assistant for project implementation, documentation, deployment checks, and iterative build workflows.
+OpenClaw is listed as a primary AI tool for this project. It was used as the autonomous AI development/runtime assistant for project implementation, documentation, deployment checks, iterative build workflows, and agentic project orchestration.
 
 ### DOKU MCP Tools
 

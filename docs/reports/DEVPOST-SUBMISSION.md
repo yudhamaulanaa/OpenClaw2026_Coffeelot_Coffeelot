@@ -70,8 +70,9 @@ See [`AI-TOOLS-MODELS.md`](AI-TOOLS-MODELS.md).
 
 Summary:
 
-- OpenAI-compatible Chat Completions API.
-- Runtime model configured as `gpt-5.5` through a compatible provider.
+- OpenClaw autonomous agent runtime/development environment.
+- GPT-5.5 as the main LLM model for Agent Workflow insights.
+- OpenAI-compatible Chat Completions API integration.
 - Deterministic fallback insight engine for reproducibility when no provider key is configured.
 - Agent workflows use structured JSON output for dashboard rendering and comparison.
 - DOKU MCP tools support payment creation/status integration.

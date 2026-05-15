@@ -203,4 +203,9 @@
 ## Completed — Submission Repository Link
 
 - [x] Update submission docs to point to `OpenClaw2026_Coffeelot_Coffeelot`.
+## Completed — Main AI Stack Clarification
+
+- [x] Add OpenClaw as main AI tool/runtime in submission materials.
+- [x] Add GPT-5.5 as main LLM model in submission materials.
+- [x] Regenerate pitch deck PDF after AI stack update.
 

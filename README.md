@@ -67,7 +67,7 @@ The `/agent` dashboard shows workflow controls, agent timeline, structured LLM i
 - Frontend: React + Vite
 - Database: SQLite + Prisma ORM
 - Shared types: TypeScript workspace package
-- AI: OpenAI-compatible Chat Completions API
+- Main AI runtime: OpenClaw agent runtime + GPT-5.5 via OpenAI-compatible Chat Completions API
 - Payment: DOKU MCP sandbox integration
 - QR rendering: `qrcode.react`
 - Deployment: systemd services behind Nginx Proxy Manager

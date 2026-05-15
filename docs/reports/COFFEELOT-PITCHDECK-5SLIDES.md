@@ -118,9 +118,16 @@ Coffeelot is built as four connected layers:
 - Kitchen SLA
 - Payment Reconciliation Insight
 
+**AI + Tech Stack**
+
+- Main AI runtime/tool: OpenClaw
+- Main LLM model: GPT-5.5
+- Backend/frontend: Bun, TypeScript, Elysia, React/Vite, Prisma SQLite
+- Integrations: DOKU MCP sandbox, OpenAI-compatible Chat Completions API
+
 **Key proof**
 
-> Coffeelot already processes real operational signals: orders, payment, inventory, kitchen queue, booking windows, and LLM insight.
+> Coffeelot already processes real operational signals: orders, payment, inventory, kitchen queue, booking windows, and GPT-5.5-powered LLM insight.
 
 ---
 

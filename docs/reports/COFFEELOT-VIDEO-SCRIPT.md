@@ -217,7 +217,7 @@ Tone: confident, product-demo style, Indonesian narration.
 
 **Narration:**
 
-> Secara teknis, Coffeelot dibangun dengan Bun, TypeScript, Elysia API, React/Vite frontend, Prisma SQLite, DOKU MCP sandbox, dan OpenAI-compatible LLM provider.
+> Secara teknis, Coffeelot dibangun dengan Bun, TypeScript, Elysia API, React/Vite frontend, Prisma SQLite, DOKU MCP sandbox, dan OpenClaw + GPT-5.5 AI stack.
 > Secrets disimpan runtime-only. Workflow punya fallback rule-based jika LLM tidak tersedia.
 
 **On-screen text:**
@@ -227,7 +227,8 @@ Tone: confident, product-demo style, Indonesian narration.
 - React/Vite
 - Prisma SQLite
 - DOKU MCP
-- OpenAI-compatible LLM
+- OpenClaw agent runtime
+- GPT-5.5 main LLM model
 - Rule-based fallback
 
 ---

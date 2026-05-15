@@ -74,7 +74,7 @@ endobj
 << /Type /Page /Parent 2 0 R /MediaBox [0 0 842 595] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 9 0 R >>
 endobj
 11 0 obj
-<< /Length 931 >>
+<< /Length 930 >>
 stream
 0.98 0.95 0.89 rg 0 0 842 595 re f
 0.44 0.25 0.13 rg 0 545 842 50 re f
@@ -89,7 +89,7 @@ BT /F1 17 Tf 70 290 Td (? Run 11 workflows: daily report, booking seat, menu eng
 BT /F1 17 Tf 92 265 Td (kitchen SLA, and more.) Tj ET
 BT /F1 17 Tf 70 230 Td (? /agent shows structured insight cards and comparison table.) Tj ET
 0.93 0.85 0.75 rg 48 52 746 54 re f
-BT /F2 16 Tf 66 73 Td (Operational signals become LLM-powered business intelligence.) Tj ET
+BT /F2 16 Tf 66 73 Td (OpenClaw + GPT-5.5 turn operational signals into BI insight.) Tj ET
 endstream
 endobj
 12 0 obj
@@ -131,11 +131,11 @@ xref
 0000002196 00000 n 
 0000003118 00000 n 
 0000003255 00000 n 
-0000004237 00000 n 
-0000004375 00000 n 
-0000005356 00000 n 
+0000004236 00000 n 
+0000004374 00000 n 
+0000005355 00000 n 
 trailer
 << /Size 15 /Root 1 0 R >>
 startxref
-5494
+5493
 %%EOF

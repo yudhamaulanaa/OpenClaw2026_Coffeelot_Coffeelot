@@ -51,7 +51,7 @@ slides = [
             "Run 11 workflows: daily report, booking seat, menu engineering, demand forecast, kitchen SLA, and more.",
             "/agent shows structured insight cards and comparison table.",
         ],
-        "footer": "Operational signals become LLM-powered business intelligence.",
+        "footer": "OpenClaw + GPT-5.5 turn operational signals into BI insight.",
     },
     {
         "title": "Impact + Roadmap",
