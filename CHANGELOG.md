@@ -1,5 +1,22 @@
 # Coffeelot — Changelog
 
+## [Agent Output Approval Flow] — 2026-05-15
+
+### Added
+
+- Added `PATCH /api/agent/outputs/:id/approval` for approving or rejecting agent outputs that require review.
+- Agent dashboard now shows approval status badges for outputs requiring approval.
+- Agent dashboard now supports Approve/Reject actions for pending outputs.
+- Promo generation outputs can now be reviewed before any future publishing/action flow.
+
+### Verification
+
+- `bun run typecheck` passes.
+- `bun run build` passes.
+- `coffeelot-api` and `coffeelot-web` restarted successfully.
+- Generated a promo output requiring approval and approved it through the new API.
+- Public `/agent` bundle contains approval UI strings and endpoint reference.
+
 ## [Agent Workflow Pack] — 2026-05-15
 
 ### Added

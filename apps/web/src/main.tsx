@@ -89,6 +89,9 @@ type AgentOutput = {
   content: string;
   createdAt: string;
   metadata?: string | null;
+  requiresApproval?: boolean;
+  approved?: boolean | null;
+  approvedAt?: string | null;
 };
 
 type AgentRun = {
@@ -410,6 +413,12 @@ function AgentDashboard() {
     }
   }
 
+  async function approveOutput(outputId: string, action: "approve" | "reject") {
+    await api(`/agent/outputs/${outputId}/approval`, { method: "PATCH", body: JSON.stringify({ action }) });
+    await loadAgentData();
+    setMessage(action === "approve" ? "Agent output approved." : "Agent output rejected.");
+  }
+
   return (
     <main className="shell">
       <AppNavbar active="agent" />
@@ -445,8 +454,23 @@ function AgentDashboard() {
             {run.errorMessage ? <code>{run.errorMessage}</code> : null}
             {run.outputs.map((output) => (
               <div key={output.id} className="agent-output-card">
-                <strong>{output.title}</strong>
-                <em>{output.outputType}</em>
+                <div className="agent-output-head">
+                  <strong>{output.title}</strong>
+                  <em>{output.outputType}</em>
+                </div>
+                {output.requiresApproval ? (
+                  <div className="approval-row">
+                    <span className={output.approved === true ? "approval approved" : output.approved === false ? "approval rejected" : "approval pending"}>
+                      {output.approved === true ? "Approved" : output.approved === false ? "Rejected" : "Needs approval"}
+                    </span>
+                    {output.approved == null ? (
+                      <div>
+                        <button onClick={() => approveOutput(output.id, "approve").catch((error) => setMessage(error.message))}>Approve</button>
+                        <button className="secondary-button" onClick={() => approveOutput(output.id, "reject").catch((error) => setMessage(error.message))}>Reject</button>
+                      </div>
+                    ) : null}
+                  </div>
+                ) : null}
                 <pre>{output.content}</pre>
               </div>
             ))}

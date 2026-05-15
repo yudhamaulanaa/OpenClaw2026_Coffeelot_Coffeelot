@@ -722,6 +722,22 @@ export const app = new Elysia({ prefix: "/api" })
     const { tenantId } = resolveTenantContext(headers);
     return prisma.agentOutput.findMany({ where: { tenantId }, orderBy: { createdAt: "desc" }, take: 50 });
   })
+  .patch(
+    "/agent/outputs/:id/approval",
+    async ({ headers, params, body }) => {
+      const { tenantId } = resolveTenantContext(headers);
+      const approved = body.action === "approve";
+      if (!["approve", "reject"].includes(body.action)) throw new ApiError("INVALID_PAYLOAD", "Unknown approval action");
+      const output = await prisma.agentOutput.findFirst({ where: { id: params.id, tenantId } });
+      if (!output) throw new ApiError("NOT_FOUND", "Agent output not found", 404);
+      if (!output.requiresApproval) throw new ApiError("INVALID_PAYLOAD", "Agent output does not require approval", 400);
+      return prisma.agentOutput.update({
+        where: { id: output.id },
+        data: { approved, approvedAt: new Date() },
+      });
+    },
+    { body: t.Object({ action: t.String() }) },
+  )
   .get("/reports/critical-stock", async ({ headers }) => {
     const { tenantId, outletId } = resolveTenantContext(headers);
     const items = await prisma.inventoryItem.findMany({ where: { tenantId, outletId }, orderBy: { name: "asc" } });

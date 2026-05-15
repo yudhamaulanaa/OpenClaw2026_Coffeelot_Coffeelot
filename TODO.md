@@ -111,6 +111,7 @@
 - [x] Add promo generation workflow
 
 - [x] Add morning briefing workflow
+- [x] Add approval flow for agent outputs/actions
 
 ## Later
 

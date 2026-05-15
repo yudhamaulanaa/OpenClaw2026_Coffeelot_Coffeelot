@@ -117,6 +117,7 @@ Build agent orchestrator dan workflow engine.
 - [x] Event trigger system
 - [x] Agent output storage (agent_runs, agent_outputs tables)
 - [x] Agent dashboard page (activity timeline)
+- [x] Approval flow for agent outputs/actions
 
 ---
 
