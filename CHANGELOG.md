@@ -1,5 +1,26 @@
 # Coffeelot — Changelog
 
+## [Agent Event Triggers] — 2026-05-15
+
+### Added
+
+- Added event-triggered agent workflow runs after paid orders.
+- Paid order events trigger `daily_report` with `trigger_type=event`.
+- If inventory is low after a paid order/stock deduction, the event also triggers `restock_alert`.
+- Event triggers are controlled by runtime env flags.
+
+### Runtime Config
+
+- `AGENT_EVENT_TRIGGERS_ENABLED`
+- `AGENT_EVENT_PAID_ORDER_DAILY_REPORT_ENABLED`
+
+### Verification
+
+- `bun run typecheck` passes.
+- `bun run build` passes.
+- `coffeelot-api` restarted successfully.
+- Test paid cash order triggered event runs for `daily_report` and low-stock `restock_alert`, both completed.
+
 ## [Agent Workflow Scheduler] — 2026-05-15
 
 ### Added

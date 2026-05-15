@@ -40,6 +40,35 @@ function applyCors(origin: string | null, set: { headers?: Record<string, unknow
 
 type PaymentRecord = Awaited<ReturnType<typeof prisma.payment.findFirstOrThrow>>;
 
+function runAgentEventWorkflow(input: { tenantId: string; outletId: string; workflowId: AgentWorkflowId; eventName: string; orderId?: string }) {
+  const enabled = process.env.AGENT_EVENT_TRIGGERS_ENABLED !== "false";
+  if (!enabled) return;
+  setTimeout(async () => {
+    try {
+      const result = await runAgentWorkflow({ tenantId: input.tenantId, outletId: input.outletId, workflowId: input.workflowId, triggerType: "event" });
+      console.log(`Agent event ${input.eventName} ran ${input.workflowId}: ${result.run.status}`);
+    } catch (error) {
+      console.error(`Agent event ${input.eventName} failed ${input.workflowId}`, error instanceof Error ? error.message : error);
+    }
+  }, 0).unref();
+}
+
+async function triggerPaidOrderAgentEvents(orderId: string) {
+  const order = await prisma.order.findUnique({ where: { id: orderId }, select: { tenantId: true, outletId: true } });
+  if (!order) return;
+
+  if (process.env.AGENT_EVENT_PAID_ORDER_DAILY_REPORT_ENABLED !== "false") {
+    runAgentEventWorkflow({ tenantId: order.tenantId, outletId: order.outletId, workflowId: "daily_report", eventName: "paid_order", orderId });
+  }
+
+  const inventory = await prisma.inventoryItem.findMany({ where: { tenantId: order.tenantId, outletId: order.outletId } });
+  const hasLowStock = inventory.some((item) => Number(item.currentStock) <= Number(item.minimumStock));
+  if (hasLowStock) {
+    runAgentEventWorkflow({ tenantId: order.tenantId, outletId: order.outletId, workflowId: "restock_alert", eventName: "low_stock_after_paid_order", orderId });
+  }
+}
+
+
 async function getOrderStockRequirements(tx: Parameters<Parameters<typeof prisma.$transaction>[0]>[0], orderId: string) {
   const order = await tx.order.findUniqueOrThrow({ where: { id: orderId }, include: { items: true } });
   const productIds = [...new Set(order.items.map((item) => item.productId))];
@@ -110,8 +139,9 @@ async function deductStockForPaidOrder(tx: Parameters<Parameters<typeof prisma.$
 
 async function markPaymentFromProviderStatus(payment: PaymentRecord, status: string, rawResponse: unknown) {
   const paidAt = status === "paid" ? new Date() : payment.paidAt;
-  return prisma.$transaction(async (tx) => {
-    const updatedPayment = await tx.payment.update({
+  const wasAlreadyPaid = payment.status === "paid" && Boolean(payment.paidAt);
+  const updatedPayment = await prisma.$transaction(async (tx) => {
+    const savedPayment = await tx.payment.update({
       where: { id: payment.id },
       data: {
         status,
@@ -128,8 +158,14 @@ async function markPaymentFromProviderStatus(payment: PaymentRecord, status: str
       await deductStockForPaidOrder(tx, payment.orderId);
     }
 
-    return updatedPayment;
+    return savedPayment;
   });
+
+  if (status === "paid" && !wasAlreadyPaid) {
+    await triggerPaidOrderAgentEvents(payment.orderId);
+  }
+
+  return updatedPayment;
 }
 
 async function reconcilePayment(payment: PaymentRecord) {
@@ -303,7 +339,7 @@ export const app = new Elysia({ prefix: "/api" })
       if (!isPaymentMethod(body.payment_method)) throw new ApiError("INVALID_PAYLOAD", "Invalid payment_method");
       if (body.items.length === 0) throw new ApiError("INVALID_PAYLOAD", "At least one order item is required");
 
-      return prisma.$transaction(async (tx) => {
+      const result = await prisma.$transaction(async (tx) => {
         const productIds = body.items.map((item) => item.product_id);
         const products = await tx.product.findMany({ where: { tenantId, id: { in: productIds }, isActive: true } });
         if (products.length !== productIds.length) throw new ApiError("INACTIVE_PRODUCT", "One or more products are inactive or missing");
@@ -351,6 +387,8 @@ export const app = new Elysia({ prefix: "/api" })
         await deductStockForPaidOrder(tx, order.id);
         return { order, items: order.items };
       });
+      await triggerPaidOrderAgentEvents(result.order.id);
+      return result;
     },
     {
       body: t.Object({

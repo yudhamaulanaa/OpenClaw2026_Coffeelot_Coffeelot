@@ -37,7 +37,7 @@ Keep `.md` files updated as part of the work, not afterthoughts:
 
 ### What's Next
 
-Continue with Milestone 6/7 follow-ups. The internal workflow runner, agent dashboard, daily report/restock workflows, and configurable scheduler are now implemented. Next targets: event trigger system, richer workflow outputs, and approval states. DOKU callback security remains a tracked follow-up hardening task.
+Continue with Milestone 6/7 follow-ups. The internal workflow runner, agent dashboard, daily report/restock workflows, configurable scheduler, and event trigger system are now implemented. Next targets: richer workflow outputs, additional Milestone 7 workflows, and approval states. DOKU callback security remains a tracked follow-up hardening task.
 
 ### Modules Created
 

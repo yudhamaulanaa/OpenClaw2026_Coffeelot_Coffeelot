@@ -104,6 +104,7 @@
 - [x] Add restock alert workflow using inventory thresholds
 - [x] Add agent dashboard/activity timeline page
 - [x] Add configurable scheduler for daily_report and restock_alert workflows
+- [x] Add event triggers for paid orders and low-stock restock alerts
 
 ## Later
 
