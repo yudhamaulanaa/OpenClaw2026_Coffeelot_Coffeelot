@@ -213,3 +213,7 @@
 ## Completed — POS Cart Quantity Controls
 
 - [x] Add `-` and `+` buttons to main POS `/` cart rows.
+## Completed — GitHub Hero Image
+
+- [x] Add user-provided hero image to the repository README.
+

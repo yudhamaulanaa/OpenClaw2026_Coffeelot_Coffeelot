@@ -778,3 +778,7 @@
 
 - Added `-` and `+` quantity controls to the main POS `/` cart.
 - POS cart rows now show item name, unit price × quantity, subtotal, and quantity buttons matching the `/chat` cart behavior.
+## 2026-05-15 — GitHub Hero Image
+
+- Added `docs/assets/coffeelot-github-hero.jpg` and embedded it near the top of the README for the GitHub project page.
+

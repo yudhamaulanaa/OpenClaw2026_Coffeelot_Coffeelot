@@ -6,6 +6,8 @@ Coffeelot combines a built-in POS, customer self-order, DOKU payment integration
 
 > From daily transactions to autonomous operational intelligence.
 
+![Coffeelot GitHub hero](docs/assets/coffeelot-github-hero.jpg)
+
 ## Live Demo
 
 - POS: <https://coffeelot.app/>
