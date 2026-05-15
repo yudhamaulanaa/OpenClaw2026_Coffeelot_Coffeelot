@@ -1,5 +1,18 @@
 # Coffeelot — Changelog
 
+## [Milestone 3 and 4 Complete] — 2026-05-15
+
+### Updated
+
+- Marked Milestone 3 backend foundation complete in `ROADMAP.md`.
+- Marked Milestone 4 built-in POS/order channels MVP foundation complete in `ROADMAP.md`.
+- Updated `PROJECT_STATUS.md` to set Milestone 5 DOKU payment integration as the next target.
+
+### Verification
+
+- `bun run typecheck` passes for shared, API, and web workspaces.
+- `bun run build` passes for shared, API, and web workspaces; web production bundle generated successfully.
+
 ## [Milestone 4 Order Channels API] — 2026-05-15
 
 ### Added

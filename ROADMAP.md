@@ -42,9 +42,11 @@ Status: **Complete** — database schema, migration, seed data, Bun tooling, Pri
 
 ---
 
-## Milestone 3 — Backend Foundation
+## Milestone 3 — Backend Foundation ✅
 
 Setup API server dan core services.
+
+Status: **Complete** — API foundation, Prisma client, tenant context, products, inventory, orders, stock/invoice basics, and reports are implemented.
 
 - [x] Elysia.js server setup
 - [x] Database client (Prisma + SQLite)
@@ -57,9 +59,11 @@ Setup API server dan core services.
 
 ---
 
-## Milestone 4 — Built-in POS
+## Milestone 4 — Built-in POS ✅
 
 Build POS module sebagai data source dan workflow operasional kasir/barista.
+
+Status: **Complete for MVP foundation** — cashier POS, cart, checkout, kitchen queue, prep status API, QR order links, and chat cart order channel foundation are implemented.
 
 - [x] Product grid UI
 - [x] Cart management

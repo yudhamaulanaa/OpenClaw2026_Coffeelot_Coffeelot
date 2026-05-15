@@ -8,7 +8,11 @@ Last updated: 2026-05-15
 
 Milestone 1 — Project Brain is complete.
 
-Milestone 2 — Database Foundation is in progress on branch `feat/milestone-2-database-foundation`. The monorepo foundation, `.env.example`, validated Prisma SQLite schema, initial SQLite migration, and demo seed are now created and verified. Bun 1.3.14 is installed on the host, dependencies are installed, Prisma Client generation works, seed execution works, and workspace typecheck passes. Next implementation target: Milestone 5 DOKU payment integration after Milestone 4 closeout.
+Milestone 2 — Database Foundation is in progress on branch `feat/milestone-2-database-foundation`. The monorepo foundation, `.env.example`, validated Prisma SQLite schema, initial SQLite migration, and demo seed are now created and verified. Bun 1.3.14 is installed on the host, dependencies are installed, Prisma Client generation works, seed execution works, and workspace typecheck passes. Milestone 3 — Backend Foundation is complete.
+
+Milestone 4 — Built-in POS / Order Channels MVP foundation is complete.
+
+Next implementation target: Milestone 5 DOKU payment integration.
 
 Roadmap and docs are updated with the latest MVP direction:
 
