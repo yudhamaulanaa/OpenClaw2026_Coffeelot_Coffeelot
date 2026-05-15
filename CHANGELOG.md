@@ -1,5 +1,19 @@
 # Coffeelot — Changelog
 
+## [POS Payment Reconcile Button] — 2026-05-15
+
+### Fixed
+
+- POS root `Check Pembayaran` now calls `POST /api/payments/:id/reconcile` instead of only reading local payment status.
+- Successful POS payment checks refresh the kitchen/inventory view after reconciliation.
+
+### Verification
+
+- `bun run typecheck` passes.
+- `bun run build` passes.
+- `coffeelot-web` restarted successfully.
+- Public root bundle contains the reconcile call used by the POS payment check button.
+
 ## [Prevent Negative Stock] — 2026-05-15
 
 ### Fixed

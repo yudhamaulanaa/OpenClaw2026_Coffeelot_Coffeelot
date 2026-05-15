@@ -218,9 +218,11 @@ function App() {
     if (!lastPayment?.id) return;
     setCheckingLastPayment(true);
     try {
-      const status = await api<{ id: string; status: string; paid_at?: string | null }>(`/payments/${lastPayment.id}/status`);
-      setLastPayment((current) => current ? { ...current, status: status.status } : current);
-      setMessage(status.status === "paid" ? "Pembayaran sudah diterima." : `Status pembayaran: ${status.status}`);
+      const reconcile = await api<{ payment?: { status?: string; paidAt?: string | null }; provider?: { status?: string } }>(`/payments/${lastPayment.id}/reconcile`, { method: "POST" });
+      const nextStatus = reconcile.payment?.status ?? reconcile.provider?.status ?? lastPayment.status ?? "pending";
+      setLastPayment((current) => current ? { ...current, status: nextStatus } : current);
+      setMessage(nextStatus === "paid" ? "Pembayaran sudah diterima." : `Status pembayaran: ${nextStatus}`);
+      await load();
     } finally {
       setCheckingLastPayment(false);
     }
