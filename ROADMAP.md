@@ -73,10 +73,10 @@ Build POS module sebagai data source dan workflow operasional kasir/barista.
 - [x] Barista click actions per order
 - [x] Highlight waiting time / order age
 - [x] Tablet-friendly kitchen display
-- [ ] Self-order via chat sebagai order channel MVP
-- [ ] QR order link generator untuk self-order
-- [ ] Customer cart flow via chat
-- [ ] Chat order masuk ke POS + kitchen queue
+- [x] Self-order via chat sebagai order channel MVP
+- [x] QR order link generator untuk self-order
+- [x] Customer cart flow via chat
+- [x] Chat order masuk ke POS + kitchen queue
 
 ---
 

@@ -1,5 +1,23 @@
 # Coffeelot — Changelog
 
+## [Milestone 4 Order Channels API] — 2026-05-15
+
+### Added
+
+- Added kitchen queue API and preparation status update endpoint.
+- Added QR order link creation endpoint.
+- Added chat cart session, add item, remove item, and submit-to-order endpoints.
+- Chat cart submit now creates a `pending_payment` chat-channel order feeding the same order/items tables used by POS and kitchen flow.
+
+### Updated
+
+- Marked QR/self-order/chat cart routing tasks complete in `TODO.md` and `ROADMAP.md`.
+- Updated `PROJECT_STATUS.md` to point next work at Milestone 5 after Milestone 4 closeout.
+
+### Verification
+
+- `bun run typecheck` passes for shared, API, and web workspaces.
+
 ## [Milestone 4 POS MVP] — 2026-05-15
 
 ### Added

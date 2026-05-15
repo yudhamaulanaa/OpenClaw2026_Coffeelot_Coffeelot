@@ -195,6 +195,128 @@ export const app = new Elysia({ prefix: "/api" })
     return prisma.order.findMany({ where: { tenantId, outletId }, include: { items: true }, orderBy: { createdAt: "desc" } });
   })
 
+
+  .get("/kitchen/orders", async ({ headers, query }) => {
+    const { tenantId, outletId } = resolveTenantContext(headers);
+    const status = query.status as string | undefined;
+    return prisma.order.findMany({
+      where: {
+        tenantId,
+        outletId,
+        orderStatus: "paid",
+        prepStatus: status ?? { not: "completed" },
+      },
+      include: { items: true },
+      orderBy: { createdAt: "asc" },
+    });
+  })
+  .patch(
+    "/kitchen/orders/:id/status",
+    async ({ headers, params, body }) => {
+      const { tenantId, outletId } = resolveTenantContext(headers);
+      const allowed = ["new", "preparing", "ready", "completed"];
+      if (!allowed.includes(body.prep_status)) throw new ApiError("INVALID_PAYLOAD", "Invalid prep_status");
+      await prisma.order.findFirstOrThrow({ where: { id: params.id, tenantId, outletId } });
+      return prisma.order.update({
+        where: { id: params.id },
+        data: { prepStatus: body.prep_status },
+        select: { id: true, prepStatus: true, updatedAt: true },
+      });
+    },
+    { body: t.Object({ prep_status: t.String() }) },
+  )
+  .post(
+    "/order-links",
+    async ({ headers, body }) => {
+      const { tenantId, outletId } = resolveTenantContext(headers);
+      const token = `qr-${outletId}-${body.table_label ?? "general"}-${Date.now()}`.toLowerCase().replace(/[^a-z0-9-]/g, "-");
+      return prisma.qrOrderLink.create({
+        data: { tenantId, outletId: body.outlet_id ?? outletId, tableLabel: body.table_label, token, isActive: true },
+      });
+    },
+    { body: t.Object({ outlet_id: t.Optional(t.String()), table_label: t.Optional(t.String()) }) },
+  )
+  .post(
+    "/chat-carts",
+    async ({ headers, body }) => {
+      const { tenantId, outletId } = resolveTenantContext(headers);
+      return prisma.chatCartSession.create({
+        data: {
+          tenantId,
+          outletId,
+          tableLabel: body.table_label,
+          customerName: body.customer_name,
+          customerContact: body.customer_contact,
+          sourceChannel: body.source_channel ?? "chat",
+          status: "active",
+        },
+        include: { items: true },
+      });
+    },
+    {
+      body: t.Object({
+        table_label: t.Optional(t.String()),
+        customer_name: t.Optional(t.String()),
+        customer_contact: t.Optional(t.String()),
+        source_channel: t.Optional(t.String()),
+      }),
+    },
+  )
+  .post(
+    "/chat-carts/:id/items",
+    async ({ params, body }) => {
+      const product = body.product_id ? await prisma.product.findUnique({ where: { id: body.product_id } }) : null;
+      return prisma.chatCartItem.create({
+        data: {
+          sessionId: params.id,
+          productId: body.product_id,
+          itemName: product?.name ?? body.item_name,
+          qty: body.qty,
+          unitPrice: product ? Number(product.price) : body.unit_price,
+          notes: body.notes,
+        },
+      });
+    },
+    { body: t.Object({ product_id: t.Optional(t.String()), item_name: t.String(), qty: t.Integer({ minimum: 1 }), unit_price: t.Number({ minimum: 0 }), notes: t.Optional(t.String()) }) },
+  )
+  .delete("/chat-carts/:id/items/:itemId", async ({ params }) => {
+    return prisma.chatCartItem.delete({ where: { id: params.itemId } });
+  })
+  .post("/chat-carts/:id/submit", async ({ headers, params }) => {
+    const { tenantId, outletId } = resolveTenantContext(headers);
+    const session = await prisma.chatCartSession.findFirstOrThrow({ where: { id: params.id, tenantId, outletId }, include: { items: true } });
+    const subtotal = session.items.reduce((sum, item) => sum + Number(item.unitPrice) * item.qty, 0);
+    const order = await prisma.order.create({
+      data: {
+        tenantId,
+        outletId,
+        invoiceNumber: null,
+        orderStatus: "pending_payment",
+        prepStatus: "new",
+        orderChannel: "chat",
+        tableLabel: session.tableLabel,
+        paymentMethod: "qris",
+        subtotal,
+        discount: 0,
+        total: subtotal,
+        notes: `Chat cart ${session.id}`,
+        items: {
+          create: session.items.map((item) => ({
+            tenantId,
+            productId: item.productId ?? "demo-product-es-kopi-susu",
+            productName: item.itemName,
+            qty: item.qty,
+            unitPrice: Number(item.unitPrice),
+            totalPrice: Number(item.unitPrice) * item.qty,
+            notes: item.notes,
+          })),
+        },
+      },
+      include: { items: true },
+    });
+    await prisma.chatCartSession.update({ where: { id: session.id }, data: { status: "submitted" } });
+    return { order, items: order.items };
+  })
   .get("/reports/recent-orders", async ({ headers, query }) => {
     const { tenantId, outletId } = resolveTenantContext(headers);
     const limit = Math.min(Number(query.limit ?? 10), 50);

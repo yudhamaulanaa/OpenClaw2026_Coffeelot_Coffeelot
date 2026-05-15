@@ -32,10 +32,10 @@
 - [x] Receipt preview
 - [x] Kitchen/barista queue UI
 - [x] Prep status API: new → preparing → ready → completed
-- [ ] QR order link generator
-- [ ] Chat cart session model/API
-- [ ] Self-order via chat MVP flow
-- [ ] Route chat orders into POS + kitchen queue
+- [x] QR order link generator
+- [x] Chat cart session model/API
+- [x] Self-order via chat MVP flow
+- [x] Route chat orders into POS + kitchen queue
 
 ## Milestone 5 — DOKU Payment Integration
 
