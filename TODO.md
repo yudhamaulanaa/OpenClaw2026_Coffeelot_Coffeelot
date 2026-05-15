@@ -72,4 +72,5 @@
 
 ## Blocked
 
-None.
+- Real DOKU integration is blocked until sandbox credentials/config and callback signing details are available.
+- `www.coffeelot.app` SSL/proxy setup is blocked until DNS resolves publicly.
