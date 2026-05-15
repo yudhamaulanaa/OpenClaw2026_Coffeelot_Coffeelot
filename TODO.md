@@ -88,10 +88,10 @@
 
 ## Next — Milestone 6 AI Agent Core
 
-- [ ] Implement internal agent workflow runner service
-- [ ] Add agent run creation/status/output API endpoints
-- [ ] Add daily report workflow using existing sales/report data
-- [ ] Add restock alert workflow using inventory thresholds
+- [x] Implement internal agent workflow runner service
+- [x] Add agent run creation/status/output API endpoints
+- [x] Add daily report workflow using existing sales/report data
+- [x] Add restock alert workflow using inventory thresholds
 - [ ] Add agent dashboard/activity timeline page
 
 ## Later

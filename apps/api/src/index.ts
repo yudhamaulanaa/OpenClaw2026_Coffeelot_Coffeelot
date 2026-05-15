@@ -6,6 +6,7 @@ import { ApiError, statusFromError, toErrorEnvelope } from "./errors";
 import { createDokuMcpPayment, listDokuMcpTools } from "./doku-mcp";
 import { getDokuTransactionStatus } from "./payment-reconciliation";
 import { createSandboxPayment, normalizePaymentStatus } from "./payments";
+import { AGENT_WORKFLOWS, runAgentWorkflow, type AgentTriggerType, type AgentWorkflowId } from "./agent-workflows";
 
 const port = Number(process.env.API_PORT ?? 3001);
 const host = process.env.API_HOST ?? "127.0.0.1";
@@ -581,6 +582,26 @@ export const app = new Elysia({ prefix: "/api" })
         .filter((item) => Number(item.currentStock) <= Number(item.minimumStock))
         .map((item) => ({ name: item.name, current_stock: Number(item.currentStock), minimum_stock: Number(item.minimumStock), unit: item.unit })),
     };
+  })
+  .get("/agent/workflows", () => ({ workflows: AGENT_WORKFLOWS }))
+  .post(
+    "/agent/runs",
+    async ({ headers, body }) => {
+      const { tenantId, outletId } = resolveTenantContext(headers);
+      if (!AGENT_WORKFLOWS.includes(body.workflow_id as AgentWorkflowId)) throw new ApiError("INVALID_PAYLOAD", "Unknown agent workflow");
+      const triggerType = (body.trigger_type ?? "on_demand") as AgentTriggerType;
+      if (!["scheduled", "event", "on_demand"].includes(triggerType)) throw new ApiError("INVALID_PAYLOAD", "Unknown agent trigger_type");
+      return runAgentWorkflow({ tenantId, outletId, workflowId: body.workflow_id as AgentWorkflowId, triggerType });
+    },
+    { body: t.Object({ workflow_id: t.String(), trigger_type: t.Optional(t.String()) }) },
+  )
+  .get("/agent/runs", async ({ headers }) => {
+    const { tenantId, outletId } = resolveTenantContext(headers);
+    return prisma.agentRun.findMany({ where: { tenantId, outletId }, include: { outputs: true }, orderBy: { createdAt: "desc" }, take: 50 });
+  })
+  .get("/agent/outputs", async ({ headers }) => {
+    const { tenantId } = resolveTenantContext(headers);
+    return prisma.agentOutput.findMany({ where: { tenantId }, orderBy: { createdAt: "desc" }, take: 50 });
   })
   .get("/reports/critical-stock", async ({ headers }) => {
     const { tenantId, outletId } = resolveTenantContext(headers);

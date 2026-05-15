@@ -499,3 +499,44 @@ Inspect available DOKU MCP tools for the configured runtime credentials. Intende
 ### GET /api/payments?order_id=uuid
 
 Get payment(s) for an order.
+
+---
+
+## Agent Core
+
+### GET /api/agent/workflows
+
+List available internal workflows.
+
+**Response 200:**
+```json
+{ "workflows": ["daily_report", "restock_alert"] }
+```
+
+### POST /api/agent/runs
+
+Run an agent workflow and persist the run/output records.
+
+**Body:**
+```json
+{
+  "workflow_id": "daily_report | restock_alert",
+  "trigger_type": "on_demand | scheduled | event"
+}
+```
+
+**Response 200:**
+```json
+{
+  "run": { "id": "uuid", "workflowId": "restock_alert", "status": "completed" },
+  "outputs": [{ "title": "Restock alert — all clear", "outputType": "alert", "content": "..." }]
+}
+```
+
+### GET /api/agent/runs
+
+Return recent agent runs with outputs for the current tenant/outlet.
+
+### GET /api/agent/outputs
+
+Return recent agent outputs for the current tenant.

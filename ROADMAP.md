@@ -111,11 +111,11 @@ Integrate DOKU MCP Server untuk payment processing.
 
 Build agent orchestrator dan workflow engine.
 
-- [ ] Agent core (execution loop) — starting next
-- [ ] Workflow registry
+- [x] Agent core (execution loop)
+- [x] Workflow registry
 - [ ] Scheduler (cron-based)
 - [ ] Event trigger system
-- [ ] Agent output storage (agent_runs, agent_outputs tables)
+- [x] Agent output storage (agent_runs, agent_outputs tables)
 - [ ] Agent dashboard page (activity timeline)
 
 ---
@@ -124,8 +124,8 @@ Build agent orchestrator dan workflow engine.
 
 Implement individual agent workflows.
 
-- [ ] Daily Report workflow
-- [ ] Restock Alert workflow
+- [x] Daily Report workflow — first API-backed version
+- [x] Restock Alert workflow — first API-backed version
 - [ ] Risk Detection workflow
 - [ ] Promo Generation workflow
 - [ ] Morning Briefing workflow

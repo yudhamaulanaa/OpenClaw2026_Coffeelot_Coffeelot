@@ -1,5 +1,25 @@
 # Coffeelot — Changelog
 
+## [Milestone 6 Agent Core Runner] — 2026-05-15
+
+### Added
+
+- Added internal agent workflow runner service with run/output persistence through existing `agent_runs` and `agent_outputs` tables.
+- Added initial workflows: `daily_report` and `restock_alert`.
+- Added API endpoints:
+  - `GET /api/agent/workflows`
+  - `POST /api/agent/runs`
+  - `GET /api/agent/runs`
+  - `GET /api/agent/outputs`
+
+### Verification
+
+- `bun run typecheck` passes.
+- `bun run build` passes.
+- `coffeelot-api` restarted successfully.
+- `GET /api/agent/workflows` returns `daily_report` and `restock_alert`.
+- `POST /api/agent/runs` with `restock_alert` completed and created an alert output.
+
 ## [Milestone 5 MVP Wrap-up] — 2026-05-15
 
 ### Updated
